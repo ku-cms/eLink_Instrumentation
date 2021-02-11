@@ -15,14 +15,10 @@ options = [
     
 	   ]
 
-
 command = 'python python/readVNADataSKRF.py --basename={0:s}/{1:s}'
-for opt in options:
-    s = command.format(
-      	opt[0], opt[1]
-	)
-    
-    print(s)
 
+for opt in options:
+    s = command.format(opt[0], opt[1])
+    print(s)
     subprocess.call( [s, ""], shell=True )	
 
