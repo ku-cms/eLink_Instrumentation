@@ -32,29 +32,31 @@ def name(input):
 parser = OptionParser()
 
 parser.add_option('--basename', metavar='T', type='string', action='store',
-                  default='Redo_VNA/straight_SMA.vna', #31, 15, 33 #calibration_test.vna 
+                  default='straight_SMA.vna',
                   dest='basename',
                   help='input text file')
 
-parser.add_option('--directory', metavar='T', type='string', action='store',
-                  default='Plots',
-                  dest='directory',
+parser.add_option('--data_directory', metavar='T', type='string', action='store',
+                  default='data',
+                  dest='data_directory',
+                  help='directory to store data')
+
+parser.add_option('--plot_directory', metavar='T', type='string', action='store',
+                  default='plots',
+                  dest='plot_directory',
                   help='directory to store plots')
 
 (options,args) = parser.parse_args()
-# ==========end: options =============
-basename = options.basename
-dir_in = "data"
-dir_out = options.directory
+basename       = options.basename
+data_directory = options.data_directory
+plot_directory = options.plot_directory
+
 if '_\d+' in basename:
     cable = name(basename)
-else: cable = basename    
-#date  = ''
+else:
+    cable = basename    
 
-#basename = 'TP_1m_23_ChD1.vna' #TP_1m_33_ChD1.vna calibration_test
-#cable = name(basename)
-
-infile = pd.read_csv(basename+'.txt', names=['pt','f','s11R','s11I','s12R','s12I','s13R','s13I','s14R','s14I'], delim_whitespace=True, skiprows=1)
+infile = pd.read_csv(data_directory+'/'+basename+'.txt', names=['pt','f','s11R','s11I','s12R','s12I','s13R','s13I','s14R','s14I'], delim_whitespace=True, skiprows=1)
 infile.dropna(how='all')
 
 pd.set_option("display.max_rows", 5)
@@ -69,8 +71,7 @@ for i, row in infile.iterrows():
                 f.close()
         except:
             pass
-        #filename = dir_in+'/'+basename+ '_' + str(fileindex)+'.s2p'
-        filename = basename+ '_' + str(fileindex)+'.s2p'
+        filename = data_directory+'/'+basename+'_' +str(fileindex)+'.s2p'
         fileindex += 1
         f = open(filename,'w')
         f.write('# GHZ	S	RI	R	50.0\n')
@@ -89,8 +90,7 @@ for i, row in infile.iterrows():
     except:
         pass
     
-#example = rf.Network(dir_in+'/'+basename+'_0.s2p', f_unit='ghz')
-example = rf.Network(basename+'_0.s2p', f_unit='ghz')
+example = rf.Network(data_directory+'/'+basename+'_0.s2p', f_unit='ghz')
 
 # .s2p format consist of following columns
 # Stim  Real (S11)  Imag(S11)  Real(S21)  Imag(S21)  Real(S12)  Imag(S12)  Real(S22)  Imag(S22)
@@ -138,7 +138,7 @@ with style.context('seaborn-ticks'):
     plt.ylim((0.0, 200.0))
     plt.xlim((0, 35))
     plt.tight_layout()
-    fig0.savefig(dir_out+'/'+cable+'_freq_time_Z_rf.png')
+    fig0.savefig(plot_directory+'/'+cable+'_freq_time_Z_rf.png')
     
     # Gating the Reflection of Interest
     s11_gated = example.s11.time_gate()#(center=0, span=.2)#autogate on the fly
@@ -156,7 +156,7 @@ with style.context('seaborn-ticks'):
     
     plt.tight_layout()
     #plt.show()
-    fig1.savefig(dir_out+'/'+cable+'_fref_time_rf.png')
+    fig1.savefig(plot_directory+'/'+cable+'_fref_time_rf.png')
     
     fig = plt.figure(figsize=(14,6))
     #ax0 = fig.add_subplot(1, 2, 2)
@@ -189,7 +189,7 @@ with style.context('seaborn-ticks'):
            example.plot_z_time_db(m=0, n=0, label='Z11')    #plot_z_re_time
            example.plot_z_time_db(m=1, n=0, label='Z12')
     
-    fig.savefig(dir_out+'/'+cable+'_rf.png')
+    fig.savefig(plot_directory+'/'+cable+'_rf.png')
 
 
 #plt.figure(1)
@@ -197,7 +197,7 @@ with style.context('seaborn-ticks'):
 #    example.plot_s_db(m=1, n=0)
 #    pylab.show()
 #    tight_layout()
-#    pl.dump(fig, open(dir_out+'/'+cable+'.pickle', 'wb'))
+#    pl.dump(fig, open(plot_directory+'/'+cable+'.pickle', 'wb'))
 #
 #plt.draw()
 #print ('ch impedance:', example.z0)

@@ -13,9 +13,9 @@ options = [
             
             ['data', '9_feb_2021_test1_5.vna'],
     
-	   ]
+	  ]
 
-command = 'python python/readVNADataSKRF.py --basename={0:s}/{1:s}'
+command = 'python python/readVNADataSKRF.py --data_directory={0:s} --basename={1:s}'
 
 for opt in options:
     s = command.format(opt[0], opt[1])
