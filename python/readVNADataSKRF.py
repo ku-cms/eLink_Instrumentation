@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 from itertools import islice
-import sys, re
+import sys
+import re
+import pylab
 import numpy as np
 import skrf as rf
-#rf.stylely()
-
-import pylab
 import pandas as pd
-
-from matplotlib import pyplot as plt
-from matplotlib.ticker import AutoMinorLocator
-from matplotlib import style
 import pickle as pl
+from optparse import OptionParser
+from matplotlib import pyplot as plt
+from matplotlib import style
+from matplotlib.ticker import AutoMinorLocator
+
+#rf.stylely()
 
 def name(input):
     match = re.match(r'TP_\w+_\d+', input)
     name = match.group()
     if '1p4' in name: name = name.replace('1p4', '1.4')
     return name
-
-from optparse import OptionParser
-parser = OptionParser()
 
 # (35: 17, 18, 19, 26, 27, 28, 29, 56, 57, 58) 'TP_35cm_XX_ChD1.vna
 # (35 redo: 56, 60) 
@@ -31,8 +29,7 @@ parser = OptionParser()
 # (2 : 46, 47) TP_2m_47_ChD1
 # (2: 46)
 
-
-
+parser = OptionParser()
 
 parser.add_option('--basename', metavar='T', type='string', action='store',
                   default='Redo_VNA/straight_SMA.vna', #31, 15, 33 #calibration_test.vna 
@@ -191,19 +188,19 @@ with style.context('seaborn-ticks'):
        elif i==5:
            example.plot_z_time_db(m=0, n=0, label='Z11')    #plot_z_re_time
            example.plot_z_time_db(m=1, n=0, label='Z12')
+    
+    fig.savefig(dir_out+'/'+cable+'_rf.png')
+
+
 #plt.figure(1)
 #pylab.title('S_{12}')
 #    example.plot_s_db(m=1, n=0)
-    #pylab.show()
-    #tight_layout()
-    
-    fig.savefig(dir_out+'/'+cable+'_rf.png')
-    
-    #pl.dump(fig, open(dir_out+'/'+cable+'.pickle', 'wb'))
-
+#    pylab.show()
+#    tight_layout()
+#    pl.dump(fig, open(dir_out+'/'+cable+'.pickle', 'wb'))
+#
 #plt.draw()
-
 #print ('ch impedance:', example.z0)
-
-
 #input("hold")    
+
+

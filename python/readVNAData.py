@@ -49,10 +49,10 @@ with open(input) as f:
         if z:
             date = z.group().split()[2] 
             data_groups.append(i)            
-    print ('line boundaries for data group: ', data_groups)   
+    print('line boundaries for data group: ', data_groups)   
 f.close()
 
-print ('Data was taken on: ', date)
+print('Data was taken on: ', date)
 
 # reopen the text file, and jump to lines of interests correponding to different data groups.
 # ------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ with open(input) as f:
             if len(check)!= 0:
                 if 'S11' in check[0][0]: found_S11=True
                 else:
-                    print ('1st parameter: ',check[0][0], 'better adapt the script to read S11')
+                    print('1st parameter: ',check[0][0], 'better adapt the script to read S11')
                     break
             # find a starting line to read the tables
             start = re.match(r'FREQUENCY\s+POINTS:\s+',l)            
@@ -97,9 +97,9 @@ for i, c in enumerate(group_1):
     z_in_img.append(Z_in_img)
 
 
-#print ('freq: ', freq)
-#print ('Z_real: ', z_in_real)
-#print ('time: ', time)
+#print('freq: ', freq)
+#print('Z_real: ', z_in_real)
+#print('time: ', time)
 
 fig = plt.figure(figsize=(8,5))
 ax0 = fig.add_subplot(1,2,1)
