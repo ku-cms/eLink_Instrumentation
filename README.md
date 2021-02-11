@@ -1,17 +1,6 @@
 # eLink_Instrumentation
-Scripts to read data from VNA and oscilloscope to study impedance and eye diagrams
 
-## VNA Data (input: touchstone or .txt files)
-
-### VNADataInspection.py
-Scripts to read a .s4p file
-
-### readVNAData.py
-Script to extract Z-impedance parameters from self defined function with input as text files
-
-### readVNADataSKRF.py
-Script to convert .txt files into .s2p files, and analyze S-parameter proeprties using skrf library
-
-### plotImpedance.py
-Standalone script to plot S11 and TD11 using .s2p input files
+- VNA data processing scripts to study e-link impedance
+- Oscilloscope data processing scripts to study e-link eye diagrams
+- Aurora bitstream used to emulate RD53A bitstream in order to test the Ernie board 
 
