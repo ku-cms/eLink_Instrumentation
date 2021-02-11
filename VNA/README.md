@@ -2,13 +2,20 @@
 
 Input files: touchstone or .txt
 
-- VNADataInspection.py: reads .s4p file
+## Scripts
 
-- readVNAData.py: extracts Z-impedance parameters from input text files using self defined function
+### VNADataInspection.py
+Reads .s4p file
 
-- readVNADataSKRF.py: converts .txt files to .s2p files and analyzes S-parameter properties using skrf library
+### readVNAData.py
+Extracts Z-impedance parameters from input text files using self defined function
 
-- create_all_s2p.py: calls readVNADataSKRF.py on a list of files
+### readVNADataSKRF.py
+Converts .txt files to .s2p files and analyzes S-parameter properties using skrf library
 
-- plotImpedance.py: plots S11 and TD11 using .s2p input files
+### create_all_s2p.py
+Calls readVNADataSKRF.py on a list of files
+
+### plotImpedance.py
+Plots S11 and TD11 using .s2p input files
 
