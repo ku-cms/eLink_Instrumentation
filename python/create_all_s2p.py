@@ -55,11 +55,13 @@ options = [
             #['Redo_VNA', 'TP_35cm_63_ChD0_redo.vna'],
             #['Redo_VNA', '082820_TP_63_35cm_ChD1_KA.vna'],
             #['Redo_VNA', 'TP_35cm_63_ChCMD_redo.vna'],
+            
+            ['data', '9_feb_2021_test1_5.vna'],
     
 	   ]
 
 
-command = 'python readVNADataSKRF.py --basename={0:s}/{1:s}'
+command = 'python python/readVNADataSKRF.py --basename={0:s}/{1:s}'
 
 for opt in options:
     s = command.format(

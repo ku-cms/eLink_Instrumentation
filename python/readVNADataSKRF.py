@@ -47,7 +47,8 @@ parser.add_option('--directory', metavar='T', type='string', action='store',
 (options,args) = parser.parse_args()
 # ==========end: options =============
 basename = options.basename
-dir_in= options.directory
+dir_in = "data"
+dir_out = options.directory
 if '_\d+' in basename:
     cable = name(basename)
 else: cable = basename    
@@ -71,7 +72,8 @@ for i, row in infile.iterrows():
                 f.close()
         except:
             pass
-        filename = dir_in+'/'+basename+ '_' + str(fileindex)+'.s2p'
+        #filename = dir_in+'/'+basename+ '_' + str(fileindex)+'.s2p'
+        filename = basename+ '_' + str(fileindex)+'.s2p'
         fileindex += 1
         f = open(filename,'w')
         f.write('# GHZ	S	RI	R	50.0\n')
@@ -90,7 +92,8 @@ for i, row in infile.iterrows():
     except:
         pass
     
-example = rf.Network(dir_in+'/'+basename+'_0.s2p', f_unit='ghz')
+#example = rf.Network(dir_in+'/'+basename+'_0.s2p', f_unit='ghz')
+example = rf.Network(basename+'_0.s2p', f_unit='ghz')
 
 # .s2p format consist of following columns
 # Stim  Real (S11)  Imag(S11)  Real(S21)  Imag(S21)  Real(S12)  Imag(S12)  Real(S22)  Imag(S22)
@@ -138,7 +141,7 @@ with style.context('seaborn-ticks'):
     plt.ylim((0.0, 200.0))
     plt.xlim((0, 35))
     plt.tight_layout()
-    fig0.savefig(dir_in+'/'+cable+'_freq_time_Z_rf.png')
+    fig0.savefig(dir_out+'/'+cable+'_freq_time_Z_rf.png')
     
     # Gating the Reflection of Interest
     s11_gated = example.s11.time_gate()#(center=0, span=.2)#autogate on the fly
@@ -156,7 +159,7 @@ with style.context('seaborn-ticks'):
     
     plt.tight_layout()
     #plt.show()
-    fig1.savefig(dir_in+'/'+cable+'_fref_time_rf.png')
+    fig1.savefig(dir_out+'/'+cable+'_fref_time_rf.png')
     
     fig = plt.figure(figsize=(14,6))
     #ax0 = fig.add_subplot(1, 2, 2)
@@ -193,8 +196,11 @@ with style.context('seaborn-ticks'):
 #    example.plot_s_db(m=1, n=0)
     #pylab.show()
     #tight_layout()
-    fig.savefig(dir_in+'/'+cable+'_rf.png')
-    pl.dump(fig, open(dir_in+'/'+cable+'.pickle', 'wb'))
+    
+    fig.savefig(dir_out+'/'+cable+'_rf.png')
+    
+    #pl.dump(fig, open(dir_out+'/'+cable+'.pickle', 'wb'))
+
 #plt.draw()
 
 #print ('ch impedance:', example.z0)
