@@ -16,13 +16,26 @@ options = [
            #['Redo_VNA', 'TP_35cm_60_ChCMD_redo.vna'],
             
             # using Cu calibration plate
-            ['data', '9_feb_2021_test1_1.vna'],
-            ['data', '9_feb_2021_test1_2.vna'],
-            ['data', '9_feb_2021_test1_3.vna'],
-            ['data', '9_feb_2021_test1_4.vna'],
-            ['data', '9_feb_2021_test1_5.vna'],
+            #['data', '9_feb_2021_test1_1.vna'],
+            #['data', '9_feb_2021_test1_2.vna'],
+            #['data', '9_feb_2021_test1_3.vna'],
+            #['data', '9_feb_2021_test1_4.vna'],
+            #['data', '9_feb_2021_test1_5.vna'],
+            
             # cable 100
-            ['data', 'TP_35cm_100_test1_1.vna'],
+            #['data', 'TP_35cm_100_test1_1.vna'],
+            
+            # calibration
+            ['data', 'calibration_test.vna'],
+            ['data', 'small_SMA.vna'],
+            ['data', 'straight_SMA.vna'],
+            
+            # cable 129
+            ['data', 'TP_0p35m_129_ChCMD.vna'],
+            ['data', 'TP_0p35m_129_ChD0.vna'],
+            ['data', 'TP_0p35m_129_ChD1.vna'],
+            ['data', 'TP_0p35m_129_ChD2.vna'],
+            ['data', 'TP_0p35m_129_ChD3.vna'],
     
 	  ]
 
