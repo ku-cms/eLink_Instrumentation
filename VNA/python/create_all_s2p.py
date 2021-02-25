@@ -26,16 +26,25 @@ options = [
             #['data', 'TP_35cm_100_test1_1.vna'],
             
             # calibration
-            ['data', 'calibration_test.vna'],
-            ['data', 'small_SMA.vna'],
-            ['data', 'straight_SMA.vna'],
+            #['data', 'calibration_test.vna'],
+            #['data', 'small_SMA.vna'],
+            #['data', 'straight_SMA.vna'],
             
             # cable 129
-            ['data', 'TP_0p35m_129_ChCMD.vna'],
-            ['data', 'TP_0p35m_129_ChD0.vna'],
-            ['data', 'TP_0p35m_129_ChD1.vna'],
-            ['data', 'TP_0p35m_129_ChD2.vna'],
-            ['data', 'TP_0p35m_129_ChD3.vna'],
+            #['data', 'TP_0p35m_129_ChCMD.vna'],
+            #['data', 'TP_0p35m_129_ChD0.vna'],
+            #['data', 'TP_0p35m_129_ChD1.vna'],
+            #['data', 'TP_0p35m_129_ChD2.vna'],
+            #['data', 'TP_0p35m_129_ChD3.vna'],
+
+            # cable 100
+            # CMD_v1: CMD on 33pin conenctions: VNA 1 to CMD_P (12), VNA 2 to CMD_N (13)
+            # CMD_v2: CMD on 33pin conenctions: VNA 1 to CMD_D (13), VNA 2 to CMD_P (12)
+            ['data', 'TP_35cm_100_33pin_CMD_v2.vna'],
+            ['data', 'TP_35cm_100_33pin_D0.vna'],
+            ['data', 'TP_35cm_100_33pin_D1.vna'],
+            ['data', 'TP_35cm_100_33pin_D2.vna'],
+            ['data', 'TP_35cm_100_33pin_D3.vna'],
     
 	  ]
 
