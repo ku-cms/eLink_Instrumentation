@@ -40,11 +40,15 @@ options = [
             # cable 100
             # CMD_v1: CMD on 33pin conenctions: VNA 1 to CMD_P (12), VNA 2 to CMD_N (13)
             # CMD_v2: CMD on 33pin conenctions: VNA 1 to CMD_D (13), VNA 2 to CMD_P (12)
-            ['data', 'TP_35cm_100_33pin_CMD_v2.vna'],
-            ['data', 'TP_35cm_100_33pin_D0.vna'],
-            ['data', 'TP_35cm_100_33pin_D1.vna'],
-            ['data', 'TP_35cm_100_33pin_D2.vna'],
-            ['data', 'TP_35cm_100_33pin_D3.vna'],
+            #['data', 'TP_35cm_100_33pin_CMD_v2.vna'],
+            #['data', 'TP_35cm_100_33pin_D0.vna'],
+            #['data', 'TP_35cm_100_33pin_D1.vna'],
+            #['data', 'TP_35cm_100_33pin_D2.vna'],
+            #['data', 'TP_35cm_100_33pin_D3.vna'],
+
+            # loopback cable, 45 pin
+            ['data', 'loopback_45pin_36tpi_27tpi.vna'],
+            ['data', 'loopback_45pin_18tpi_9tpi.vna'],
     
 	  ]
 
