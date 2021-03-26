@@ -51,13 +51,13 @@ options = [
             #['data', 'loopback_45pin_18tpi_9tpi.vna'],
             
             # John's cable v2
-            #['data', 'TP_trial2_0tpi.vna'],
-            #['data', 'TP_trial2_2tpi.vna'],
+            ['data', 'TP_trial2_0tpi.vna'],
+            ['data', 'TP_trial2_2tpi.vna'],
             #['data', 'TP_trial2_2tpi_run2.vna'],
-            ['data', 'TP_trial2_2tpi_run3.vna'],
-            #['data', 'TP_trial2_4tpi.vna'],
-            #['data', 'TP_trial2_6tpi.vna'],
-            #['data', 'TP_trial2_8tpi.vna'],
+            #['data', 'TP_trial2_2tpi_run3.vna'],
+            ['data', 'TP_trial2_4tpi.vna'],
+            ['data', 'TP_trial2_6tpi.vna'],
+            ['data', 'TP_trial2_8tpi.vna'],
     
 	  ]
 
