@@ -14,6 +14,7 @@ from matplotlib.ticker import AutoMinorLocator
 
 #rf.stylely()
 
+
 def name(input):
     match = re.match(r'TP_\w+_\d+', input)
     name = match.group()
@@ -28,6 +29,7 @@ def name(input):
 # (1p4: 35, 36, 41, 42
 # (2 : 46, 47) TP_2m_47_ChD1
 # (2: 46)
+
 
 parser = OptionParser()
 
@@ -46,7 +48,7 @@ parser.add_option('--plot_directory', metavar='T', type='string', action='store'
                   dest='plot_directory',
                   help='directory to store plots')
 
-(options,args) = parser.parse_args()
+(options, args) = parser.parse_args()
 basename       = options.basename
 data_directory = options.data_directory
 plot_directory = options.plot_directory
@@ -77,11 +79,11 @@ for i, row in infile.iterrows():
         f.write('# GHZ	S	RI	R	50.0\n')
 
         try:
-            #print (row['f'][1:-1], row['s11R'][1:-1], row['s11I'][1:-1], row['s12R'][1:-1] ) 
+            #print (row['f'][1:-1], row['s11R'][1:-1], row['s11I'][1:-1], row['s12R'][1:-1] )
             f.write(f"!freq       Rel{row['f'][1:-1]}       Im{row['f'][1:-1]}      Rel{row['s11R'][1:-1]}       Im{row['s11R'][1:-1]}        Rel{row['s11I'][1:-1]}        Im{row['s11I'][1:-1]}         Rel{row['s12R'][1:-1]}      Im{row['s12R'][1:-1]}\n")
         except:
             if row['f'][1:-1] == 'SDD':
-                 f.write(f"!freq\tRelS11\tImS11\n")
+                f.write(f"!freq\tRelS11\tImS11\n")
         prevF = 0
     try:
         if float(row['s11R']) == float(row['s11R']) and float(row['f'])>prevF:
