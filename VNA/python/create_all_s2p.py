@@ -46,18 +46,33 @@ options = [
             #['data', 'TP_35cm_100_33pin_D2.vna'],
             #['data', 'TP_35cm_100_33pin_D3.vna'],
 
+            # John's cable number 1
             # loopback cable, 45 pin
             #['data', 'loopback_45pin_36tpi_27tpi.vna'],
             #['data', 'loopback_45pin_18tpi_9tpi.vna'],
             
-            # John's cable v2
+            # John's cable number 2
+            # 33 pin to 45 pin: 0, 2, 4, 6, 8 twists per inch
             ['data', 'TP_trial2_0tpi.vna'],
             ['data', 'TP_trial2_2tpi.vna'],
-            #['data', 'TP_trial2_2tpi_run2.vna'],
-            #['data', 'TP_trial2_2tpi_run3.vna'],
             ['data', 'TP_trial2_4tpi.vna'],
             ['data', 'TP_trial2_6tpi.vna'],
             ['data', 'TP_trial2_8tpi.vna'],
+            ['data', 'TP_JohnCable2_0tpi_run1.vna'],
+            ['data', 'TP_JohnCable2_0tpi_run2.vna'],
+            ['data', 'TP_JohnCable2_0tpi_run3.vna'],
+            ['data', 'TP_JohnCable2_2tpi_run1.vna'],
+            ['data', 'TP_JohnCable2_2tpi_run2.vna'],
+            ['data', 'TP_JohnCable2_2tpi_run3.vna'],
+            ['data', 'TP_JohnCable2_4tpi_run1.vna'],
+            ['data', 'TP_JohnCable2_4tpi_run2.vna'],
+            ['data', 'TP_JohnCable2_4tpi_run3.vna'],
+            ['data', 'TP_JohnCable2_6tpi_run1.vna'],
+            ['data', 'TP_JohnCable2_6tpi_run2.vna'],
+            ['data', 'TP_JohnCable2_6tpi_run3.vna'],
+            ['data', 'TP_JohnCable2_8tpi_run1.vna'],
+            ['data', 'TP_JohnCable2_8tpi_run2.vna'],
+            ['data', 'TP_JohnCable2_8tpi_run3.vna'],
     
 	  ]
 
