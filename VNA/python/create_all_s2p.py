@@ -76,7 +76,7 @@ options = [
     
 	  ]
 
-command = 'python python/readVNADataSKRF.py --data_directory={0:s} --basename={1:s}'
+command = 'python3 python/readVNADataSKRF.py --data_directory={0:s} --basename={1:s}'
 
 for opt in options:
     s = command.format(opt[0], opt[1])
