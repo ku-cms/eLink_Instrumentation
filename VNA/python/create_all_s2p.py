@@ -75,9 +75,17 @@ options = [
             #['data', 'TP_JohnCable2_8tpi_run3.vna'],
     
             # Cable 120
+            ['data', 'TP_0.8m_120_M1CMD.vna'],
+            ['data', 'TP_0.8m_120_M1CMD_run2.vna'],
+            ['data', 'TP_0.8m_120_M1D0.vna'],
+            ['data', 'TP_0.8m_120_M1D1.vna'],
+            ['data', 'TP_0.8m_120_M2CMD.vna'],
+            ['data', 'TP_0.8m_120_M2D0.vna'],
+            ['data', 'TP_0.8m_120_M2D1.vna'],
+            ['data', 'TP_0.8m_120_M2D1_run2.vna'],
+            ['data', 'TP_0.8m_120_M3CMD.vna'],
             ['data', 'TP_0.8m_120_M3D0.vna'],
             ['data', 'TP_0.8m_120_M3D1.vna'],
-            ['data', 'TP_0.8m_120_M3CMD.vna'],
 	  ]
 
 command = 'python3 python/readVNADataSKRF.py --data_directory={0:s} --basename={1:s}'
