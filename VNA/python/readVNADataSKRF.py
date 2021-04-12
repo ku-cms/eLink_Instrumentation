@@ -138,7 +138,7 @@ with style.context('seaborn-ticks'):
     #plt.ylim((0.0, 200.0))
     #plt.xlim((0.0, 35.0))
     plt.ylim((0.0, 400.0))
-    plt.xlim((0.0, 10.0))
+    plt.xlim((0.0, 30.0))
     plt.tight_layout()
     fig0.savefig(plot_directory+'/'+cable+'_freq_time_Z_rf.png')
     

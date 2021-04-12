@@ -75,17 +75,27 @@ options = [
             #['data', 'TP_JohnCable2_8tpi_run3.vna'],
     
             # Cable 120
-            ['data', 'TP_0.8m_120_M1CMD.vna'],
-            ['data', 'TP_0.8m_120_M1CMD_run2.vna'],
-            ['data', 'TP_0.8m_120_M1D0.vna'],
-            ['data', 'TP_0.8m_120_M1D1.vna'],
-            ['data', 'TP_0.8m_120_M2CMD.vna'],
-            ['data', 'TP_0.8m_120_M2D0.vna'],
-            ['data', 'TP_0.8m_120_M2D1.vna'],
-            ['data', 'TP_0.8m_120_M2D1_run2.vna'],
-            ['data', 'TP_0.8m_120_M3CMD.vna'],
-            ['data', 'TP_0.8m_120_M3D0.vna'],
-            ['data', 'TP_0.8m_120_M3D1.vna'],
+            #['data', 'TP_0.8m_120_M1CMD.vna'],
+            #['data', 'TP_0.8m_120_M1CMD_run2.vna'],
+            #['data', 'TP_0.8m_120_M1D0.vna'],
+            #['data', 'TP_0.8m_120_M1D1.vna'],
+            #['data', 'TP_0.8m_120_M2CMD.vna'],
+            #['data', 'TP_0.8m_120_M2D0.vna'],
+            #['data', 'TP_0.8m_120_M2D1.vna'],
+            #['data', 'TP_0.8m_120_M2D1_run2.vna'],
+            #['data', 'TP_0.8m_120_M3CMD.vna'],
+            #['data', 'TP_0.8m_120_M3D0.vna'],
+            #['data', 'TP_0.8m_120_M3D1.vna'],
+            
+            # John's cable number 3
+            # Length: 2 m
+            # Channels: 4, 4*, 8, 8*, 16
+            ['data', 'johncable3_2m_4.vna'],
+            ['data', 'johncable3_2m_4star.vna'],
+            ['data', 'johncable3_2m_8.vna'],
+            ['data', 'johncable3_2m_8star.vna'],
+            ['data', 'johncable3_2m_16.vna'],
+
 	  ]
 
 command = 'python3 python/readVNADataSKRF.py --data_directory={0:s} --basename={1:s}'
