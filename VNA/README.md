@@ -8,10 +8,10 @@ Certain python packages are required, so you will need to setup your python envi
 The main package we will use is called scikit-rf with documentation [here](https://scikit-rf.readthedocs.io/en/latest/index.html) and installation instructions [here](https://scikit-rf.readthedocs.io/en/latest/tutorials/Installation.html).
 I recommend creating a python environment using conda in order to install the necessary packages.
 See the conda documentation [here](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html).
-Also, for new macs (2020 and later) that have an Apple M1 chip (which uses a new architecture), look [here](https://www.jimbobbennett.io/installing-scikit-learn-on-an-apple-m1/).
+Also, for new Macs (2020 and later) that have an Apple M1 chip (which uses a new architecture), look [here](https://www.jimbobbennett.io/installing-scikit-learn-on-an-apple-m1/).
 
 To install conda, go [here](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/index.html), choose your operating system, and follow the instructions.
-Once conda is installed, you can run these commands.
+Once conda is installed, you can run these commands in your terminal (for Mac or Linux... I'm not sure about Windows!).
 ```
 conda update -n base conda
 conda config --set auto_activate_base false
