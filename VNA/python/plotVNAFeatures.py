@@ -39,14 +39,15 @@ import sys, re, os
 from pylab import *
 import numpy as np
 import skrf as rf
-#rf.stylely()
-#print(rf.__version__)
 import pylab
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib import style
 import statistics
+
+#rf.stylely()
+#print(rf.__version__)
 
 ###################
 # helper functions
@@ -62,7 +63,7 @@ def createLabels():
         ff = str(outDir+"/"+files[i]) 
         x_labels.append((str(ff).split('.vna')[0].split('/')[-1:][0]))
         #x_labels.append("Calibration")
-        print (x_labels)
+        #print (x_labels)
     return x_labels
 
 def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
@@ -108,15 +109,16 @@ def display_mean_impedance(ax, t1, t2, col):##https://www.tutorialfor.com/questi
     y_plot_value.append(int(Z_mean.values))
     ax.plot(x_coor, y_coor, color=col, linewidth=1, label='', linestyle='--')
 
-def name(input):
-    match = re.match(r'TP_\w+_\d+', input)
-    name = match.group()
-    if '1p4' in name: name = name.replace('1p4', '1.4')
+def getName(input_string):
+    match = re.match(r'TP_\w+_\d+', input_string)
+    name  = match.group()
+    if '1p4' in name:
+        name = name.replace('1p4', '1.4')
     return name
 
-############################################
-#            Job steering                  #
-############################################
+#######################################
+#            Options                  #
+#######################################
 from optparse import OptionParser
 parser = OptionParser()
 
@@ -125,15 +127,20 @@ parser.add_option('--createS2p', type='int', action='store',
                       dest='createS2p',
                       help='bool if 1 then create .s2p files, if 0 then they already exist and no need to recreate them')
 
-parser.add_option('--inputFiles',  metavar='T', type='string', action='store',
+parser.add_option('--inputDir',  metavar='T', type='string', action='store',
                       default='../example_data',
-                      dest='inputFiles',
+                      dest='inputDir',
                       help='directory with example input files')
 
 parser.add_option('--inputTxtFiles', metavar='F', type='string', action='store',
                       default = "input_cable_data.txt",
                       dest='inputTxtFiles',
                       help='Input txt files')
+
+parser.add_option('--cableName',  metavar='T', type='string', action='store',
+                      default='',
+                      dest='cableName',
+                      help='cable name (required for non-standard names)')
 
 parser.add_option('--cableLength', metavar='F', type='string', action='store',
                       default = "35",
@@ -171,25 +178,33 @@ parser.add_option('--SParamterComp', metavar='T', type='string', action='store',
                       help='S-paramter to draw')
 
 (options,args) = parser.parse_args()
-# ==========end: options =============
+
+createS2p       = bool(options.createS2p)
+inDir           = options.inputDir
+inputTxtFiles   = options.inputTxtFiles
+cableName       = options.cableName
+cableLength     = options.cableLength
+t1              = options.t1
+t2              = options.t2
+outDir          = options.outputFiles
+s2pDir          = options.outputTouchstone
+subfile         = options.outputTouchstoneSubFile
+comp            = options.SParamterComp
+
+# ========= end: options ============= #
+
 files = []
-with open(options.inputTxtFiles, 'r') as fl:
+with open(inputTxtFiles, 'r') as fl:
     for line in fl.readlines():
         files.append(line.strip())
     fl.close    
-print ('getting files: ', files)
 
-if options.createS2p == 0:
-    createS2p = False
-elif options.createS2p == 1:
-    createS2p = True
-else: print('createS2p can be only 0 or 1')    
+print("input file list: {0}".format(inputTxtFiles))
+for f in files:
+    print (" - {0}".format(f))
 
-inDir = options.inputFiles
-s2pDir = options.outputTouchstone
-ensure_dir(s2pDir)
-outDir = options.outputFiles
 ensure_dir(outDir)
+ensure_dir(s2pDir)
 
 ############################
 # Create the .s2p files
@@ -202,7 +217,7 @@ if createS2p:
         pd.set_option("display.max_rows", 5)
           
         fileindex = 0 # this will be increment to upto 9 corresponding to 10 .s2p files
-        prevF = 0
+        prevF     = 0
         basename = f.split('.')[0]
            
         for i, row in infile.iterrows():
@@ -233,19 +248,14 @@ if createS2p:
                 pass
 
 ########################
-# Plots
+#        Plots         #
 ########################
-comp = options.SParamterComp
-subfile = options.outputTouchstoneSubFile
 S_ij = ''
-if comp == '11' and subfile == '0': S_ij = '11'
-elif comp == '12'and subfile == '0': S_ij = '21'
+if   comp == '11' and subfile == '0': S_ij = '11'
+elif comp == '12' and subfile == '0': S_ij = '21'
 elif comp == '21' and subfile == '1': S_ij = '11'
 i = int(S_ij[0])
 j = int(S_ij[1])
-
-t1 = options.t1
-t2 = options.t2
 
 labels = createLabels()
 
@@ -267,7 +277,7 @@ with style.context('seaborn-darkgrid'):
     ax0.grid(True, color='0.4', which='major')
 
     for label, col in zip(labels, colors):
-        net = rf.Network(s2pDir+'/'+label+'_'+subfile+'.s2p', f_unit='ghz')#33
+        net = rf.Network(s2pDir+'/'+label+'_'+subfile+'.s2p', f_unit='ghz') # 33
         
         ## ---Frequency Domain Plots---:
         net_dc = net[i,j].extrapolate_to_dc(kind='linear')       
@@ -278,7 +288,14 @@ with style.context('seaborn-darkgrid'):
         net_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+','+label, ax=ax1, color=col)
         display_mean_impedance(ax1, t1, t2, 'b')
 
-    cable_ID = name(labels[0])   
-    fig0.savefig(outDir+'/TP_'+cable_ID+'cm_freq_time_Z_rf_'+"S"+comp+'.png')        
+    if cableName:
+        cable_ID = cableName
+    else:
+        cable_ID = getName(labels[0])   
+    print("labels[0]: {0}, cable_ID: {1}".format(labels[0], cable_ID))
+    #fig0.savefig(outDir+'/TP_'+cable_ID+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
+    fig0.savefig("{0}/TP_{1}cm_freq_time_Z_rf_S{2}.png".format(outDir, cable_ID, comp))
+
 #pylab.show()        
 #input('hold on')
+
