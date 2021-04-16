@@ -64,13 +64,13 @@ def createLabels():
         x_labels.append((str(ff).split('.vna')[0].split('/')[-1:][0]))
     return x_labels
 
-def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
+def set_axes(ax, title, xmin, xmax, ymin, ymax, nolim):
     ax.xaxis.set_minor_locator(AutoMinorLocator(2))
     ax.yaxis.set_minor_locator(AutoMinorLocator(2))
     ax.grid(True, color='0.8', which='minor')
     ax.grid(True, color='0.4', which='major')
     ax.set_title(title) # Time domain
-    if nolim==False:
+    if not nolim:
         ax.set_xlim((xmin, xmax))
         ax.set_ylim((ymin, ymax))
     plt.tight_layout()
@@ -282,11 +282,12 @@ with style.context('seaborn-darkgrid'):
         ## ---Frequency Domain Plots---:
         net_dc = net[i,j].extrapolate_to_dc(kind='linear')       
         net_dc.plot_s_db(label='S'+comp+','+label, ax=ax0, color=col)  
-        set_axes(ax0, 'Frequency Domain', 100000, 6000000000, -50.0, 50.0, 1)
+        set_axes(ax0, 'Frequency Domain', 100000, 6000000000, -50.0, 50.0, nolim=False)
 
         ## ---Time Domain Plots---:
         net_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+','+label, ax=ax1, color=col)
         display_mean_impedance(ax1, t1, t2, 'b')
+        set_axes(ax1, 'Time Domain', 0.0, 30.0, 0.0, 400.0, nolim=False)
 
     if cableName:
         cable_ID = cableName
