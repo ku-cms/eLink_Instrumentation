@@ -99,7 +99,7 @@ def display_mean_impedance(ax, t1, t2, col):
 
     # get the mean value of Z for a given time difference
     Z_mean =  df.query('t >=@t1 & t<=@t2').agg({'Z': 'mean'})
-    print('Mean impedance from', t1, 'ns and', t2, 'ns =', Z_mean.values, 'for', lines[0])
+    print("Mean impedance from {0} ns to {1} ns = {2:.2f} ohms for {3}".format(t1, t2, Z_mean.values[0], lines[0]))
     # plot the average line
     x_coor = [t1, t2]
     y_coor = [Z_mean, Z_mean]
