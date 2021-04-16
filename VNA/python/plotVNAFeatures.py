@@ -156,7 +156,7 @@ parser.add_option('--outputFiles', metavar='T', type='string', action='store',
                       help='directory to store plots')
 
 parser.add_option('--outputTouchstone', metavar='T', type='string', action='store',
-                      default='sp2Dir',
+                      default='s2pDir',
                       dest='outputTouchstone',
                       help='directory to store resulted touch stone files')
 
