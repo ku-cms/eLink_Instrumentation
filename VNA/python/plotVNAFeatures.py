@@ -62,8 +62,6 @@ def createLabels():
     for i in range(len(files)):
         ff = str(outDir+"/"+files[i]) 
         x_labels.append((str(ff).split('.vna')[0].split('/')[-1:][0]))
-        #x_labels.append("Calibration")
-        #print (x_labels)
     return x_labels
 
 def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
@@ -71,23 +69,22 @@ def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
     ax.yaxis.set_minor_locator(AutoMinorLocator(2))
     ax.grid(True, color='0.8', which='minor')
     ax.grid(True, color='0.4', which='major')
-    ax.set_title(title) #Time domain
+    ax.set_title(title) # Time domain
     if nolim==False:
         ax.set_xlim((xmin, xmax))
         ax.set_ylim((ymin, ymax))
     plt.tight_layout()
 
-
-def display_mean_impedance(ax, t1, t2, col):##https://www.tutorialfor.com/questions-285739.htm
+# https://www.tutorialfor.com/questions-285739.htm
+def display_mean_impedance(ax, t1, t2, col): 
     y_plot_value=[]
     lines = ax.get_lines()
 
-    # delete any other array correponding to a line drawn in ax but the last one. This is a
-    # brute force way of resetting the line data to the data current line
+    # Delete all elements of the array (except the last one) correponding to a line drawn in ax.
+    # This is a brute force way of resetting the line data to the data current line.
     if len(lines)>1:
         del lines[:-1]
 
-    # ressure that length of line is 1.
     #print('size of lines:', len(lines))
 
     # store the line arrays into list. Every line drawn on the ax is considered as data
@@ -157,9 +154,9 @@ parser.add_option('--t2', metavar='F', type='float', action='store',
                       dest='t2',
                       help='stop time to take the average on the time domain plot')
 
-parser.add_option('--outputFiles', metavar='T', type='string', action='store',
+parser.add_option('--outputDir', metavar='T', type='string', action='store',
                       default='Plots',
-                      dest='outputFiles',
+                      dest='outputDir',
                       help='directory to store plots')
 
 parser.add_option('--outputTouchstone', metavar='T', type='string', action='store',
@@ -186,12 +183,14 @@ cableName       = options.cableName
 cableLength     = options.cableLength
 t1              = options.t1
 t2              = options.t2
-outDir          = options.outputFiles
+outDir          = options.outputDir
 s2pDir          = options.outputTouchstone
 subfile         = options.outputTouchstoneSubFile
 comp            = options.SParamterComp
 
 # ========= end: options ============= #
+
+verbose = False
 
 files = []
 with open(inputTxtFiles, 'r') as fl:
@@ -199,9 +198,10 @@ with open(inputTxtFiles, 'r') as fl:
         files.append(line.strip())
     fl.close    
 
-print("input file list: {0}".format(inputTxtFiles))
-for f in files:
-    print (" - {0}".format(f))
+if verbose:
+    print("input file list: {0}".format(inputTxtFiles))
+    for f in files:
+        print (" - {0}".format(f))
 
 ensure_dir(outDir)
 ensure_dir(s2pDir)
@@ -292,9 +292,10 @@ with style.context('seaborn-darkgrid'):
         cable_ID = cableName
     else:
         cable_ID = getName(labels[0])   
-    print("labels[0]: {0}, cable_ID: {1}".format(labels[0], cable_ID))
-    #fig0.savefig(outDir+'/TP_'+cable_ID+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
-    fig0.savefig("{0}/TP_{1}cm_freq_time_Z_rf_S{2}.png".format(outDir, cable_ID, comp))
+    
+    #print("labels[0]: {0}, cable_ID: {1}".format(labels[0], cable_ID))
+    
+    fig0.savefig("{0}/{1}_freq_time_Z_rf_S{2}.png".format(outDir, cable_ID, comp))
 
 #pylab.show()        
 #input('hold on')
