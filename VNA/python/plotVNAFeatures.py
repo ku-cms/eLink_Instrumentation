@@ -39,14 +39,15 @@ import sys, re, os
 from pylab import *
 import numpy as np
 import skrf as rf
-#rf.stylely()
-#print(rf.__version__)
 import pylab
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib import style
 import statistics
+
+#rf.stylely()
+#print(rf.__version__)
 
 ###################
 # helper functions
@@ -61,32 +62,29 @@ def createLabels():
     for i in range(len(files)):
         ff = str(outDir+"/"+files[i]) 
         x_labels.append((str(ff).split('.vna')[0].split('/')[-1:][0]))
-        #x_labels.append("Calibration")
-        print (x_labels)
     return x_labels
 
-def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
+def set_axes(ax, title, xmin, xmax, ymin, ymax, nolim):
     ax.xaxis.set_minor_locator(AutoMinorLocator(2))
     ax.yaxis.set_minor_locator(AutoMinorLocator(2))
     ax.grid(True, color='0.8', which='minor')
     ax.grid(True, color='0.4', which='major')
-    ax.set_title(title) #Time domain
-    if nolim==False:
+    ax.set_title(title) # Time domain
+    if not nolim:
         ax.set_xlim((xmin, xmax))
         ax.set_ylim((ymin, ymax))
     plt.tight_layout()
 
-
-def display_mean_impedance(ax, t1, t2, col):##https://www.tutorialfor.com/questions-285739.htm
+# https://www.tutorialfor.com/questions-285739.htm
+def display_mean_impedance(ax, t1, t2, col): 
     y_plot_value=[]
     lines = ax.get_lines()
 
-    # delete any other array correponding to a line drawn in ax but the last one. This is a
-    # brute force way of resetting the line data to the data current line
+    # Delete all elements of the array (except the last one) correponding to a line drawn in ax.
+    # This is a brute force way of resetting the line data to the data current line.
     if len(lines)>1:
         del lines[:-1]
 
-    # ressure that length of line is 1.
     #print('size of lines:', len(lines))
 
     # store the line arrays into list. Every line drawn on the ax is considered as data
@@ -101,22 +99,23 @@ def display_mean_impedance(ax, t1, t2, col):##https://www.tutorialfor.com/questi
 
     # get the mean value of Z for a given time difference
     Z_mean =  df.query('t >=@t1 & t<=@t2').agg({'Z': 'mean'})
-    print('Mean impedance from', t1, 'ns and', t2, 'ns =', Z_mean.values, 'for', lines[0])
+    print("Mean impedance from {0} ns to {1} ns = {2:.2f} ohms for {3}".format(t1, t2, Z_mean.values[0], lines[0]))
     # plot the average line
     x_coor = [t1, t2]
     y_coor = [Z_mean, Z_mean]
     y_plot_value.append(int(Z_mean.values))
     ax.plot(x_coor, y_coor, color=col, linewidth=1, label='', linestyle='--')
 
-def name(input):
-    match = re.match(r'TP_\w+_\d+', input)
-    name = match.group()
-    if '1p4' in name: name = name.replace('1p4', '1.4')
+def getName(input_string):
+    match = re.match(r'TP_\w+_\d+', input_string)
+    name  = match.group()
+    if '1p4' in name:
+        name = name.replace('1p4', '1.4')
     return name
 
-############################################
-#            Job steering                  #
-############################################
+#######################################
+#            Options                  #
+#######################################
 from optparse import OptionParser
 parser = OptionParser()
 
@@ -125,15 +124,20 @@ parser.add_option('--createS2p', type='int', action='store',
                       dest='createS2p',
                       help='bool if 1 then create .s2p files, if 0 then they already exist and no need to recreate them')
 
-parser.add_option('--inputFiles',  metavar='T', type='string', action='store',
+parser.add_option('--inputDir',  metavar='T', type='string', action='store',
                       default='../example_data',
-                      dest='inputFiles',
+                      dest='inputDir',
                       help='directory with example input files')
 
 parser.add_option('--inputTxtFiles', metavar='F', type='string', action='store',
                       default = "input_cable_data.txt",
                       dest='inputTxtFiles',
                       help='Input txt files')
+
+parser.add_option('--cableName',  metavar='T', type='string', action='store',
+                      default='',
+                      dest='cableName',
+                      help='cable name (required for non-standard names)')
 
 parser.add_option('--cableLength', metavar='F', type='string', action='store',
                       default = "35",
@@ -150,13 +154,13 @@ parser.add_option('--t2', metavar='F', type='float', action='store',
                       dest='t2',
                       help='stop time to take the average on the time domain plot')
 
-parser.add_option('--outputFiles', metavar='T', type='string', action='store',
+parser.add_option('--outputDir', metavar='T', type='string', action='store',
                       default='Plots',
-                      dest='outputFiles',
+                      dest='outputDir',
                       help='directory to store plots')
 
 parser.add_option('--outputTouchstone', metavar='T', type='string', action='store',
-                      default='sp2Dir',
+                      default='s2pDir',
                       dest='outputTouchstone',
                       help='directory to store resulted touch stone files')
 
@@ -171,25 +175,36 @@ parser.add_option('--SParamterComp', metavar='T', type='string', action='store',
                       help='S-paramter to draw')
 
 (options,args) = parser.parse_args()
-# ==========end: options =============
+
+createS2p       = bool(options.createS2p)
+inDir           = options.inputDir
+inputTxtFiles   = options.inputTxtFiles
+cableName       = options.cableName
+cableLength     = options.cableLength
+t1              = options.t1
+t2              = options.t2
+outDir          = options.outputDir
+s2pDir          = options.outputTouchstone
+subfile         = options.outputTouchstoneSubFile
+comp            = options.SParamterComp
+
+# ========= end: options ============= #
+
+verbose = False
+
 files = []
-with open(options.inputTxtFiles, 'r') as fl:
+with open(inputTxtFiles, 'r') as fl:
     for line in fl.readlines():
         files.append(line.strip())
     fl.close    
-print ('getting files: ', files)
 
-if options.createS2p == 0:
-    createS2p = False
-elif options.createS2p == 1:
-    createS2p = True
-else: print('createS2p can be only 0 or 1')    
+if verbose:
+    print("input file list: {0}".format(inputTxtFiles))
+    for f in files:
+        print (" - {0}".format(f))
 
-inDir = options.inputFiles
-s2pDir = options.outputTouchstone
-ensure_dir(s2pDir)
-outDir = options.outputFiles
 ensure_dir(outDir)
+ensure_dir(s2pDir)
 
 ############################
 # Create the .s2p files
@@ -202,7 +217,7 @@ if createS2p:
         pd.set_option("display.max_rows", 5)
           
         fileindex = 0 # this will be increment to upto 9 corresponding to 10 .s2p files
-        prevF = 0
+        prevF     = 0
         basename = f.split('.')[0]
            
         for i, row in infile.iterrows():
@@ -233,19 +248,14 @@ if createS2p:
                 pass
 
 ########################
-# Plots
+#        Plots         #
 ########################
-comp = options.SParamterComp
-subfile = options.outputTouchstoneSubFile
 S_ij = ''
-if comp == '11' and subfile == '0': S_ij = '11'
-elif comp == '12'and subfile == '0': S_ij = '21'
+if   comp == '11' and subfile == '0': S_ij = '11'
+elif comp == '12' and subfile == '0': S_ij = '21'
 elif comp == '21' and subfile == '1': S_ij = '11'
 i = int(S_ij[0])
 j = int(S_ij[1])
-
-t1 = options.t1
-t2 = options.t2
 
 labels = createLabels()
 
@@ -267,18 +277,27 @@ with style.context('seaborn-darkgrid'):
     ax0.grid(True, color='0.4', which='major')
 
     for label, col in zip(labels, colors):
-        net = rf.Network(s2pDir+'/'+label+'_'+subfile+'.s2p', f_unit='ghz')#33
+        net = rf.Network(s2pDir+'/'+label+'_'+subfile+'.s2p', f_unit='ghz') # 33
         
         ## ---Frequency Domain Plots---:
         net_dc = net[i,j].extrapolate_to_dc(kind='linear')       
         net_dc.plot_s_db(label='S'+comp+','+label, ax=ax0, color=col)  
-        set_axes(ax0, 'Frequency Domain', 100000, 6000000000, -50.0, 50.0, 1)
+        set_axes(ax0, 'Frequency Domain', 100000, 6000000000, -50.0, 50.0, nolim=False)
 
         ## ---Time Domain Plots---:
         net_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+','+label, ax=ax1, color=col)
         display_mean_impedance(ax1, t1, t2, 'b')
+        set_axes(ax1, 'Time Domain', 0.0, 30.0, 0.0, 400.0, nolim=False)
 
-    cable_ID = name(labels[0])   
-    fig0.savefig(outDir+'/TP_'+cable_ID+'cm_freq_time_Z_rf_'+"S"+comp+'.png')        
+    if cableName:
+        cable_ID = cableName
+    else:
+        cable_ID = getName(labels[0])   
+    
+    #print("labels[0]: {0}, cable_ID: {1}".format(labels[0], cable_ID))
+    
+    fig0.savefig("{0}/{1}_freq_time_Z_rf_S{2}.png".format(outDir, cable_ID, comp))
+
 #pylab.show()        
 #input('hold on')
+
