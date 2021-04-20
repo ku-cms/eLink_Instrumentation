@@ -1,6 +1,6 @@
 import pandas as pd
 
-excel_file  = 'Data1.xlsx'
+excel_file  = 'formatted_data_1.xlsx'
 excel_sheet = 'Data'
 
 type1_cols_height_34 = [3, 4, 5]
