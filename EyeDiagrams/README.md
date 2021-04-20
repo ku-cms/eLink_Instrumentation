@@ -12,9 +12,17 @@ First activate the conda environment with the necessary packages based on the in
 conda activate .venv
 ```
 
-The example input file is Data1.xlsx, which is input for the script readData.py.
+One example input file is formatted_data_1.xlsx, which is input for the script readData.py.
+You can run the script like this.
 ```
 cd EyeDiagrams
 python readData.py
+```
+
+Another example input file is raw_data_1.csv, which is input for the script Analyzer.py.
+You can run the script like this.
+```
+cd EyeDiagrams
+python Analyzer.py
 ```
 
