@@ -137,7 +137,7 @@ with style.context('seaborn-ticks'):
     plt.title('Time domain') #The time_step component of the z-matrix vs frequency
     example_dc.s11.plot_z_time_step(attribute='z_time_step', pad=2000, window='hamming', z0=50, label='TD11')
     example_dc.s21.plot_z_time_step(pad=2000, window='hamming', z0=50, label='TD12')
-    plt.ylim((0.0, 200.0))
+    plt.ylim((0.0, 300.0))
     plt.xlim((0, 35))
     plt.tight_layout()
     fig0.savefig(plot_directory+'/'+cable+'_freq_time_Z_rf.png')

@@ -36,12 +36,19 @@ options = [
             # ['data', 'TP_0p35m_129_ChD1.vna'],
             # ['data', 'TP_0p35m_129_ChD2.vna'],
             # ['data', 'TP_0p35m_129_ChD3.vna'],
-            ['data', 'TP_trial2_0tpi.vna'],
-            ['data', 'TP_trial2_2tpi.vna'],
-            ['data', 'TP_trial2_4tpi.vna'],
-            ['data', 'TP_trial2_6tpi.vna'],
-            ['data', 'TP_trial2_8tpi.vna'],
-    
+
+            # ['data', 'TP_trial2_0tpi.vna'],
+            # ['data', 'TP_trial2_2tpi.vna'],
+            # ['data', 'TP_trial2_4tpi.vna'],
+            # ['data', 'TP_trial2_6tpi.vna'],
+            # ['data', 'TP_trial2_8tpi.vna'],
+
+            # ['data', 'johncable3_2m_8star.vna'],
+            # ['data', 'johncable3_2m_8.vna'],
+            # ['data', 'johncable3_2m_4.vna'],
+            # ['data', 'johncable3_2m_4star.vna'],
+            # ['data', 'johncable3_2m_16.vna'],
+            ['data', 'johncable4_Bill4tpi.vna'],
 	  ]
 
 command = 'python3 python/readVNADataSKRF.py --data_directory={0:s} --basename={1:s}'
