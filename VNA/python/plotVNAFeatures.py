@@ -174,8 +174,7 @@ parser.add_option('--SParamterComp', metavar='T', type='string', action='store',
                       dest='SParamterComp',
                       help='S-paramter to draw')
 
-(options,args) = parser.parse_args()
-
+(options,args)  = parser.parse_args()
 createS2p       = bool(options.createS2p)
 inDir           = options.inputDir
 inputTxtFiles   = options.inputTxtFiles

@@ -75,38 +75,50 @@ options = [
             #['data', 'TP_JohnCable2_8tpi_run2.vna'],
             #['data', 'TP_JohnCable2_8tpi_run3.vna'],
     
-            # Cable 120
-            #['data', 'TP_0.8m_120_M1CMD.vna'],
-            #['data', 'TP_0.8m_120_M1CMD_run2.vna'],
-            #['data', 'TP_0.8m_120_M1D0.vna'],
-            #['data', 'TP_0.8m_120_M1D1.vna'],
-            #['data', 'TP_0.8m_120_M2CMD.vna'],
-            #['data', 'TP_0.8m_120_M2D0.vna'],
-            #['data', 'TP_0.8m_120_M2D1.vna'],
-            #['data', 'TP_0.8m_120_M2D1_run2.vna'],
-            #['data', 'TP_0.8m_120_M3CMD.vna'],
-            #['data', 'TP_0.8m_120_M3D0.vna'],
-            #['data', 'TP_0.8m_120_M3D1.vna'],
+            # Cable 120 (Before Lashing)
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1CMD.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1CMD_run2.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1D0.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1D1.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2CMD.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D0.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D1.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D1_run2.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3CMD.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3D0.vna'],
+            ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3D1.vna'],
+            
+            # Cable 120 (After Lashing)
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M1CMD.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M1D0.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M1D1.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M2CMD.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M2D0.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M2D1.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3CMD.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3CMD_run2.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3D0.vna'],
+            ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3D1.vna'],
             
             # John's cable number 3
             # Length: 2 m
             # Channels: 4, 4*, 8, 8*, 16
-            ['data', 'johncable3_2m_4.vna'],
-            ['data', 'johncable3_2m_4star.vna'],
-            ['data', 'johncable3_2m_8.vna'],
-            ['data', 'johncable3_2m_8star.vna'],
-            ['data', 'johncable3_2m_16.vna'],
+            #['data', 'johncable3_2m_4.vna'],
+            #['data', 'johncable3_2m_4star.vna'],
+            #['data', 'johncable3_2m_8.vna'],
+            #['data', 'johncable3_2m_8star.vna'],
+            #['data', 'johncable3_2m_16.vna'],
 
             # John's cable number 4
             # Length: 1 m
             # Channels: 4J, 4B, 8, 16, 24
-            ['data', 'johncable4_Bill4tpi.vna'],
+            #['data', 'johncable4_Bill4tpi.vna'],
+]
 
-
-command = 'python3 python/readVNADataSKRF.py --data_directory={0:s} --basename={1:s}'
+command = 'python3 python/readVNADataSKRF.py --plot_directory={0:s} --data_directory={1:s} --basename={2:s}'
 
 for opt in options:
-    s = command.format(opt[0], opt[1])
+    s = command.format(opt[0], opt[1], opt[2])
     print(s)
     subprocess.call( [s, ""], shell=True )	
 

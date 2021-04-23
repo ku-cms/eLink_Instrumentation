@@ -49,9 +49,9 @@ parser.add_option('--plot_directory', metavar='T', type='string', action='store'
                   help='directory to store plots')
 
 (options, args) = parser.parse_args()
-basename       = options.basename
-data_directory = options.data_directory
-plot_directory = options.plot_directory
+basename        = options.basename
+data_directory  = options.data_directory
+plot_directory  = options.plot_directory
 
 if '_\d+' in basename:
     cable = name(basename)
