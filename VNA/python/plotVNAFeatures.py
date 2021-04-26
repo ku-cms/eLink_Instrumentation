@@ -78,15 +78,13 @@ def set_axes(ax, title, xmin, xmax, ymin, ymax, nolim):
 
 # https://www.tutorialfor.com/questions-285739.htm
 def display_mean_impedance(ax, t1, t2, col): 
-    y_plot_value=[]
+    y_plot_value = []
     lines = ax.get_lines()
 
     # Delete all elements of the array (except the last one) correponding to a line drawn in ax.
     # This is a brute force way of resetting the line data to the data current line.
     if len(lines)>1:
         del lines[:-1]
-
-    #print('size of lines:', len(lines))
 
     # store the line arrays into list. Every line drawn on the ax is considered as data
     Y = [line.get_ydata() for line in lines]
@@ -100,7 +98,7 @@ def display_mean_impedance(ax, t1, t2, col):
 
     # get the mean value of Z for a given time difference
     Z_mean =  df.query('t >=@t1 & t<=@t2').agg({'Z': 'mean'})
-    print("Mean impedance from {0} ns to {1} ns = {2:.2f} ohms for {3}".format(t1, t2, Z_mean.values[0], lines[0]))
+    print("Mean impedance [{0} ns, {1} ns] = {2:.2f} ohms for {3}".format(t1, t2, Z_mean.values[0], lines[0]))
     # plot the average line
     x_coor = [t1, t2]
     y_coor = [Z_mean, Z_mean]
@@ -190,7 +188,7 @@ comp            = options.SParamterComp
 
 # ========= end: options ============= #
 
-verbose = True
+verbose = False
 
 files = []
 with open(inputTxtFiles, 'r') as fl:
@@ -218,9 +216,9 @@ if createS2p:
           
         fileindex = 0 # this will be increment to upto 9 corresponding to 10 .s2p files
         prevF     = 0
-        #basename = f.split('.')[0]
         basename = f.rpartition('.')[0]
-        print("f: {0}, basename: {1}".format(f, basename))
+        if verbose:
+            print("f: {0}, basename: {1}".format(f, basename))
            
         for i, row in infile.iterrows():
             if row['pt'] == 'PARAMETER:':
@@ -264,25 +262,20 @@ labels = createLabels()
 colors = [
             'xkcd:cherry red',
             'xkcd:tangerine',
-            'xkcd:emerald',
-            'xkcd:blue green',
+            'xkcd:green',
+            'xkcd:neon green',
             'xkcd:azure',
-            'xkcd:medium blue',
-            'xkcd:neon purple',
-            'xkcd:purple',
-            'xkcd:lavender',
             'xkcd:cyan',
+            'xkcd:neon purple',
+            'xkcd:coral',
             'xkcd:magenta',
             'xkcd:goldenrod',
             'xkcd:seafoam green',
-            'xkcd:pinkish',
+            'xkcd:lavender',
             'xkcd:turquoise',
+            'xkcd:electric blue',
+            'xkcd:purple',
 ]
-
-#if len(labels) == 5:
-#    colors = ['b', 'r', 'y', 'g', 'm']
-#elif len(labels) == 6:
-#    colors = ['b', 'r', 'y', 'g', 'm', 'w']
 
 with style.context('seaborn-darkgrid'):    
     fig0 = plt.figure(figsize=(10,4))
@@ -296,7 +289,6 @@ with style.context('seaborn-darkgrid'):
     ax0.grid(True, color='0.8', which='minor')
     ax0.grid(True, color='0.4', which='major')
 
-    #for label, col in zip(labels, colors):
     for n in range(len(labels)):
         label = labels[n]
         color = colors[n]
@@ -305,11 +297,13 @@ with style.context('seaborn-darkgrid'):
         ## ---Frequency Domain Plots---:
         net_dc = net[i,j].extrapolate_to_dc(kind='linear')       
         net_dc.plot_s_db(label='S'+comp+','+label, ax=ax0, color=color)  
-        set_axes(ax0, 'Frequency Domain', 100000, 6000000000, -50.0, 50.0, nolim=False)
+        # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
+        set_axes(ax0, 'Frequency Domain', 0.0, 6.0e9, -50.0, 100.0, nolim=False)
 
         ## ---Time Domain Plots---:
         net_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+','+label, ax=ax1, color=color)
         display_mean_impedance(ax1, t1, t2, 'b')
+        # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
         set_axes(ax1, 'Time Domain', 0.0, 30.0, 0.0, 400.0, nolim=False)
 
     if cableName:
@@ -317,7 +311,8 @@ with style.context('seaborn-darkgrid'):
     else:
         cable_ID = getName(labels[0])   
     
-    print("labels[0]: {0}, cable_ID: {1}".format(labels[0], cable_ID))
+    if verbose:
+        print("labels[0]: {0}, cable_ID: {1}".format(labels[0], cable_ID))
     
     fig0.savefig("{0}/{1}_freq_time_Z_rf_S{2}.png".format(outDir, cable_ID, comp))
 
