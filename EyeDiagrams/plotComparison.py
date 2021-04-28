@@ -9,8 +9,8 @@ def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
-def printData(file_name):
-    with open(file_name, "r") as f:
+def printData(input_file):
+    with open(input_file, "r") as f:
         reader = csv.reader(f)
         print(" --- print file")
         for line in f:
@@ -21,18 +21,20 @@ def printData(file_name):
         for row in reader:
             print(row)
 
-def getData(file_name):
+def getData(input_file):
     data = []
-    with open(file_name, "r") as f:
+    with open(input_file, "r") as f:
         reader = csv.reader(f)
         for row in reader:
             data.append(row)
     return data
 
-def plotData(file_name, plot_dir):
+def plotData(input_file, output_file, plot_dir):
     verbose = False
     makeDir(plot_dir)
-    data = getData(file_name)
+    data = getData(input_file)
+    output_png = "{0}/{1}.png".format(plot_dir, output_file)
+    output_pdf = "{0}/{1}.pdf".format(plot_dir, output_file)
 
     # get data from column
     column_index_1 = 3
@@ -79,17 +81,21 @@ def plotData(file_name, plot_dir):
     ax.set_title("Cable 120 Eye Diagram Data",  fontsize=16)
     ax.set_xlabel("Channel",                    fontsize=12)
     ax.set_ylabel(data_label,                   fontsize=12)
+    
     plt.scatter(x_array, y1_array, label="Before Lashing")
     plt.scatter(x_array, y2_array, label="After Lashing")
     plt.legend(loc='upper right', prop={'size': 12})
-    plt.show()
+    plt.savefig(output_png)
+    plt.savefig(output_pdf)
+    #plt.show()
 
 def main():
-    file_name = "Cable_120_EyeDiagrams.csv"
-    plot_dir  = "plots"
+    input_file  = "Cable_120_EyeDiagrams.csv"
+    output_file = "Cable_120_EyeDiagram_Heights"
+    plot_dir    = "plots"
     
-    #printData(file_name)
-    plotData(file_name, plot_dir)
+    #printData(input_file)
+    plotData(input_file, output_file, plot_dir)
 
 if __name__ == "__main__":
     main()
