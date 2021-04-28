@@ -55,11 +55,18 @@ def plotData(file_name, plot_dir):
         #print("{0}: {1}".format(i, row[column_index]))
     
     # plot
+    fig, ax = plt.subplots(figsize=(6, 6))
+
     x_array = np.array(x_vals)
     y_array = np.array(y_vals)
     #print(x_array)
     #print(y_array)
     
+    ax.set_xlim([0.0, 10.0])
+    ax.set_ylim([0.0, 200.0])
+    ax.set_title("Impedance of Cable 120",  fontsize=16)
+    ax.set_xlabel("Channel",                fontsize=12)
+    ax.set_ylabel("Impedance ($\Omega$)",   fontsize=12)
     plt.scatter(x_array, y_array)
     plt.show()
 
