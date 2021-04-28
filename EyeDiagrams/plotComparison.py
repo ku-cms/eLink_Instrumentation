@@ -29,7 +29,7 @@ def getData(input_file):
             data.append(row)
     return data
 
-def plotData(input_file, output_file, plot_dir):
+def plotData(input_file, output_file, plot_dir, title, column_indices, xlim, ylim):
     verbose = False
     makeDir(plot_dir)
     data = getData(input_file)
@@ -37,8 +37,8 @@ def plotData(input_file, output_file, plot_dir):
     output_pdf = "{0}/{1}.pdf".format(plot_dir, output_file)
 
     # get data from column
-    column_index_1 = 3
-    column_index_2 = 6
+    column_index_1 = column_indices[0]
+    column_index_2 = column_indices[1]
     data_label     = ""
     x_vals  = []
     y1_vals = []
@@ -76,28 +76,49 @@ def plotData(input_file, output_file, plot_dir):
         print(y1_array)
         print(y2_array)
     
-    ax.set_xlim([0.0, 10.0])
-    ax.set_ylim([0.0, 200.0])
-    ax.set_title("Cable 120 Eye Diagram Data",  fontsize=16)
-    ax.set_xlabel("Channel",                    fontsize=12)
-    ax.set_ylabel(data_label,                   fontsize=12)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    ax.set_title(title,         fontsize=16)
+    ax.set_xlabel("Channel",    fontsize=12)
+    ax.set_ylabel(data_label,   fontsize=12)
     
     plt.scatter(x_array, y1_array, label="Before Lashing")
     plt.scatter(x_array, y2_array, label="After Lashing")
     plt.legend(loc='upper right', prop={'size': 12})
     plt.savefig(output_png)
     plt.savefig(output_pdf)
-    #plt.show()
+
+def makePlots():
+    input_file      = "Cable_120_EyeDiagrams.csv"
+    plot_dir        = "plots"
+    
+    # Heights
+    output_file     = "Cable_120_EyeDiagram_Heights"
+    title           = "Cable 120 Eye Diagram Heights"
+    column_indices  = [3, 6]
+    xlim            = [0.0, 10.0]
+    ylim            = [0.0, 200.0]
+    plotData(input_file, output_file, plot_dir, title, column_indices, xlim, ylim)
+    
+    # Jitters
+    output_file     = "Cable_120_EyeDiagram_Jitters"
+    title           = "Cable 120 Eye Diagram Jitters"
+    column_indices  = [4, 7]
+    xlim            = [0.0, 10.0]
+    ylim            = [0.0, 400.0]
+    plotData(input_file, output_file, plot_dir, title, column_indices, xlim, ylim)
+    
+    # Widths
+    output_file     = "Cable_120_EyeDiagram_Widths"
+    title           = "Cable 120 Eye Diagram Widths"
+    column_indices  = [5, 8]
+    xlim            = [0.0, 10.0]
+    ylim            = [0.0, 400.0]
+    plotData(input_file, output_file, plot_dir, title, column_indices, xlim, ylim)
 
 def main():
-    input_file  = "Cable_120_EyeDiagrams.csv"
-    output_file = "Cable_120_EyeDiagram_Heights"
-    plot_dir    = "plots"
-    
-    #printData(input_file)
-    plotData(input_file, output_file, plot_dir)
+    makePlots()
 
 if __name__ == "__main__":
     main()
-
 
