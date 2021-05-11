@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from itertools import islice
+import os
 import sys
 import re
 import pylab
@@ -14,6 +15,9 @@ from matplotlib.ticker import AutoMinorLocator
 
 #rf.stylely()
 
+def ensure_dir(file_name):
+    if not os.path.exists(file_name):
+        os.mkdir(file_name)
 
 def name(input):
     match = re.match(r'TP_\w+_\d+', input)
@@ -52,6 +56,8 @@ parser.add_option('--plot_directory', metavar='T', type='string', action='store'
 basename        = options.basename
 data_directory  = options.data_directory
 plot_directory  = options.plot_directory
+
+ensure_dir(plot_directory)
 
 if '_\d+' in basename:
     cable = name(basename)
