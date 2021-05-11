@@ -97,6 +97,7 @@ options = [
             # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2CMD.vna'],
             # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D0.vna'],
             # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D1.vna'],
+
             # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D1_run2.vna'],
             # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3CMD.vna'],
             # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3D0.vna'],
@@ -118,6 +119,21 @@ options = [
             ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_CMD.vna'],
             ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_CMD_swap12.vna'],
             ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_CMD_1to2_3to4.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D0.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D0_swap12.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D0_1to2_3to4.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D1.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D1_run2.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D1_swap12.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D2.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D2_run2.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D2_swap12.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D3.vna'],
+            ['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D3_swap12.vna'],
+            
+            # testing breaks (3, 4 disconnected; 1, 2, 3, 4 disconnected)
+            #['plots', 'data', 'break_34.vna'],
+            #['plots', 'data', 'break_1234.vna'],
             
 ]
 
