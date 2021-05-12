@@ -179,7 +179,6 @@ def plot(basename, data_directory, plot_directory):
         
         fig.savefig(plot_directory+'/'+cable+'_rf.png')
     
-    
     #plt.figure(1)
     #pylab.title('S_{12}')
     #    example.plot_s_db(m=1, n=0)
@@ -190,6 +189,9 @@ def plot(basename, data_directory, plot_directory):
     #plt.draw()
     #print ('ch impedance:', example.z0)
     #input("hold")    
+
+    # release memory
+    plt.close('all')
 
 def main():
     parser = OptionParser()

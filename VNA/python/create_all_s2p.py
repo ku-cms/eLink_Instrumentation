@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import subprocess
+from readVNADataSKRF import plot
 
 # WARNING:
 # Write file names ending in .vna
@@ -89,58 +89,56 @@ options = [
             # Channels: 4J, 4B, 8, 16, 24
             #['data', 'johncable4_Bill4tpi.vna'],
     
-            # # Cable 120 (Before Lashing)
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1CMD.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1CMD_run2.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1D0.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M1D1.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2CMD.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D0.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D1.vna'],
-
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M2D1_run2.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3CMD.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3D0.vna'],
-            # ['plots/Cable_120_beforeLashing', 'data/Cable_120_beforeLashing', 'TP_0.8m_120_M3D1.vna'],
-            # 
-            # # Cable 120 (After Lashing)
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M1CMD.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M1D0.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M1D1.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M2CMD.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M2D0.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M2D1.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3CMD.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3CMD_run2.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3D0.vna'],
-            # ['plots/Cable_120_afterLashing', 'data/Cable_120_afterLashing', 'TP_0.8m_120_M3D1.vna'],
+            # Cable 120 (Before Lashing)
+            ['TP_0.8m_120_M1CMD.vna',       'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M1CMD_run2.vna',  'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M1D0.vna',        'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M1D1.vna',        'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M2CMD.vna',       'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M2D0.vna',        'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M2D1.vna',        'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M2D1_run2.vna',   'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M3CMD.vna',       'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M3D0.vna',        'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            ['TP_0.8m_120_M3D1.vna',        'data/Cable_120_beforeLashing', 'plots/Cable_120_beforeLashing'],
+            
+            # Cable 120 (After Lashing)
+            ['TP_0.8m_120_M1CMD.vna',       'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M1D0.vna',        'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M1D1.vna',        'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M2CMD.vna',       'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M2D0.vna',        'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M2D1.vna',        'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M3CMD.vna',       'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M3CMD_run2.vna',  'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M3D0.vna',        'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
+            ['TP_0.8m_120_M3D1.vna',        'data/Cable_120_afterLashing', 'plots/Cable_120_afterLashing'],
             
             # Cable 158 (Before Lashing)
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_CMD.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_CMD_swap12.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_CMD_1to2_3to4.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D0.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D0_swap12.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D0_1to2_3to4.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D1.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D1_run2.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D1_swap12.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D2.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D2_run2.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D2_swap12.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D3.vna'],
-            #['plots/Cable_158_beforeLashing', 'data/Cable_158_beforeLashing', 'TP_1p6m_158_D3_swap12.vna'],
+            ['TP_1p6m_158_CMD.vna',             'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_CMD_swap12.vna',      'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_CMD_1to2_3to4.vna',   'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D0.vna',              'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D0_swap12.vna',       'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D0_1to2_3to4.vna',    'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D1.vna',              'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D1_run2.vna',         'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D1_swap12.vna',       'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D2.vna',              'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D2_run2.vna',         'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D2_swap12.vna',       'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D3.vna',              'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
+            ['TP_1p6m_158_D3_swap12.vna',       'data/Cable_158_beforeLashing', 'plots/Cable_158_beforeLashing'],
             
             # testing breaks (3, 4 disconnected; 1, 2, 3, 4 disconnected)
-            ['plots', 'data', 'break_34.vna'],
-            ['plots', 'data', 'break_1234.vna'],
+            #['break_34.vna',   'data', 'plots'],
+            #['break_1234.vna', 'data', 'plots'],
             
 ]
 
-command = 'python3 python/readVNADataSKRF.py --plot_directory={0:s} --data_directory={1:s} --basename={2:s}'
-
 for opt in options:
-    s = command.format(opt[0], opt[1], opt[2])
-    print(s)
-    subprocess.call( [s, ""], shell=True )	
+    basename        = opt[0]
+    data_directory  = opt[1]
+    plot_directory  = opt[2]
+    plot(basename, data_directory, plot_directory)
 
