@@ -191,6 +191,7 @@ def plot(basename, data_directory, plot_directory):
     #input("hold")    
 
     # release memory
+    # https://stackoverflow.com/questions/21884271/warning-about-too-many-open-figures
     plt.close('all')
 
 def main():
