@@ -13,7 +13,14 @@ from matplotlib import pyplot as plt
 from matplotlib import style
 from matplotlib.ticker import AutoMinorLocator
 
-#rf.stylely()
+# (35: 17, 18, 19, 26, 27, 28, 29, 56, 57, 58) 'TP_35cm_XX_ChD1.vna
+# (35 redo: 56, 60) 
+# (1 : 20, 21, 23, 32, 33) TP_1m_XX_ChD1.vna # 20,21 went wrong
+# (1 redo: 53, 53_D0, 55)
+# (1p4: 35, 36, 37, 38, 39, 40) TP_1p4m_XX_ChD1.vna. #38, 40 went wrong
+# (1p4: 35, 36, 41, 42
+# (2 : 46, 47) TP_2m_47_ChD1
+# (2: 46)
 
 def ensure_dir(file_name):
     if not os.path.exists(file_name):
@@ -25,35 +32,9 @@ def name(input):
     if '1p4' in name: name = name.replace('1p4', '1.4')
     return name
 
-# (35: 17, 18, 19, 26, 27, 28, 29, 56, 57, 58) 'TP_35cm_XX_ChD1.vna
-# (35 redo: 56, 60) 
-# (1 : 20, 21, 23, 32, 33) TP_1m_XX_ChD1.vna # 20,21 went wrong
-# (1 redo: 53, 53_D0, 55)
-# (1p4: 35, 36, 37, 38, 39, 40) TP_1p4m_XX_ChD1.vna. #38, 40 went wrong
-# (1p4: 35, 36, 41, 42
-# (2 : 46, 47) TP_2m_47_ChD1
-# (2: 46)
 
-def main():
-    parser = OptionParser()
-    parser.add_option('--basename', metavar='T', type='string', action='store',
-                      default='straight_SMA.vna',
-                      dest='basename',
-                      help='input text file')
-    parser.add_option('--data_directory', metavar='T', type='string', action='store',
-                      default='data',
-                      dest='data_directory',
-                      help='directory to store data')
-    parser.add_option('--plot_directory', metavar='T', type='string', action='store',
-                      default='plots',
-                      dest='plot_directory',
-                      help='directory to store plots')
-    
-    (options, args) = parser.parse_args()
-    basename        = options.basename
-    data_directory  = options.data_directory
-    plot_directory  = options.plot_directory
-    
+def plot(basename, data_directory, plot_directory):
+    #rf.stylely()
     ensure_dir(plot_directory)
     
     if '_\d+' in basename:
@@ -209,6 +190,27 @@ def main():
     #plt.draw()
     #print ('ch impedance:', example.z0)
     #input("hold")    
+
+def main():
+    parser = OptionParser()
+    parser.add_option('--basename', metavar='T', type='string', action='store',
+                      default='straight_SMA.vna',
+                      dest='basename',
+                      help='input text file')
+    parser.add_option('--data_directory', metavar='T', type='string', action='store',
+                      default='data',
+                      dest='data_directory',
+                      help='directory to store data')
+    parser.add_option('--plot_directory', metavar='T', type='string', action='store',
+                      default='plots',
+                      dest='plot_directory',
+                      help='directory to store plots')
+    
+    (options, args) = parser.parse_args()
+    basename        = options.basename
+    data_directory  = options.data_directory
+    plot_directory  = options.plot_directory
+    plot(basename, data_directory, plot_directory)
 
 if __name__ == "__main__":
     main()
