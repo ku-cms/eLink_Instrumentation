@@ -1,0 +1,57 @@
+{
+    "M1CMD" : { 
+                "data_file" : "TP_0.8m_120_M1CMD.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M1CMD_run2" : { 
+                "data_file" : "TP_0.8m_120_M1CMD_run2.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M1D0" : { 
+                "data_file" : "TP_0.8m_120_M1D0.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M1D1" : { 
+                "data_file" : "TP_0.8m_120_M1D1.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M2CMD" : { 
+                "data_file" : "TP_0.8m_120_M2CMD.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M2D0" : { 
+                "data_file" : "TP_0.8m_120_M2D0.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M2D1" : { 
+                "data_file" : "TP_0.8m_120_M2D1.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M2D1_run2" : { 
+                "data_file" : "TP_0.8m_120_M2D1_run2.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M3CMD" : { 
+                "data_file" : "TP_0.8m_120_M3CMD.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M3D0" : { 
+                "data_file" : "TP_0.8m_120_M3D0.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    },
+    "M3D1" : { 
+                "data_file" : "TP_0.8m_120_M3D1.vna",
+                "data_dir"  : "data/Cable_120_beforeLashing",
+                "plot_dir"  : "plots/Cable_120_beforeLashing"
+    }
+}

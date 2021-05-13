@@ -1,0 +1,52 @@
+{
+    "M1CMD" : { 
+                "data_file" : "TP_0.8m_120_M1CMD.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M1D0" : { 
+                "data_file" : "TP_0.8m_120_M1D0.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M1D1" : { 
+                "data_file" : "TP_0.8m_120_M1D1.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M2CMD" : { 
+                "data_file" : "TP_0.8m_120_M2CMD.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M2D0" : { 
+                "data_file" : "TP_0.8m_120_M2D0.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M2D1" : { 
+                "data_file" : "TP_0.8m_120_M2D1.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M3CMD" : { 
+                "data_file" : "TP_0.8m_120_M3CMD.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M3CMD_run2" : { 
+                "data_file" : "TP_0.8m_120_M3CMD_run2.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M3D0" : { 
+                "data_file" : "TP_0.8m_120_M3D0.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    },
+    "M3D1" : { 
+                "data_file" : "TP_0.8m_120_M3D1.vna",
+                "data_dir"  : "data/Cable_120_afterLashing",
+                "plot_dir"  : "plots/Cable_120_afterLashing"
+    }
+}
