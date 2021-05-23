@@ -24,7 +24,8 @@ def getFile(input_files, module, channel, requireModule):
         return ""
 
 def run(input_files, output_file, modules, channels, requireModule):
-    verbose = False
+    verbose   = False
+    precision = 3
     # row, column indices start from 0 for data matrix
     row_map    = {"label1" : 32, "label2" : 33, "value" : 34}
     column_map = {"height" : 13, "jitter" : 43, "width" : 53}
@@ -54,19 +55,43 @@ def run(input_files, output_file, modules, channels, requireModule):
                 jitter = float(data[row_map["value"]][column_map["jitter"]]) * unit_map["jitter"]
                 width  = float(data[row_map["value"]][column_map["width"]] ) * unit_map["width"]
                 # columns: index, module, channel, height, jitter, width
-                output_row = [index, module, channel, round(height, 3), round(jitter, 3), round(width, 3)]
+                output_row = [index, module, channel, round(height, precision), round(jitter, precision), round(width, precision)]
                 output_writer.writerow(output_row)
                 index += 1
 
-def makeTable(input_dir, output_dir, output_file_name):
+def makeTable(input_dir, output_dir, output_file_name, cable_type):
     output_file = "{0}/{1}".format(output_dir, output_file_name)
     input_file_pattern = "{0}/*.csv".format(input_dir)
-    modules  = ["M1"]
-    channels = ["CMD", "D0", "D1", "D2", "D3"]
-    requireModule = False
-
     tools.makeDir(output_dir)
     input_files = glob.glob(input_file_pattern)
+    
+    cable_type_map = {
+        1 : {
+            "modules"       : ["M1"],
+            "channels"      : ["CMD", "D0", "D1", "D2", "D3"],
+            "requireModule" : False 
+        },
+        2 : {
+            "modules"       : ["M1"],
+            "channels"      : ["CMD", "D0", "D1"],
+            "requireModule" : False 
+        },
+        3 : {
+            "modules"       : ["M1", "M2"],
+            "channels"      : ["CMD", "D0", "D1"],
+            "requireModule" : True 
+        },
+        4 : {
+            "modules"       : ["M1", "M2", "M3"],
+            "channels"      : ["CMD", "D0", "D1"],
+            "requireModule" : True 
+        },
+    }
+
+    modules         = cable_type_map[cable_type]["modules"]
+    channels        = cable_type_map[cable_type]["channels"]
+    requireModule   = cable_type_map[cable_type]["requireModule"]
+
     run(input_files, output_file, modules, channels, requireModule)
 
 def main():
@@ -75,11 +100,13 @@ def main():
     parser.add_argument("--input_dir",          "-i",   default="", help="input directory containing data csv files")
     parser.add_argument("--output_dir",         "-o",   default="", help="output directory for output csv file")
     parser.add_argument("--output_file_name",   "-f",   default="", help="output csv file name")
+    parser.add_argument("--cable_type",         "-t",   default=-1, help="cable type [1-4]")
     
     options             = parser.parse_args()
     input_dir           = options.input_dir
     output_dir          = options.output_dir
     output_file_name    = options.output_file_name
+    cable_type          = int(options.cable_type)
     
     # check for valid options
     if not input_dir:
@@ -91,11 +118,14 @@ def main():
     if not output_file_name:
         print("Provide an output file name using the -f option.")
         return
+    if cable_type < 1 or cable_type > 4:
+        print("Provide cable type [1-4] using the -t option.")
+        return
     if not os.path.exists(input_dir):
         print("ERROR: The input directory \"{0}\" does not exist.".format(input_dir))
         return
 
-    makeTable(input_dir, output_dir, output_file_name)
+    makeTable(input_dir, output_dir, output_file_name, cable_type)
 
 if __name__ == "__main__":
     main()
