@@ -114,7 +114,7 @@ def plotData(input_file, output_file, plot_dir, title, column_indices, xlim, yli
     plt.savefig(output_pdf)
 
 def makePlots():
-    input_file      = "Cable_120_EyeDiagrams.csv"
+    input_file      = "data/Cable_120/Cable_120_EyeDiagrams.csv"
     plot_dir        = "plots"
     drawMean        = True
     
