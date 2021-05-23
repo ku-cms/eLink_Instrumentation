@@ -4,20 +4,24 @@ import csv
 import glob
 import tools
 
-def getFile(input_files, channel):
-    file_matches = []
+def getFile(input_files, module, channel, requireModule):
+    matching_files = []
     for f in input_files:
-        if channel in f:
-            file_matches.append(f)
-    n = len(file_matches)
-    if n == 1:
-        return file_matches[0]
+        if requireModule:
+            if module in f and channel in f:
+                matching_files.append(f)
+        else:
+            if channel in f:
+                matching_files.append(f)
+    n_matching = len(matching_files)
+    if n_matching == 1:
+        return matching_files[0]
     else:
-        print("ERROR: For channel {0}, there are {1} files found (should be 1).".format(channel, n))
-        print("files: {0}".format(file_matches))
+        print("ERROR: For module {0} channel {1}, there are {2} matching files found (should be 1).".format(module, channel, n_matching))
+        print("matching files: {0}".format(matching_files))
         return ""
 
-def makeTable(input_files, output_file, modules, channels):
+def makeTable(input_files, output_file, modules, channels, requireModule):
     verbose = False
     # row, column indices start from 0 for data matrix
     row_map    = {"label1" : 32, "label2" : 33, "value" : 34}
@@ -30,9 +34,9 @@ def makeTable(input_files, output_file, modules, channels):
         index = 1
         for module in modules:
             for channel in channels:
-                f = getFile(input_files, channel)
+                f = getFile(input_files, module, channel, requireModule)
                 if not f:
-                    print("ERROR: Unique file not found for channel {0}".format(channel))
+                    print("ERROR: Unique file not found for module {0} channel {1}.".format(module, channel))
                     return
                 data = tools.getData(f)
                 if verbose:
@@ -56,12 +60,13 @@ def makeTables():
     table_dir = "tables"
     input_file_pattern = "data/Cable_158_beforeLashing/*.csv"
     output_file = "{0}/Cable_158_EyeDiagrams_beforeLashing.csv".format(table_dir)
-    modules = ["M1"]
+    modules  = ["M1"]
     channels = ["CMD", "D0", "D1", "D2", "D3"]
+    requireModule = False
 
     tools.makeDir(table_dir)
     input_files = glob.glob(input_file_pattern)
-    makeTable(input_files, output_file, modules, channels)
+    makeTable(input_files, output_file, modules, channels, requireModule)
 
 def main():
     makeTables()
