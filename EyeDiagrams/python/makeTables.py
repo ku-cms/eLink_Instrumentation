@@ -1,5 +1,7 @@
 # makeTables.py
 
+import argparse
+import os
 import csv
 import glob
 import tools
@@ -21,7 +23,7 @@ def getFile(input_files, module, channel, requireModule):
         print("matching files: {0}".format(matching_files))
         return ""
 
-def makeTable(input_files, output_file, modules, channels, requireModule):
+def run(input_files, output_file, modules, channels, requireModule):
     verbose = False
     # row, column indices start from 0 for data matrix
     row_map    = {"label1" : 32, "label2" : 33, "value" : 34}
@@ -56,22 +58,45 @@ def makeTable(input_files, output_file, modules, channels, requireModule):
                 output_writer.writerow(output_row)
                 index += 1
 
-def makeTables():
-    table_dir = "tables"
-    input_file_pattern = "data/Cable_158_beforeLashing/*.csv"
-    output_file = "{0}/Cable_158_EyeDiagrams_beforeLashing.csv".format(table_dir)
+def makeTable(input_dir, output_dir, output_file_name):
+    output_file = "{0}/{1}".format(output_dir, output_file_name)
+    input_file_pattern = "{0}/*.csv".format(input_dir)
     modules  = ["M1"]
     channels = ["CMD", "D0", "D1", "D2", "D3"]
     requireModule = False
 
-    tools.makeDir(table_dir)
+    tools.makeDir(output_dir)
     input_files = glob.glob(input_file_pattern)
-    makeTable(input_files, output_file, modules, channels, requireModule)
+    run(input_files, output_file, modules, channels, requireModule)
 
 def main():
-    makeTables()
+    # options
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--input_dir",          "-i",   default="", help="input directory containing data csv files")
+    parser.add_argument("--output_dir",         "-o",   default="", help="output directory for output csv file")
+    parser.add_argument("--output_file_name",   "-f",   default="", help="output csv file name")
+    
+    options             = parser.parse_args()
+    input_dir           = options.input_dir
+    output_dir          = options.output_dir
+    output_file_name    = options.output_file_name
+    
+    # check for valid options
+    if not input_dir:
+        print("Provide an input directory using the -i option.")
+        return
+    if not output_dir:
+        print("Provide an output directory using the -o option.")
+        return
+    if not output_file_name:
+        print("Provide an output file name using the -f option.")
+        return
+    if not os.path.exists(input_dir):
+        print("ERROR: The input directory \"{0}\" does not exist.".format(input_dir))
+        return
+
+    makeTable(input_dir, output_dir, output_file_name)
 
 if __name__ == "__main__":
     main()
-
 
