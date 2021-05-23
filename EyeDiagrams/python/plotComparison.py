@@ -1,38 +1,13 @@
 # plotComparison.py
 
-import csv
-import os
 import numpy as np
 import matplotlib.pyplot as plt
-
-def makeDir(dir_name):
-    if not os.path.exists(dir_name):
-        os.makedirs(dir_name)
-
-def printData(input_file):
-    with open(input_file, "r") as f:
-        reader = csv.reader(f)
-        print(" --- print file")
-        for line in f:
-            print(line, end='')
-        # return to start of file
-        f.seek(0)
-        print(" --- print csv")
-        for row in reader:
-            print(row)
-
-def getData(input_file):
-    data = []
-    with open(input_file, "r") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            data.append(row)
-    return data
+import tools
 
 def plotData(input_file, output_file, plot_dir, title, column_indices, xlim, ylim, drawMean):
     verbose = False
-    makeDir(plot_dir)
-    data = getData(input_file)
+    tools.makeDir(plot_dir)
+    data = tools.getData(input_file)
     output_png = "{0}/{1}.png".format(plot_dir, output_file)
     output_pdf = "{0}/{1}.pdf".format(plot_dir, output_file)
 
@@ -114,8 +89,8 @@ def plotData(input_file, output_file, plot_dir, title, column_indices, xlim, yli
     plt.savefig(output_pdf)
 
 def makePlots():
-    input_file      = "Cable_120_EyeDiagrams.csv"
-    plot_dir        = "plots"
+    input_file      = "data/Cable_120/Cable_120_EyeDiagrams.csv"
+    plot_dir        = "plots/Cable_120"
     drawMean        = True
     
     # Heights
