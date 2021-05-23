@@ -17,7 +17,7 @@ def getFile(input_files, channel):
         print("files: {0}".format(file_matches))
         return ""
 
-def makeTable(input_files, output_file, channels):
+def makeTable(input_files, output_file, modules, channels):
     verbose = False
     # row, column indices start from 0 for data matrix
     row_map    = {"label1" : 32, "label2" : 33, "value" : 34}
@@ -27,38 +27,41 @@ def makeTable(input_files, output_file, channels):
     with open(output_file, "w") as output_csv:
         output_writer = csv.writer(output_csv)
         output_writer.writerow(output_column_titles)
-        for i, channel in enumerate(channels):
-            f = getFile(input_files, channel)
-            if not f:
-                print("ERROR: Unique file not found for channel {0}".format(channel))
-                return
-            data = tools.getData(f)
-            if verbose:
-                print(f)
-                for key in column_map:
-                    # remove space from strings
-                    # convert values to floats
-                    label1 = data[row_map["label1"]][column_map[key]].strip()
-                    label2 = data[row_map["label2"]][column_map[key]].strip()
-                    value  = float(data[row_map["value"]][column_map[key]])
-                    print(" - {0}: {1} = {2:.2E}".format(label1, label2, value))
-            module = "M1"
-            height = float(data[row_map["value"]][column_map["height"]]) * unit_map["height"]
-            jitter = float(data[row_map["value"]][column_map["jitter"]]) * unit_map["jitter"]
-            width  = float(data[row_map["value"]][column_map["width"]] ) * unit_map["width"]
-            # columns: index, module, channel, height, jitter, width
-            output_row = [i+1, module, channel, round(height, 3), round(jitter, 3), round(width, 3)]
-            output_writer.writerow(output_row)
+        index = 1
+        for module in modules:
+            for channel in channels:
+                f = getFile(input_files, channel)
+                if not f:
+                    print("ERROR: Unique file not found for channel {0}".format(channel))
+                    return
+                data = tools.getData(f)
+                if verbose:
+                    print(f)
+                    for key in column_map:
+                        # remove space from strings
+                        # convert values to floats
+                        label1 = data[row_map["label1"]][column_map[key]].strip()
+                        label2 = data[row_map["label2"]][column_map[key]].strip()
+                        value  = float(data[row_map["value"]][column_map[key]])
+                        print(" - {0}: {1} = {2:.2E}".format(label1, label2, value))
+                height = float(data[row_map["value"]][column_map["height"]]) * unit_map["height"]
+                jitter = float(data[row_map["value"]][column_map["jitter"]]) * unit_map["jitter"]
+                width  = float(data[row_map["value"]][column_map["width"]] ) * unit_map["width"]
+                # columns: index, module, channel, height, jitter, width
+                output_row = [index, module, channel, round(height, 3), round(jitter, 3), round(width, 3)]
+                output_writer.writerow(output_row)
+                index += 1
 
 def makeTables():
     table_dir = "tables"
     input_file_pattern = "data/Cable_158_beforeLashing/*.csv"
     output_file = "{0}/Cable_158_EyeDiagrams_beforeLashing.csv".format(table_dir)
+    modules = ["M1"]
     channels = ["CMD", "D0", "D1", "D2", "D3"]
 
     tools.makeDir(table_dir)
     input_files = glob.glob(input_file_pattern)
-    makeTable(input_files, output_file, channels)
+    makeTable(input_files, output_file, modules, channels)
 
 def main():
     makeTables()
