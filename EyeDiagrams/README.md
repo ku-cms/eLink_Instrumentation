@@ -10,7 +10,12 @@ Follow the setup instrutions [here](https://github.com/ku-cms/eLink_Instrumentat
 
 ### Processing Data
 
-The primary data processing script takes a directory of csv files that contain eye diagram data as input and combines the data into a single output csv file.
+The primary data processing script "makeTables.py" takes a directory of csv files that contain eye diagram data as input and combines the data into a single output csv file.
+First, to run makeTables.py, eye diagram data is required.
+- The statistics tables for each channel should be saved as csv files.
+- These files should be put into a directory for the respective cable.
+- This directory containing the raw data is the input directory for makeTables.py.
+
 Use -h to see the help menu, which displays the options:
 ```
 python3 python/makeTables.py -h
@@ -18,9 +23,9 @@ python3 python/makeTables.py -h
 The script requires an input directory (-i), an output directory (-o), and output file name (-f), and a cable type (-t).
 Here is an example of running this script:
 ```
-python3 python/makeTables.py -i data/Cable_158_beforeLashing  -o tables -f Cable_158_EyeDiagrams_beforeLashing.csv -t 1
+python3 python/makeTables.py -i data/Cable_158_beforeLashing -o tables -f Cable_158_EyeDiagrams_beforeLashing.csv -t 1
 ```
-This will create the output file tables/Cable_158_EyeDiagrams_beforeLashing.csv.
+This will create the output file "tables/Cable_158_EyeDiagrams_beforeLashing.csv."
 
 TODO: Make a plotting script to plot eye diagram data for each cable.
 
