@@ -115,7 +115,7 @@ def plotData(input_file, output_file, plot_dir, title, column_indices, xlim, yli
 
 def makePlots():
     input_file      = "data/Cable_120/Cable_120_EyeDiagrams.csv"
-    plot_dir        = "plots"
+    plot_dir        = "plots/Cable_120"
     drawMean        = True
     
     # Heights
