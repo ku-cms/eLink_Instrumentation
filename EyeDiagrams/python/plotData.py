@@ -73,12 +73,7 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
-def makePlots():
-    #cable_number    = 158
-    #input_file      = "tables/Cable_158_EyeDiagrams_beforeLashing.csv"
-    cable_number    = 121
-    input_file      = "tables/Cable_121_EyeDiagrams.csv"
-    plot_dir        = "plots/Cable_{0}".format(cable_number)
+def makePlots(cable_number, input_file, plot_dir):
     drawMean        = True
     
     # Heights
@@ -103,7 +98,13 @@ def makePlots():
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
 
 def main():
-    makePlots()
+    cable_number    = 158
+    input_file      = "tables/Cable_158_EyeDiagrams_beforeLashing.csv"
+    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    #cable_number    = 121
+    #input_file      = "tables/Cable_121_EyeDiagrams.csv"
+    #plot_dir        = "plots/Cable_{0}".format(cable_number)
+    makePlots(cable_number, input_file, plot_dir)
 
 if __name__ == "__main__":
     main()
