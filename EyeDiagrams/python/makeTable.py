@@ -100,6 +100,7 @@ def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--input_dir",          "-i",   default="",         help="input directory containing data (csv files)")
     parser.add_argument("--table_output_dir",   "-o",   default="tables",   help="output directory for table (csv file)")
+    parser.add_argument("--plot_output_dir",    "-p",   default="",         help="output directory for plots (pdf/png files)")
     parser.add_argument("--output_file_name",   "-f",   default="",         help="output csv file name")
     parser.add_argument("--cable_number",       "-n",   default=-1,         help="cable number [n > 0]")
     parser.add_argument("--cable_type",         "-t",   default=-1,         help="cable type [1-4]")
@@ -107,6 +108,7 @@ def main():
     options             = parser.parse_args()
     input_dir           = options.input_dir
     table_output_dir    = options.table_output_dir
+    plot_output_dir     = options.plot_output_dir
     output_file_name    = options.output_file_name
     cable_number        = int(options.cable_number)
     cable_type          = int(options.cable_type)
@@ -117,6 +119,9 @@ def main():
         return
     if not table_output_dir:
         print("Provide a table output directory using the -o option.")
+        return
+    if not plot_output_dir:
+        print("Provide a plot output directory using the -p option.")
         return
     if not output_file_name:
         print("Provide an output file name using the -f option.")
@@ -132,7 +137,7 @@ def main():
         return
 
     output_file     = "{0}/{1}".format(table_output_dir, output_file_name)
-    plot_output_dir = "plots/Cable_{0}".format(cable_number)
+    #plot_output_dir = "plots/Cable_{0}".format(cable_number)
 
     makeTable(input_dir, table_output_dir, output_file_name, cable_type)
     makePlots(cable_number, output_file, plot_output_dir)
