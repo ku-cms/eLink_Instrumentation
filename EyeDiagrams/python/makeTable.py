@@ -1,11 +1,11 @@
-# makeTables.py
+# makeTable.py
 
 import argparse
 import os
 import csv
 import glob
 import tools
-from plotData import makePlots
+from makePlots import makePlots
 
 def getFile(input_files, module, channel, requireModule):
     matching_files = []
