@@ -21,8 +21,32 @@ In addition, it creates plots of this data and outputs these as pdf/png files.
 
 First, eye diagram data is required.
 - The statistics table for each channel should be saved as a csv file.
+- Only include the module number (M1, M2, etc.) in the file name for type 3/4 cables.
+- Include the channel number (CMD, D0, D1, etc.) in the file name for all cables.
+- Example file name (type 1 cable): TP_158_CMD_Stats.csv
+- Example file name (type 4 cable): TP_121_M1_CMD_Stats.csv
 - These files should be put into a directory for the respective cable, for example "data/Cable_121".
 - This directory containing the raw data is the input directory for processData.py.
+
+Data cleaning is required for the raw data files to remove byte 0x96 (`<96>`) that appears in the csv files.
+
+Open the file in vim.
+```
+vim TP_158_CMD_Stats.csv
+```
+Use this command in vim to remove byte 0x96 (and actually press control V).
+```
+:%s/<CTRL-V>x96//g
+```
+Then use ":x" to save file and exit.
+Repeat for other files using vim history to get this command quickly.
+
+If needed, here is an example of renaming a group of files from a terminal.
+In this example, "wf" is replaced with "Stats" in the file name for all csv files in the current directory.
+This step is not required.
+```
+for f in *.csv; do mv "$f" "$(echo "$f" | sed s/wf/Stats/g)"; done
+```
 
 Use -h to see the help menu, which displays the options:
 ```
@@ -43,6 +67,7 @@ python3 python/processData.py -i data/Cable_121 -o tables -p plots/Cable_121 -f 
 In both of these example, the intput directory is "data/Cable_121."
 The script will output the data to "tables/Cable_121_EyeDiagrams.csv," and the plots will be saved in "plots/Cable_121."
 
+After running "python/processData.py," copy the output table and plots to a central location.
 
 ### Additional Scripts
 
