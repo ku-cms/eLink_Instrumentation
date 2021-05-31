@@ -21,7 +21,7 @@ def printData(input_file):
         for row in reader:
             print(row)
 
-# reads csv file
+# takes a csv file as input and outputs data in a matrix
 def getData(input_file):
     data = []
     with open(input_file, "r") as f:

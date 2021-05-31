@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tools
 
+# create plot from intput data file
 def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean):
     verbose = False
     tools.makeDir(plot_dir)
@@ -20,6 +21,7 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
     x_vals     = []
     y_vals     = []
 
+    # loop over data
     for i, row in enumerate(data):
         # first row has labels
         if i == 0:
@@ -55,6 +57,7 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
         print("y_mean = {0}".format(y_mean))
         print("y_std  = {0}".format(y_std))
     
+    # format plot
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.set_title(title,         fontsize=16)
@@ -63,16 +66,21 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
     
     p1 = plt.scatter(x_array, y_array, color=colors[0], label="data")
     objects = [p1]
+
+    # draw mean and std dev on plot
     if drawMean:
         p2 = plt.axline((x_extended[0], y_mean), (x_extended[-1], y_mean), color=colors[0], linestyle="--", label="mean")
         p3 = plt.fill_between(x_extended, y_mean - y_std, y_mean + y_std, color=colors[0], alpha=0.2, label="std dev")
         objects = [p1, p2, p3]
+    
     # specify order for legend
     labels = [o.get_label() for o in objects]
+    
     plt.legend(objects, labels, loc='upper right', prop={'size': 12})
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
+# primary make plots function
 def makePlots(cable_number, input_file, plot_dir):
     drawMean        = True
     
@@ -98,12 +106,16 @@ def makePlots(cable_number, input_file, plot_dir):
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
 
 def main():
-    cable_number    = 158
-    input_file      = "tables/Cable_158_EyeDiagrams_beforeLashing.csv"
-    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
-    #cable_number    = 121
-    #input_file      = "tables/Cable_121_EyeDiagrams.csv"
-    #plot_dir        = "plots/Cable_{0}".format(cable_number)
+    # testing
+    
+    #cable_number    = 158
+    #input_file      = "tables/Cable_158_EyeDiagrams_beforeLashing.csv"
+    #plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    
+    cable_number    = 121
+    input_file      = "tables/Cable_121_EyeDiagrams.csv"
+    plot_dir        = "plots/Cable_{0}".format(cable_number)
+    
     makePlots(cable_number, input_file, plot_dir)
 
 if __name__ == "__main__":
