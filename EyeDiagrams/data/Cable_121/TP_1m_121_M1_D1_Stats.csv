@@ -1,0 +1,36 @@
+DPOJET Version:  3.6.0 Build 25 ::Mon  24 May 2021 08:45:41 GMT
+
+Measurements -,
+
+Measurement#,Measurement,Source(s),Others,
+1, TIE1,"Ch1"," Edges => Signal Type: Auto, Clock Edge: Rise | Clock Recovery => Method: Constant Clock  Mean, Auto Calc: Every Acq, Nominal Data Rate: Off, Bit Rate: 2.5Gb/s, Known Data Pattern: Off, Pattern Filename: C:\TekApplications\DPOJET\Patterns\PRBS127.txt | Filters => F1: Spec: No Filter, F2: Spec: No Filter | General => Measurement Range Limits: Off, Max: 1ns, Min: -1ns, Custom Source Name: --"
+2, Height1,"Ch1"," Bit Config => Bit Type: All Bits | Clock Recovery => Method: Constant Clock  Mean, Auto Calc: Every Acq, Nominal Data Rate: Off, Bit Rate: 2.5Gb/s, Known Data Pattern: Off, Pattern Filename: C:\TekApplications\DPOJET\Patterns\PRBS127.txt | General => Measurement Range Limits: Off, Max: 500mV, Min: 50mV, Custom Source Name: --"
+3, TJ@BER1,"Ch1"," Edges => Signal Type: Auto, Clock Edge: Rise | Clock Recovery => Method: Constant Clock  Mean, Auto Calc: Every Acq, Nominal Data Rate: Off, Bit Rate: 2.5Gb/s, Known Data Pattern: Off, Pattern Filename: C:\TekApplications\DPOJET\Patterns\PRBS127.txt | RjDj => Pattern Type: Arbitrary, Window Length: 5UI, Population: 100, BER = 1E-12 | Filters => F1: Spec: No Filter, F2: Spec: No Filter | General => Measurement Range Limits: Off, Max: 1ns, Min: 0s, Custom Source Name: --"
+4, RJdd1,"Ch1"," Edges => Signal Type: Auto, Clock Edge: Rise | Clock Recovery => Method: Constant Clock  Mean, Auto Calc: Every Acq, Nominal Data Rate: Off, Bit Rate: 2.5Gb/s, Known Data Pattern: Off, Pattern Filename: C:\TekApplications\DPOJET\Patterns\PRBS127.txt | RjDj => Pattern Type: Arbitrary, Window Length: 5UI, Population: 100 | Filters => F1: Spec: No Filter, F2: Spec: No Filter | General => Measurement Range Limits: Off, Max: 1ns, Min: 0s, Custom Source Name: --"
+5, DJdd1,"Ch1"," Edges => Signal Type: Auto, Clock Edge: Rise | Clock Recovery => Method: Constant Clock  Mean, Auto Calc: Every Acq, Nominal Data Rate: Off, Bit Rate: 2.5Gb/s, Known Data Pattern: Off, Pattern Filename: C:\TekApplications\DPOJET\Patterns\PRBS127.txt | RjDj => Pattern Type: Arbitrary, Window Length: 5UI, Population: 100 | Filters => F1: Spec: No Filter, F2: Spec: No Filter | General => Measurement Range Limits: Off, Max: 1ns, Min: 0s, Custom Source Name: --"
+6, Width@BER1,"Ch1"," Edges => Signal Type: Auto, Clock Edge: Rise | Clock Recovery => Method: Constant Clock  Mean, Auto Calc: Every Acq, Nominal Data Rate: Off, Bit Rate: 2.5Gb/s, Known Data Pattern: Off, Pattern Filename: C:\TekApplications\DPOJET\Patterns\PRBS127.txt | RjDj => Pattern Type: Arbitrary, Window Length: 5UI, Population: 100, BER = 1E-12 | Filters => F1: Spec: No Filter, F2: Spec: No Filter | General => Measurement Range Limits: Off, Max: 900mUI, Min: 100mUI, Custom Source Name: --"
+
+Source Ref Levels -,
+
+Ref Levels,Ch1,Ch2,Ch3,Ch4,Math1,Math2,Math3,Math4,Ref1,Ref2,Ref3,Ref4,
+Autoset Method,Auto((Min-Max)),Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,
+Rise High,346.3mV,1V,1V,1V,1V,1V,1V,1V,1V,1V,1V,1V,
+Rise Mid,208.8mV,0V,0V,0V,0V,0V,0V,0V,0V,0V,0V,0V,
+Rise Low,71.3mV,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,
+Hysteresis,10.3mV,30mV,30mV,30mV,30mV,30mV,30mV,30mV,30mV,30mV,30mV,30mV,
+Fall High,346.3mV,1V,1V,1V,1V,1V,1V,1V,1V,1V,1V,1V,
+Fall Mid,208.8mV,0V,0V,0V,0V,0V,0V,0V,0V,0V,0V,0V,
+Fall Low,71.3mV,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,-1V,
+
+Miscellaneous -,
+
+,Source Gating,Source Qualify,Stat Pop Limit,
+State,Off,Off, Active: High,Off, Limit By: Acquistions, Stop Condition: Each Measurement
+Source,-,Ch4,-
+Size,-,-,1k,
+
+Statistics -,
+,,, TIE1,,,,,,,,,, Height1,,,,,,,,,, TJ@BER1,,,,,,,,,, RJdd1,,,,,,,,,, DJdd1,,,,,,,,,, Width@BER1,,,,,,,,,,
+Acq#,Time,,Mean,Std Dev,Max,Min,p-p,Population,Max-cc,Min-cc,Limit Test,,Mean,Std Dev,Max,Min,p-p,Population,Max-cc,Min-cc,Limit Test,,Mean,Std Dev,Max,Min,p-p,Population,Max-cc,Min-cc,Limit Test,,Mean,Std Dev,Max,Min,p-p,Population,Max-cc,Min-cc,Limit Test,,Mean,Std Dev,Max,Min,p-p,Population,Max-cc,Min-cc,Limit Test,,Mean,Std Dev,Max,Min,p-p,Population,Max-cc,Min-cc,Limit Test,,Pass/Fail Summary,
+1,8:45:41,,5.02736893881422E-18,6.21595241053071E-11,2.33785806401268E-10,-2.71937730902163E-10,5.05723537303431E-10,34163,3.12035388149835E-10,-4.04857875882221E-10,N/A,,0.0456745907352633,0,0.0456745907352633,0.0456745907352633,0,1,0,0,N/A,,6.14795950037057E-10,0,6.14795950037057E-10,6.14795950037057E-10,0,1,0,0,N/A,,3.03465932235211E-11,0,3.03465932235211E-11,3.03465932235211E-11,0,1,0,0,N/A,,1.89943644907761E-10,0,1.89943644907761E-10,1.89943644907761E-10,0,1,0,0,N/A,,1.66450817955952E-10,0,1.66450817955952E-10,1.66450817955952E-10,0,1,0,0,N/A,,N/A,
+Total,8:45:41,,5.02736893881422E-18,6.21595241053071E-11,2.33785806401268E-10,-2.71937730902163E-10,5.05723537303431E-10,34163,3.12035388149835E-10,-4.04857875882221E-10,N/A,,0.0456745907352633,0,0.0456745907352633,0.0456745907352633,0,1,0,0,N/A,,6.14795950037057E-10,0,6.14795950037057E-10,6.14795950037057E-10,0,1,0,0,N/A,,3.03465932235211E-11,0,3.03465932235211E-11,3.03465932235211E-11,0,1,0,0,N/A,,1.89943644907761E-10,0,1.89943644907761E-10,1.89943644907761E-10,0,1,0,0,N/A,,1.66450817955952E-10,0,1.66450817955952E-10,1.66450817955952E-10,0,1,0,0,N/A,,N/A,
