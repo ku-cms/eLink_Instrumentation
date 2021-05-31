@@ -3,40 +3,82 @@
 Scripts to analyze oscilloscope data take for "e-link" cables.
 Specifically, analyze eye diagram data to measure parameters such as height and jitter.
 
+
 ## Setup
 Follow the setup instrutions [here](https://github.com/ku-cms/eLink_Instrumentation).
 
+
 ## Instructions
+
 
 ### Processing Data
 
-The primary data processing script "makeTables.py" takes a directory of csv files that contain eye diagram data as input and combines the data into a single output csv file.
-First, to run makeTables.py, eye diagram data is required.
-- The statistics tables for each channel should be saved as csv files.
-- These files should be put into a directory for the respective cable.
-- This directory containing the raw data is the input directory for makeTables.py.
+The primary data processing script is "processData.py."
+This script should be run for each cable after taking eye diagram data, and the output should be copied to a central location.
+It takes a directory of eye diagram statistics tables (csv files) as input.
+It collects this data into a single table and outputs this as a new csv file.
+In addition, it creates plots of this data and outputs these as pdf/png files.
+
+First, eye diagram data is required.
+- The statistics table for each channel should be saved as a csv file.
+- Only include the module number (M1, M2, etc.) in the file name for type 3/4 cables.
+- Include the channel number (CMD, D0, D1, etc.) in the file name for all cables.
+- Example file name (type 1 cable): TP_158_CMD_Stats.csv
+- Example file name (type 4 cable): TP_121_M1_CMD_Stats.csv
+- These files should be put into a directory for the respective cable, for example "data/Cable_121".
+- This directory containing the raw data is the input directory for processData.py.
+
+Data cleaning is required for the raw data files to remove byte 0x96 (`<96>`) that appears in the csv files.
+
+Open the file in vim.
+```
+vim TP_158_CMD_Stats.csv
+```
+Use this command in vim to remove byte 0x96 (and actually press control V).
+```
+:%s/<CTRL-V>x96//g
+```
+Then use ":x" to save file and exit.
+Repeat for other files using vim history to get this command quickly.
+
+If needed, here is an example of renaming a group of files from a terminal.
+In this example, "wf" is replaced with "Stats" in the file name for all csv files in the current directory.
+This step is not required.
+```
+for f in *.csv; do mv "$f" "$(echo "$f" | sed s/wf/Stats/g)"; done
+```
 
 Use -h to see the help menu, which displays the options:
 ```
-python3 python/makeTables.py -h
+python3 python/processData.py -h
 ```
-The script requires an input directory (-i), an output directory (-o), and output file name (-f), and a cable type (-t).
-Here is an example of running this script:
-```
-python3 python/makeTables.py -i data/Cable_158_beforeLashing -o tables -f Cable_158_EyeDiagrams_beforeLashing.csv -t 1
-```
-This will create the output file "tables/Cable_158_EyeDiagrams_beforeLashing.csv."
 
-TODO: Make a plotting script to plot eye diagram data for each cable.
+The required options are cable number (-n) and cable type (-t).
+There are other options, but they will use default values if they are not specified.
+```
+python3 python/processData.py -n 121 -t 4
+```
+Here is an example of specifying more options.
+Here the values specified are the default values, so the input/output will be the same.
+Non-default values can be provided if needed.
+```
+python3 python/processData.py -i data/Cable_121 -o tables -p plots/Cable_121 -f Cable_121_EyeDiagrams.csv -n 121 -t 4
+```
+In both of these example, the intput directory is "data/Cable_121."
+The script will output the data to "tables/Cable_121_EyeDiagrams.csv," and the plots will be saved in "plots/Cable_121."
+
+After running "python/processData.py," copy the output table and plots to a central location.
+
+### Additional Scripts
 
 There is a script for making comparison plots.
+This can be used to compare different cables, or to compare different datasets for the same cable (e.g. before/after lashing).
 It can be run like this:
 ```
 python3 python/plotComparison.py
 ```
 
-### Additional Scripts
-
+There are other scripts that require additional python packages.
 First activate the conda environment with the necessary packages based on the instructions [here](https://github.com/ku-cms/eLink_Instrumentation).
 ```
 conda activate .venv
