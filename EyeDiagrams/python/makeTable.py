@@ -114,31 +114,36 @@ def main():
     cable_type          = int(options.cable_type)
     
     # check for valid options
+    # - cable number and type are required
+    # - other options are optional; defaults are used if they are not provided
+    
     if not input_dir:
-        print("Provide an input directory using the -i option.")
-        return
+        input_dir = "data/Cable_{0}".format(cable_number)
+    
     if not table_output_dir:
         print("Provide a table output directory using the -o option.")
         return
+    
     if not plot_output_dir:
-        print("Provide a plot output directory using the -p option.")
-        return
+        plot_output_dir = "plots/Cable_{0}".format(cable_number)
+    
     if not output_file_name:
-        print("Provide an output file name using the -f option.")
-        return
+        output_file_name = "Cable_{0}_EyeDiagrams.csv".format(cable_number)
+    
     if cable_number < 1:
         print("Provide cable number [n > 0] using the -n option.")
         return
+    
     if cable_type < 1 or cable_type > 4:
         print("Provide cable type [1-4] using the -t option.")
         return
+    
     if not os.path.exists(input_dir):
         print("ERROR: The input directory \"{0}\" does not exist.".format(input_dir))
         return
 
-    output_file     = "{0}/{1}".format(table_output_dir, output_file_name)
-    #plot_output_dir = "plots/Cable_{0}".format(cable_number)
-
+    # make table and plots 
+    output_file = "{0}/{1}".format(table_output_dir, output_file_name)
     makeTable(input_dir, table_output_dir, output_file_name, cable_type)
     makePlots(cable_number, output_file, plot_output_dir)
 
