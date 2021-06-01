@@ -72,6 +72,11 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
         p2 = plt.axline((x_extended[0], y_mean), (x_extended[-1], y_mean), color=colors[0], linestyle="--", label="mean")
         p3 = plt.fill_between(x_extended, y_mean - y_std, y_mean + y_std, color=colors[0], alpha=0.2, label="std dev")
         objects = [p1, p2, p3]
+        # text
+        text_x = xlim[0] + 0.1 * (xlim[1] - xlim[0])
+        text_y = ylim[0] + 0.9 * (ylim[1] - ylim[0])
+        equation = r"$\mu = {0:.2f} \pm {1:.2f}$".format(y_mean, y_std)
+        ax.text(text_x, text_y, equation, fontsize=15)
     
     # specify order for legend
     labels = [o.get_label() for o in objects]
