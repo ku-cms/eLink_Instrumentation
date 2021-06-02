@@ -8,7 +8,7 @@ import tools
 def getFile(input_files, module, channel, requireModule):
     matching_files = []
     for f in input_files:
-        # require module and channel 
+        # require module and channel
         if requireModule:
             if module in f and channel in f:
                 matching_files.append(f)
@@ -16,10 +16,10 @@ def getFile(input_files, module, channel, requireModule):
         else:
             if channel in f:
                 matching_files.append(f)
-    
+
     # number of matching files
     n_matching = len(matching_files)
-    
+
     # return matching file
     if n_matching == 1:
         return matching_files[0]
@@ -41,7 +41,7 @@ def run(input_files, output_file, modules, channels, requireModule):
     unit_map   = {"height" : 10**3, "jitter" : 10**12, "width" : 10**12}
     output_column_titles = ["Index", "Module", "Channel", "Height (mV)", "Jitter (ps)", "Width (ps)"]
     # write to output file
-    with open(output_file, "w") as output_csv:
+    with open(output_file, 'w', newline='') as output_csv:
         output_writer = csv.writer(output_csv)
         output_writer.writerow(output_column_titles)
         index = 1
@@ -77,36 +77,36 @@ def makeTable(input_dir, output_dir, output_file_name, cable_type):
     input_file_pattern = "{0}/*.csv".format(input_dir)
     tools.makeDir(output_dir)
     input_files = glob.glob(input_file_pattern)
-    
+
     # map to define modules and channels for each cable type
     cable_type_map = {
         1 : {
             "modules"       : ["M1"],
             "channels"      : ["CMD", "D0", "D1", "D2", "D3"],
-            "requireModule" : False 
+            "requireModule" : False
         },
         2 : {
             "modules"       : ["M1"],
             "channels"      : ["CMD", "D0", "D1"],
-            "requireModule" : False 
+            "requireModule" : False
         },
         3 : {
             "modules"       : ["M1", "M2"],
             "channels"      : ["CMD", "D0", "D1"],
-            "requireModule" : True 
+            "requireModule" : True
         },
         4 : {
             "modules"       : ["M1", "M2", "M3"],
             "channels"      : ["CMD", "D0", "D1"],
-            "requireModule" : True 
+            "requireModule" : True
         },
     }
-    
+
     # get values from map
     modules         = cable_type_map[cable_type]["modules"]
     channels        = cable_type_map[cable_type]["channels"]
     requireModule   = cable_type_map[cable_type]["requireModule"]
-    
+
     # create table
     run(input_files, output_file, modules, channels, requireModule)
 
@@ -120,4 +120,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
