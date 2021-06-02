@@ -5,8 +5,33 @@ Specifically, analyze eye diagram data to measure parameters such as height and 
 
 
 ## Setup
-Follow the setup instrutions [here](https://github.com/ku-cms/eLink_Instrumentation).
 
+Fist, follow the setup instrutions [here](https://github.com/ku-cms/eLink_Instrumentation).
+
+The scripts should be run using python3.
+Depending on you environment, you may need to use "python" or "python3" to do this.
+To check your python version, do:
+```
+python --version
+```
+or 
+```
+python3 --version
+```
+
+For these scripts, python3 should be used, and numpy and matplotlib should be installed.
+Here are installation commands to install numpy and matplotlib.
+The option `--user` is only needed if you do not have admin permission.
+```
+python -m pip install --upgrade pip --user
+python -m pip install numpy --user
+python -m pip install matplotlib --user
+```
+
+Command to launch Git Bash in Windows 10 when shortcut does not work:
+```
+git -c alias.b=!bash b -l -i
+```
 
 ## Instructions
 
@@ -48,21 +73,23 @@ This step is not required.
 for f in *.csv; do mv "$f" "$(echo "$f" | sed s/wf/Stats/g)"; done
 ```
 
+Note that you may need to use "python3" instead of "python" depending on your environment.
+
 Use -h to see the help menu, which displays the options:
 ```
-python3 python/processData.py -h
+python python/processData.py -h
 ```
 
 The required options are cable number (-n) and cable type (-t).
 There are other options, but they will use default values if they are not specified.
 ```
-python3 python/processData.py -n 121 -t 4
+python python/processData.py -n 121 -t 4
 ```
 Here is an example of specifying more options.
 Here the values specified are the default values, so the input/output will be the same.
 Non-default values can be provided if needed.
 ```
-python3 python/processData.py -i data/Cable_121 -o tables -p plots/Cable_121 -f Cable_121_EyeDiagrams.csv -n 121 -t 4
+python python/processData.py -i data/Cable_121 -o tables -p plots/Cable_121 -f Cable_121_EyeDiagrams.csv -n 121 -t 4
 ```
 In both of these example, the intput directory is "data/Cable_121."
 The script will output the data to "tables/Cable_121_EyeDiagrams.csv," and the plots will be saved in "plots/Cable_121."
@@ -75,7 +102,7 @@ There is a script for making comparison plots.
 This can be used to compare different cables, or to compare different datasets for the same cable (e.g. before/after lashing).
 It can be run like this:
 ```
-python3 python/plotComparison.py
+python python/plotComparison.py
 ```
 
 There are other scripts that require additional python packages.
