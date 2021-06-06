@@ -3,6 +3,15 @@ import json
 import os
 from readVNADataSKRF import plot
 
+# inputs:
+# - json file that includes:
+#   - data file
+#   - data directory
+#   - plot directory
+
+# outputs:
+# - basic VNA plots
+
 def main():
     # options
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -27,3 +36,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
