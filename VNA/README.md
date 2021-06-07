@@ -47,7 +47,36 @@ conda deactivate
 You can now activate and deactivate your conda environment as needed.
 You will need to activate it before running the scripts that use scikit-rf and other required packages.
 
+## Processing Data
+
+First activate the conda environment with the necessary packages installed.
+```
+conda activate .venv
+```
+
+The recommended script "run_vna_basic.py" accepts a data directory (with input data) and a plot directory (for output plots).
+```
+python python/run_vna_basic.py -d data/Cable_120_beforeLashing/ -p plots/Cable_120_beforeLashing/
+```
+
+There is an alternative script "run_vna_json.py" that accepts a json file as input.
+The json file must containt data file names, data directories, and plot directories for each channel.
+```
+python python/run_vna_json.py -j json/Cable_120_beforeLashing.json
+```
+
+Finally, there is a script "create_all_s2p.py" that contains hard coded information for each cable and channel (not recommended).
+```
+python python/create_all_s2p.py
+```
+
+When you are finished, you can deactivate conda.
+```
+conda deactivate
+```
+
 ## Scripts
+
 First activate the conda environment with the necessary packages installed.
 ```
 conda activate .venv
@@ -55,18 +84,22 @@ conda activate .venv
 
 Then you can try running some of these scripts.
 
+When you are finished, you can deactivate conda.
+```
+conda deactivate
+
 ### create_all_s2p.py
 Calls 'readVNADataSKRF.py' on a list of files.
 ```
 cd VNA
-python3 python/create_all_s2p.py
+python python/create_all_s2p.py
 ```
 
 ### draw_plots.py 
 Driver script to plot all other S-parameters options such as S12 and S21 and execute 'plotVNAFeatures.py'. 
 ```
 cd VNA/python
-python3 draw_plots.py
+python draw_plots.py
 ```
 
 ### VNADataInspection.py
