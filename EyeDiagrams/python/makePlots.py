@@ -93,21 +93,21 @@ def makePlots(cable_number, input_file, plot_dir):
     output_file     = "Cable_{0}_EyeDiagram_Heights".format(cable_number)
     title           = "Cable {0} Eye Diagram Heights".format(cable_number)
     column_index    = 3
-    ylim            = [0.0, 200.0]
+    ylim            = [0.0, 400.0]
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
     
     # Jitters
     output_file     = "Cable_{0}_EyeDiagram_Jitters".format(cable_number)
     title           = "Cable {0} Eye Diagram Jitters".format(cable_number)
     column_index    = 4
-    ylim            = [0.0, 500.0]
+    ylim            = [0.0, 400.0]
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
     
     # Widths
     output_file     = "Cable_{0}_EyeDiagram_Widths".format(cable_number)
     title           = "Cable {0} Eye Diagram Widths".format(cable_number)
     column_index    = 5
-    ylim            = [0.0, 500.0]
+    ylim            = [0.0, 600.0]
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
 
 def main():
