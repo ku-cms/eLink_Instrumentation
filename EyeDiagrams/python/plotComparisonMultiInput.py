@@ -93,8 +93,8 @@ def plotData(input_file_1, input_file_2, output_file, plot_dir, title, column_in
     plt.savefig(output_pdf)
 
 def makePlots():
-    input_file_1    = "data/Cable_120/Cable_120_EyeDiagrams_beforeLashing.csv"
-    input_file_2    = "data/Cable_120/Cable_120_EyeDiagrams_afterLashing.csv"
+    input_file_1    = "tables/Cable_120_EyeDiagrams_beforeLashing.csv"
+    input_file_2    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
     plot_dir        = "plots/Cable_120"
     drawMean        = True
     
