@@ -113,14 +113,19 @@ def makePlots(cable_number, input_file, plot_dir):
 def main():
     # testing
     
-    #cable_number    = 158
-    #input_file      = "tables/Cable_158_EyeDiagrams_beforeLashing.csv"
-    #plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    cable_number    = 158
+    input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
+    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    makePlots(cable_number, input_file, plot_dir)
     
-    cable_number    = 121
-    input_file      = "tables/Cable_121_EyeDiagrams.csv"
-    plot_dir        = "plots/Cable_{0}".format(cable_number)
+    cable_number    = 120
+    input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
+    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    makePlots(cable_number, input_file, plot_dir)
     
+    cable_number    = 120
+    input_file      = "tables/Cable_{0}_EyeDiagrams_afterLashing.csv".format(cable_number)
+    plot_dir        = "plots/Cable_{0}_afterLashing".format(cable_number)
     makePlots(cable_number, input_file, plot_dir)
 
 if __name__ == "__main__":
