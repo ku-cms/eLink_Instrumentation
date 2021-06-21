@@ -57,19 +57,27 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     y2_mean  = np.mean(y2_array)
     y1_std   = np.std(y1_array)
     y2_std   = np.std(y2_array)
+    # take ratio of means
+    r21      = y2_mean / y1_mean
+    # get error of ratio (assuming independent variables without correlation)
+    # q = x / y
+    # getMultiplicationError(q, x, dx, y, dy)
+    r21_err  = tools.getMultiplicationError(r21, y2_mean, y2_std, y1_mean, y1_std) 
     # extend x to plot mean and std dev
     x_extended = np.insert(x_array, 0, float(x_array[0]  - 1) )
     x_extended = np.append(x_extended, float(x_array[-1] + 1) )
     
     if verbose:
-        print("x  = {0}".format(x_array))
-        print("x_extended  = {0}".format(x_extended))
+        print("x = {0}".format(x_array))
+        print("x_extended = {0}".format(x_extended))
         print("y1 = {0}".format(y1_array))
         print("y2 = {0}".format(y2_array))
         print("y1_mean = {0}".format(y1_mean))
         print("y2_mean = {0}".format(y2_mean))
         print("y1_std  = {0}".format(y1_std))
         print("y2_std  = {0}".format(y2_std))
+        print("r21     = {0}".format(r21))
+        print("r21_err = {0}".format(r21_err))
     
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
@@ -86,6 +94,18 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
         p5 = plt.fill_between(x_extended, y1_mean - y1_std, y1_mean + y1_std, color=colors[0], alpha=0.2, label="std dev")
         p6 = plt.fill_between(x_extended, y2_mean - y2_std, y2_mean + y2_std, color=colors[1], alpha=0.2, label="std dev")
         objects = [p1, p2, p3, p4, p5, p6]
+        # text
+        text_x    = xlim[0] + 0.1 * (xlim[1] - xlim[0])
+        text_y1   = ylim[0] + 0.9 * (ylim[1] - ylim[0])
+        text_y2   = ylim[0] + 0.8 * (ylim[1] - ylim[0])
+        text_y3   = ylim[0] + 0.7 * (ylim[1] - ylim[0])
+        equation1 = r"$\mu_1 = {0:.2f} \pm {1:.2f}$".format(y1_mean, y1_std)
+        equation2 = r"$\mu_2 = {0:.2f} \pm {1:.2f}$".format(y2_mean, y2_std)
+        # use double curly brackets {{21}} so that this is not used as an index by format
+        equation3 = r"$r_{{21}} = {0:.2f} \pm {1:.2f}$".format(r21, r21_err)
+        ax.text(text_x, text_y1, equation1, fontsize=15)
+        ax.text(text_x, text_y2, equation2, fontsize=15)
+        ax.text(text_x, text_y3, equation3, fontsize=15)
     # specify order for legend
     labels = [o.get_label() for o in objects]
     plt.legend(objects, labels, loc='upper right', prop={'size': 12})
@@ -132,8 +152,8 @@ def run():
     cable_number    = 120
     input_file_1    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
     input_file_2    = "tables/Cable_120_newSetup_EyeDiagrams.csv"
-    label_1         = "old settings (using ch1)"
-    label_2         = "new settings (using math1)"
+    label_1         = "old (ch1)"
+    label_2         = "new (math1)"
     plot_dir        = "plots/Cable_120_settings"
     drawMean        = True
     makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
@@ -142,8 +162,8 @@ def run():
     cable_number    = 121
     input_file_1    = "tables/Cable_121_EyeDiagrams.csv"
     input_file_2    = "tables/Cable_121_newSetup_EyeDiagrams.csv"
-    label_1         = "old settings (using ch1)"
-    label_2         = "new settings (using math1)"
+    label_1         = "old (ch1)"
+    label_2         = "new (math1)"
     plot_dir        = "plots/Cable_121_settings"
     drawMean        = True
     makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
