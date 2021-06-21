@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tools
 
-def plotData(input_file_1, input_file_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean):
+def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean):
     verbose = False
     tools.makeDir(plot_dir)
     data_1 = tools.getData(input_file_1)
@@ -77,8 +77,8 @@ def plotData(input_file_1, input_file_2, output_file, plot_dir, title, column_in
     ax.set_xlabel("Channel",    fontsize=12)
     ax.set_ylabel(data_label,   fontsize=12)
     
-    p1 = plt.scatter(x_array, y1_array, color=colors[0], label="before lashing")
-    p2 = plt.scatter(x_array, y2_array, color=colors[1], label="after lashing")
+    p1 = plt.scatter(x_array, y1_array, color=colors[0], label=label_1)
+    p2 = plt.scatter(x_array, y2_array, color=colors[1], label=label_2)
     objects = [p1, p2]
     if drawMean:
         p3 = plt.axline((x_extended[0], y1_mean), (x_extended[-1], y1_mean), color=colors[0], linestyle="--", label="mean")
@@ -92,38 +92,44 @@ def plotData(input_file_1, input_file_2, output_file, plot_dir, title, column_in
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
-def makePlots():
-    input_file_1    = "tables/Cable_120_EyeDiagrams_beforeLashing.csv"
-    input_file_2    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
-    plot_dir        = "plots/Cable_120"
-    drawMean        = True
-    
+def makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean):
     # Heights
-    output_file     = "Cable_120_EyeDiagram_Heights"
-    title           = "Cable 120 Eye Diagram Heights"
+    output_file     = "Cable_{0}_EyeDiagram_Heights".format(cable_number)
+    title           = "Cable {0} Eye Diagram Heights".format(cable_number)
     column_index    = 3
     xlim            = [0.0, 10.0]
     ylim            = [0.0, 200.0]
-    plotData(input_file_1, input_file_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
     
     # Jitters
-    output_file     = "Cable_120_EyeDiagram_Jitters"
-    title           = "Cable 120 Eye Diagram Jitters"
+    output_file     = "Cable_{0}_EyeDiagram_Jitters".format(cable_number)
+    title           = "Cable {0} Eye Diagram Jitters".format(cable_number)
     column_index    = 4
     xlim            = [0.0, 10.0]
     ylim            = [0.0, 500.0]
-    plotData(input_file_1, input_file_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
     
     # Widths
-    output_file     = "Cable_120_EyeDiagram_Widths"
-    title           = "Cable 120 Eye Diagram Widths"
+    output_file     = "Cable_{0}_EyeDiagram_Widths".format(cable_number)
+    title           = "Cable {0} Eye Diagram Widths".format(cable_number)
     column_index    = 5
     xlim            = [0.0, 10.0]
     ylim            = [0.0, 500.0]
-    plotData(input_file_1, input_file_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
+
+def run():
+    # Cable 120: before lashing vs. after lashing
+    cable_number    = 120
+    input_file_1    = "tables/Cable_120_EyeDiagrams_beforeLashing.csv"
+    input_file_2    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
+    label_1         = "before lashing"
+    label_2         = "after lashing"
+    plot_dir        = "plots/Cable_120"
+    drawMean        = True
+    makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
 
 def main():
-    makePlots()
+    run()
 
 if __name__ == "__main__":
     main()
