@@ -98,7 +98,7 @@ def makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_d
     title           = "Cable {0} Eye Diagram Heights".format(cable_number)
     column_index    = 3
     xlim            = [0.0, 10.0]
-    ylim            = [0.0, 200.0]
+    ylim            = [0.0, 400.0]
     plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
     
     # Jitters
@@ -106,7 +106,7 @@ def makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_d
     title           = "Cable {0} Eye Diagram Jitters".format(cable_number)
     column_index    = 4
     xlim            = [0.0, 10.0]
-    ylim            = [0.0, 500.0]
+    ylim            = [0.0, 600.0]
     plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
     
     # Widths
@@ -114,7 +114,7 @@ def makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_d
     title           = "Cable {0} Eye Diagram Widths".format(cable_number)
     column_index    = 5
     xlim            = [0.0, 10.0]
-    ylim            = [0.0, 500.0]
+    ylim            = [0.0, 800.0]
     plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
 
 def run():
@@ -124,7 +124,27 @@ def run():
     input_file_2    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
     label_1         = "before lashing"
     label_2         = "after lashing"
-    plot_dir        = "plots/Cable_120"
+    plot_dir        = "plots/Cable_120_lashing"
+    drawMean        = True
+    makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    
+    # Cable 120: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
+    cable_number    = 120
+    input_file_1    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
+    input_file_2    = "tables/Cable_120_newSetup_EyeDiagrams.csv"
+    label_1         = "old settings (using ch1)"
+    label_2         = "new settings (using math1)"
+    plot_dir        = "plots/Cable_120_settings"
+    drawMean        = True
+    makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    
+    # Cable 121: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
+    cable_number    = 121
+    input_file_1    = "tables/Cable_121_EyeDiagrams.csv"
+    input_file_2    = "tables/Cable_121_newSetup_EyeDiagrams.csv"
+    label_1         = "old settings (using ch1)"
+    label_2         = "new settings (using math1)"
+    plot_dir        = "plots/Cable_121_settings"
     drawMean        = True
     makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
 
