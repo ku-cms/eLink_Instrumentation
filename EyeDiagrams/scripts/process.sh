@@ -10,7 +10,7 @@
 file=$1
 cable_num=$2 
 storage_dir="/home/kucms/CMS/Tracker/e-links/EyeDiagramData"
-target_dir="data"
+target_dir=""$PWD"/data"
 
 echo "It's go time."
 echo "Input file: $file"
@@ -38,6 +38,7 @@ fi
 
 raw_dir="Cable_"$cable_num"_raw"
 clean_dir="Cable_"$cable_num"_clean"
+output_dir="$target_dir"/"Cable_"$cable_num""
 
 # unpack files in a new directory
 cd $storage_dir
@@ -58,4 +59,8 @@ do
         tail -n 3 "$f" > "$clean_dir"/"$base"
     fi
 done
+
+# copy to data directory in framework
+mkdir -p $output_dir
+rsync -az $clean_dir/ $output_dir
 
