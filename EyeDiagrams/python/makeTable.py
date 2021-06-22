@@ -36,8 +36,14 @@ def run(input_files, output_file, modules, channels, requireModule):
     precision = 3
     # maps to define columns that contain data from raw data csv files
     # row and column indices start from 0 for data matrix
-    row_map    = {"label1" : 32, "label2" : 33, "value" : 34}
+    
+    # raw data
+    #row_map    = {"label1" : 32, "label2" : 33, "value" : 34}
+    #column_map = {"height" : 13, "jitter" : 43, "width" : 53}
+    # clean data
+    row_map    = {"label1" : 0, "label2" : 0, "value" : 1}
     column_map = {"height" : 13, "jitter" : 43, "width" : 53}
+    
     unit_map   = {"height" : 10**3, "jitter" : 10**12, "width" : 10**12}
     output_column_titles = ["Index", "Module", "Channel", "Height (mV)", "Jitter (ps)", "Width (ps)"]
     # write to output file
