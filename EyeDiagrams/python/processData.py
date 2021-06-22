@@ -55,7 +55,7 @@ def main():
     # Make table and plots
     output_file = "{0}/{1}".format(table_output_dir, output_file_name)
     makeTable(input_dir, table_output_dir, output_file_name, cable_type)
-    makePlots(cable_number, output_file, plot_output_dir)
+    #makePlots(cable_number, output_file, plot_output_dir)
 
 if __name__ == "__main__":
     main()
