@@ -78,7 +78,6 @@ def set_axes(ax, title, xmin, xmax, ymin, ymax, nolim):
 
 # https://www.tutorialfor.com/questions-285739.htm
 def display_mean_impedance(ax, t1, t2, col): 
-    y_plot_value = []
     lines = ax.get_lines()
 
     # Delete all elements of the array (except the last one) correponding to a line drawn in ax.
@@ -102,7 +101,6 @@ def display_mean_impedance(ax, t1, t2, col):
     # plot the average line
     x_coor = [t1, t2]
     y_coor = [Z_mean, Z_mean]
-    y_plot_value.append(int(Z_mean.values))
     ax.plot(x_coor, y_coor, color=col, linewidth=1, label='', linestyle='--')
 
 def getName(input_string):
@@ -302,7 +300,7 @@ with style.context('seaborn-darkgrid'):
 
         ## ---Time Domain Plots---:
         net_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+','+label, ax=ax1, color=color)
-        display_mean_impedance(ax1, t1, t2, 'b')
+        display_mean_impedance(ax1, t1, t2, "xkcd:light magenta")
         # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
         set_axes(ax1, 'Time Domain', 0.0, 30.0, 0.0, 400.0, nolim=False)
 
