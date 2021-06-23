@@ -12,8 +12,8 @@ options = [
             # [0, '../data',                        'johncable3_2m.txt',            'johncable3_2m',            '200',  3.0,  15.0, '1', '21'], #S21
             # [1, '../data',                        'johncable4.txt',               'johncable4',               '100',  2.0,  10.0, '0', '12'], #S12
             #[1, '../data/Cable_120_beforeLashing',  'Cable_120_beforeLashing.txt',  'Cable_120_beforeLashing',   '80',  2.0,   8.0, '0', '12'], #S12
-            #[1, '../data/Cable_120_afterLashing',   'Cable_120_afterLashing.txt',   'Cable_120_afterLashing',    '80',  2.0,   8.0, '0', '12'], #S12
-            [1, '../data/JohnCable4/', 'JohnCable4.txt', 'JohnCable4', '80',  2.0,  8.0, '0', '12'], #S12
+            [1, '../data/Cable_120_afterLashing',   'Cable_120_afterLashing.txt',   'Cable_120_afterLashing',    '80',  2.0,   8.0, '0', '12'], #S12
+            #[1, '../data/JohnCable4/', 'JohnCable4.txt', 'JohnCable4', '80',  2.0,  8.0, '0', '12'], #S12
             #[1, '../data/JohnCable5/', 'JohnCable5.txt', 'JohnCable5', '80',  2.0,  8.0, '0', '12'], #S12
 	  ]
 
