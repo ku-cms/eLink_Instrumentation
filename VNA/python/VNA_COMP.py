@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib import style
 import pickle as pl
+import csv
 
 
 
@@ -60,6 +61,11 @@ def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
         ax.set_ylim((ymin, ymax))
     plt.tight_layout()
 
+def makeDir(dir_name):
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+
+
 
 parser= OptionParser()
 
@@ -90,6 +96,8 @@ for i in range(1,len(Pre_list)+1):
     globals()[f"ff{i}"]= f"Data/"+cable_number+f"/{Pre_list[i-1]}"
     globals()[f"filename{i}"]= f"{Pre_list[i-1]}"
 
+makeDir("Data/"+cable_number+"/Plots")
+makeDir("Data/"+cable_number+"/Plots/s2p")
 
 IDchecker = 0
 Breaker = True
@@ -246,10 +254,33 @@ print()
 print()
 
 
-
-
-
-
+if cable_length == "35":
+    t1 = 2.00
+    t2 = 4.00
+elif cable_length == "80":
+    t1 = 2.00
+    t2 = 6.00
+elif cable_length == "100":
+    t1 = 2.00
+    t2 = 7.00
+elif cable_length == "140":
+    t1 = 2.00
+    t2 = 9.00
+elif cable_length == "160":
+    t1 = 2.00
+    t2 = 10.00
+elif cable_length == "180":
+    t1 = 2.00
+    t2 = 11.00
+elif cable_length == "200":
+    t1 = 2.00
+    t2 = 12.00
+elif cable_length == "0":
+    t1 = 0.00
+    t2 = 1.50
+else:
+    t1=0
+    t2=0
 
 
 
@@ -277,12 +308,12 @@ while Breaker == True:
     print("\nParameter being analyzed\n","S"+comp)
 
 
-    if cable_length == '35':
-        net4 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename1.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-        net5 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename2.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-        net6 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename3.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-        #net8 = rf.Network(ff4+'_'+subfile+'.s2p', f_unit='ghz')
-        #net10 = rf.Network(ff5+'_'+subfile+'.s2p', f_unit='ghz')
+
+    net4 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename1.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
+    net5 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename2.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
+    net6 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename3.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
+    #net8 = rf.Network(ff4+'_'+subfile+'.s2p', f_unit='ghz')
+    #net10 = rf.Network(ff5+'_'+subfile+'.s2p', f_unit='ghz')
 
 
 
@@ -302,38 +333,58 @@ while Breaker == True:
         ax0.grid(True, color='0.4', which='major')
 
 
-        if cable_length == '35':
-            net4_dc = net4[i,j].extrapolate_to_dc(kind='linear')
-            net5_dc = net5[i,j].extrapolate_to_dc(kind='linear')
-            net6_dc = net6[i,j].extrapolate_to_dc(kind='linear')
-            #net8_dc = net8[i,j].extrapolate_to_dc(kind='linear')
-            #net10_dc = net10[i,j].extrapolate_to_dc(kind='linear')
-            #netref_dc = netref[i,j].extrapolate_to_dc(kind='linear')
 
-            net4_dc.plot_s_db(label='S'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='b')
-            net5_dc.plot_s_db(label='S'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='r')
-            net6_dc.plot_s_db(label='S'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='g')
-            #net8_dc.plot_s_db(label='S'+comp+ff4, ax=ax0, color='w')
-            #net10_dc.plot_s_db(label='S'+comp+ff5, ax=ax0, color='m')
+        net4_dc = net4[i,j].extrapolate_to_dc(kind='linear')
+        net5_dc = net5[i,j].extrapolate_to_dc(kind='linear')
+        net6_dc = net6[i,j].extrapolate_to_dc(kind='linear')
+        #net8_dc = net8[i,j].extrapolate_to_dc(kind='linear')
+        #net10_dc = net10[i,j].extrapolate_to_dc(kind='linear')
+        #netref_dc = netref[i,j].extrapolate_to_dc(kind='linear')
+
+        net4_dc.plot_s_db(label='S'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='b')
+        net5_dc.plot_s_db(label='S'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='r')
+        net6_dc.plot_s_db(label='S'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='g')
+        #net8_dc.plot_s_db(label='S'+comp+ff4, ax=ax0, color='w')
+        #net10_dc.plot_s_db(label='S'+comp+ff5, ax=ax0, color='m')
 
 
 
-            net4_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='b')
-            display_mean_impedance(ax1,2.0,5.0,'b')
-            net5_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='r')
-            display_mean_impedance(ax1, 2.0, 5.0, 'r')
-            net6_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='g')
-            display_mean_impedance(ax1, 2.0, 5.0, 'g')
-            #net8_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff4, ax=ax1, color='w')
-            #display_mean_impedance(ax1, 2.0, 5.0, 'w')
-            #net10_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff5, ax=ax1, color='m')
-            #display_mean_impedance(ax1, 2.0, 5.0, 'm')
+        net4_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='b')
+        display_mean_impedance(ax1,t1, t2,'b')
 
+        net5_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='r')
+        display_mean_impedance(ax1, t1, t2, 'r')
+
+        net6_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='g')
+        display_mean_impedance(ax1, t1, t2, 'g')
+
+        #net8_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff4, ax=ax1, color='w')
+        #display_mean_impedance(ax1, 2.0, 5.0, 'w')
+        #net10_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff5, ax=ax1, color='m')
+        #display_mean_impedance(ax1, 2.0, 5.0, 'm')
+        with open("Impedence_List.csv", "a") as Ana:
+            Ana.write(str(cable_number)+","+str(cable_length)+","+str(cable_type)+","+str(t1)+ "-"+str(t2)+",")
+            for i in y_plot_value:
+                Ana.write(str(i)+",")
+            Ana.write("\n")
+            Ana.close()
+
+        with open("Data/"+cable_number+"/Impedence_List.csv", "a") as Ana2:
+            Ana2.write("Cable_number,Length,Type, Time Interval, S11, S12, S21")
+            Ana2.write(str(cable_number)+","+str(cable_length)+","+str(cable_type)+","+str(t1)+ "-"+str(t2)+",")
+            for i in y_plot_value:
+                Ana2.write(str(i)+",")
+            Ana2.write("\n")
+            Ana2.close()
+
+        y_plot_value.clear()
+
+        set_axes(ax1, 'Time Domain', 0.0, 400.0, 0.0, 30.0, 0)
 
 
         fig0.savefig("Data/"+cable_number+"/Plots/"+cable_number+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
 
-        #plt.show()
+
         IDchecker+=1
 
         if IDchecker >2:
