@@ -93,34 +93,39 @@ def makePlots(cable_number, input_file, plot_dir):
     output_file     = "Cable_{0}_EyeDiagram_Heights".format(cable_number)
     title           = "Cable {0} Eye Diagram Heights".format(cable_number)
     column_index    = 3
-    ylim            = [0.0, 200.0]
+    ylim            = [0.0, 400.0]
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
     
     # Jitters
     output_file     = "Cable_{0}_EyeDiagram_Jitters".format(cable_number)
     title           = "Cable {0} Eye Diagram Jitters".format(cable_number)
     column_index    = 4
-    ylim            = [0.0, 500.0]
+    ylim            = [0.0, 400.0]
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
     
     # Widths
     output_file     = "Cable_{0}_EyeDiagram_Widths".format(cable_number)
     title           = "Cable {0} Eye Diagram Widths".format(cable_number)
     column_index    = 5
-    ylim            = [0.0, 500.0]
+    ylim            = [0.0, 600.0]
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
 
 def main():
     # testing
     
-    #cable_number    = 158
-    #input_file      = "tables/Cable_158_EyeDiagrams_beforeLashing.csv"
-    #plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    cable_number    = 158
+    input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
+    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    makePlots(cable_number, input_file, plot_dir)
     
-    cable_number    = 121
-    input_file      = "tables/Cable_121_EyeDiagrams.csv"
-    plot_dir        = "plots/Cable_{0}".format(cable_number)
+    cable_number    = 120
+    input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
+    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    makePlots(cable_number, input_file, plot_dir)
     
+    cable_number    = 120
+    input_file      = "tables/Cable_{0}_EyeDiagrams_afterLashing.csv".format(cable_number)
+    plot_dir        = "plots/Cable_{0}_afterLashing".format(cable_number)
     makePlots(cable_number, input_file, plot_dir)
 
 if __name__ == "__main__":
