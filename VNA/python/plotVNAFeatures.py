@@ -115,7 +115,7 @@ def getName(input_string):
         name = name.replace('1p4', '1.4')
     return name
 
-def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, outDir, s2pDir, subfile, comp):
+def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, outDir, s2pDir, subfile, comp, times=[]):
     verbose = False
     resultsDir = "results"
     files = []
@@ -222,7 +222,13 @@ def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, out
         csv_file = "{0}/{1}.csv".format(resultsDir, cableName)
         with open(csv_file, 'w', newline='') as output_csv:
             output_writer = csv.writer(output_csv)
+            titles = ["Channel", "t1", "t2", "Z_mean"]
+            output_writer.writerow(titles)
             for n in range(len(labels)):
+                # overwrite times if specified
+                if times:
+                    t1 = times[n][0]
+                    t2 = times[n][1]
                 label = labels[n]
                 color = colors[n]
                 net = rf.Network(s2pDir+'/'+label+'_'+subfile+'.s2p', f_unit='ghz') # 33
@@ -239,7 +245,7 @@ def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, out
                 # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
                 set_axes(ax1, 'Time Domain', 0.0, 10.0, 0.0, 300.0, nolim=False)
                 # write to csv file
-                output_row = [label, round(Z_mean, 2)]
+                output_row = [label, t1, t2, round(Z_mean, 2)]
                 output_writer.writerow(output_row)
 
     
