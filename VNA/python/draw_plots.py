@@ -22,11 +22,16 @@ options = [
 for opt in options:
     # use "times" to specify different time windows per cable
     times = []
+    #times.append([0.5, 1.0])
+    #times.append([2.0, 4.0])
+    #times.append([2.0, 7.0])
+    #times.append([2.0, 4.0])
+    #times.append([2.0, 7.0])
     times.append([0.5, 1.0])
-    times.append([2.0, 4.0])
-    times.append([2.0, 7.0])
-    times.append([2.0, 4.0])
-    times.append([2.0, 7.0])
+    times.append([0.5, 2.5])
+    times.append([0.5, 5.5])
+    times.append([0.5, 2.5])
+    times.append([0.5, 5.5])
     print("Analyzing {0}".format(opt[3]))
     #analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, outDir, s2pDir, subfile, comp)
     analyze(opt[0], opt[1], opt[2], opt[3], opt[4], opt[5], opt[6], "Plots", "s2pDir", opt[7], opt[8], times)
