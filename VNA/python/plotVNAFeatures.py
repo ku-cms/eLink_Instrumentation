@@ -35,6 +35,7 @@ VNA measurements.
 
 '''
 
+import csv
 import sys, re, os
 from pylab import *
 import numpy as np
@@ -104,6 +105,9 @@ def display_mean_impedance(ax, t1, t2, col):
     y_coor = [Z_mean, Z_mean]
     ax.plot(x_coor, y_coor, color=col, linewidth=1, label='', linestyle='--')
 
+    # return mean impedance
+    return Z_mean.values[0]
+
 def getName(input_string):
     match = re.match(r'TP_\w+_\d+', input_string)
     name  = match.group()
@@ -113,6 +117,7 @@ def getName(input_string):
 
 def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, outDir, s2pDir, subfile, comp):
     verbose = False
+    resultsDir = "results"
     files = []
     with open(inputTxtFiles, 'r') as fl:
         for line in fl.readlines():
@@ -124,8 +129,9 @@ def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, out
         for f in files:
             print (" - {0}".format(f))
     
-    ensure_dir(outDir)
     ensure_dir(s2pDir)
+    ensure_dir(outDir)
+    ensure_dir(resultsDir)
     
     ############################
     # Create the .s2p files
@@ -212,22 +218,30 @@ def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, out
         ax0.grid(True, color='0.8', which='minor')
         ax0.grid(True, color='0.4', which='major')
     
-        for n in range(len(labels)):
-            label = labels[n]
-            color = colors[n]
-            net = rf.Network(s2pDir+'/'+label+'_'+subfile+'.s2p', f_unit='ghz') # 33
-            
-            ## ---Frequency Domain Plots---:
-            net_dc = net[i,j].extrapolate_to_dc(kind='linear')       
-            net_dc.plot_s_db(label='S'+comp+','+label, ax=ax0, color=color)  
-            # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
-            set_axes(ax0, 'Frequency Domain', 0.0, 6.0e9, -50.0, 100.0, nolim=False)
+        # write csv file
+        csv_file = "{0}/{1}.csv".format(resultsDir, cableName)
+        with open(csv_file, 'w', newline='') as output_csv:
+            output_writer = csv.writer(output_csv)
+            for n in range(len(labels)):
+                label = labels[n]
+                color = colors[n]
+                net = rf.Network(s2pDir+'/'+label+'_'+subfile+'.s2p', f_unit='ghz') # 33
+                
+                ## ---Frequency Domain Plots---:
+                net_dc = net[i,j].extrapolate_to_dc(kind='linear')       
+                net_dc.plot_s_db(label='S'+comp+','+label, ax=ax0, color=color)  
+                # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
+                set_axes(ax0, 'Frequency Domain', 0.0, 6.0e9, -50.0, 100.0, nolim=False)
     
-            ## ---Time Domain Plots---:
-            net_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+','+label, ax=ax1, color=color)
-            display_mean_impedance(ax1, t1, t2, "xkcd:light magenta")
-            # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
-            set_axes(ax1, 'Time Domain', 0.0, 30.0, 0.0, 400.0, nolim=False)
+                ## ---Time Domain Plots---:
+                net_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+','+label, ax=ax1, color=color)
+                Z_mean = display_mean_impedance(ax1, t1, t2, color)
+                # set_axes(ax, title, xmin, xmax, ymin, ymax, nolim)
+                set_axes(ax1, 'Time Domain', 0.0, 30.0, 0.0, 400.0, nolim=False)
+                # write to csv file
+                output_row = [label, round(Z_mean, 2)]
+                output_writer.writerow(output_row)
+
     
         if cableName:
             cable_ID = cableName
