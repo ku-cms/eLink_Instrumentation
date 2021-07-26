@@ -111,85 +111,8 @@ def getName(input_string):
         name = name.replace('1p4', '1.4')
     return name
 
-
-def main():
-    #######################################
-    #            Options                  #
-    #######################################
-    parser = OptionParser()
-    
-    parser.add_option('--createS2p', type='int', action='store',
-                          default=1,
-                          dest='createS2p',
-                          help='bool if 1 then create .s2p files, if 0 then they already exist and no need to recreate them')
-    
-    parser.add_option('--inputDir',  metavar='T', type='string', action='store',
-                          default='../example_data',
-                          dest='inputDir',
-                          help='directory with example input files')
-    
-    parser.add_option('--inputTxtFiles', metavar='F', type='string', action='store',
-                          default = "input_cable_data.txt",
-                          dest='inputTxtFiles',
-                          help='Input txt files')
-    
-    parser.add_option('--cableName',  metavar='T', type='string', action='store',
-                          default='',
-                          dest='cableName',
-                          help='cable name (required for non-standard names)')
-    
-    parser.add_option('--cableLength', metavar='F', type='string', action='store',
-                          default = "35",
-                          dest='cableLength',
-                          help='cable lenght in cm')
-    
-    parser.add_option('--t1', metavar='F', type='float', action='store',
-                          default = 0.2,
-                          dest='t1',
-                          help='start time to take the average on the time domain plot')
-    
-    parser.add_option('--t2', metavar='F', type='float', action='store',
-                          default = 0.4,
-                          dest='t2',
-                          help='stop time to take the average on the time domain plot')
-    
-    parser.add_option('--outputDir', metavar='T', type='string', action='store',
-                          default='Plots',
-                          dest='outputDir',
-                          help='directory to store plots')
-    
-    parser.add_option('--outputTouchstone', metavar='T', type='string', action='store',
-                          default='s2pDir',
-                          dest='outputTouchstone',
-                          help='directory to store resulted touch stone files')
-    
-    parser.add_option('--outputTouchstoneSubFile', metavar='T', type='string', action='store',
-                          default='0',
-                          dest='outputTouchstoneSubFile',
-                          help='subfile to open from one of the 10 created .s2p files')
-    
-    parser.add_option('--SParamterComp', metavar='T', type='string', action='store',
-                          default='11',
-                          dest='SParamterComp',
-                          help='S-paramter to draw')
-    
-    (options,args)  = parser.parse_args()
-    createS2p       = bool(options.createS2p)
-    inDir           = options.inputDir
-    inputTxtFiles   = options.inputTxtFiles
-    cableName       = options.cableName
-    cableLength     = options.cableLength
-    t1              = options.t1
-    t2              = options.t2
-    outDir          = options.outputDir
-    s2pDir          = options.outputTouchstone
-    subfile         = options.outputTouchstoneSubFile
-    comp            = options.SParamterComp
-    
-    # ========= end: options ============= #
-    
+def analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, outDir, s2pDir, subfile, comp):
     verbose = False
-    
     files = []
     with open(inputTxtFiles, 'r') as fl:
         for line in fl.readlines():
@@ -318,6 +241,84 @@ def main():
     
     #pylab.show()        
     #input('hold on')
+
+def main():
+    #######################################
+    #            Options                  #
+    #######################################
+    parser = OptionParser()
+    
+    parser.add_option('--createS2p', type='int', action='store',
+                          default=1,
+                          dest='createS2p',
+                          help='bool if 1 then create .s2p files, if 0 then they already exist and no need to recreate them')
+    
+    parser.add_option('--inputDir',  metavar='T', type='string', action='store',
+                          default='../example_data',
+                          dest='inputDir',
+                          help='directory with example input files')
+    
+    parser.add_option('--inputTxtFiles', metavar='F', type='string', action='store',
+                          default = "input_cable_data.txt",
+                          dest='inputTxtFiles',
+                          help='Input txt files')
+    
+    parser.add_option('--cableName',  metavar='T', type='string', action='store',
+                          default='',
+                          dest='cableName',
+                          help='cable name (required for non-standard names)')
+    
+    parser.add_option('--cableLength', metavar='F', type='string', action='store',
+                          default = "35",
+                          dest='cableLength',
+                          help='cable lenght in cm')
+    
+    parser.add_option('--t1', metavar='F', type='float', action='store',
+                          default = 0.2,
+                          dest='t1',
+                          help='start time to take the average on the time domain plot')
+    
+    parser.add_option('--t2', metavar='F', type='float', action='store',
+                          default = 0.4,
+                          dest='t2',
+                          help='stop time to take the average on the time domain plot')
+    
+    parser.add_option('--outputDir', metavar='T', type='string', action='store',
+                          default='Plots',
+                          dest='outputDir',
+                          help='directory to store plots')
+    
+    parser.add_option('--outputTouchstone', metavar='T', type='string', action='store',
+                          default='s2pDir',
+                          dest='outputTouchstone',
+                          help='directory to store resulted touch stone files')
+    
+    parser.add_option('--outputTouchstoneSubFile', metavar='T', type='string', action='store',
+                          default='0',
+                          dest='outputTouchstoneSubFile',
+                          help='subfile to open from one of the 10 created .s2p files')
+    
+    parser.add_option('--SParamterComp', metavar='T', type='string', action='store',
+                          default='11',
+                          dest='SParamterComp',
+                          help='S-paramter to draw')
+    
+    (options,args)  = parser.parse_args()
+    createS2p       = bool(options.createS2p)
+    inDir           = options.inputDir
+    inputTxtFiles   = options.inputTxtFiles
+    cableName       = options.cableName
+    cableLength     = options.cableLength
+    t1              = options.t1
+    t2              = options.t2
+    outDir          = options.outputDir
+    s2pDir          = options.outputTouchstone
+    subfile         = options.outputTouchstoneSubFile
+    comp            = options.SParamterComp
+    
+    # ========= end: options ============= #
+
+    analyze(createS2p, inDir, inputTxtFiles, cableName, cableLength, t1, t2, outDir, s2pDir, subfile, comp)
 
 if __name__ == "__main__":
     main()
