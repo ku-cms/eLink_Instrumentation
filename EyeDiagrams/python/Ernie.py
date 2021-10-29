@@ -8,6 +8,11 @@ datasets = ["dataset_1", "dataset_2"]
 channels = ["A", "B", "C", "D"]
 amplitudes = [269.0, 741.0, 1119.0]
 separations = [0, 1, 2]
+
+x_axis_labels = {}
+x_axis_labels["dataset_1"] = "Aggressor amplitude (mV)"
+x_axis_labels["dataset_2"] = "All channel amplitude (mV)"
+
 colors = [
             "xkcd:cherry red",
             "xkcd:apple green",
@@ -71,7 +76,7 @@ def getStats(data_map, cable_number, separation):
         result[dataset]["std_devs"] = std_devs
     return result
 
-def plot(input_values, title, labels, output_name):
+def plot(input_values, limits, title, labels, output_name):
     fig, ax = plt.subplots(figsize=(6, 6))
     for i, separation in enumerate(separations):
         x_values = input_values[separation]["x_values"]
@@ -80,10 +85,25 @@ def plot(input_values, title, labels, output_name):
         label = "{0} mm spacing".format(separation)
         color = colors[i]
         plt.errorbar(x_values, y_values, yerr=y_errors, fmt='o', label=label, color=color, alpha=0.5)
+    
+    legend_font_size = 12
+    x_label = labels[0]
+    y_label = labels[1]
+    xlim    = limits[0]
+    ylim    = limits[1]
+    ax.legend(loc='upper right', prop={'size': legend_font_size})
+    ax.set_title(title,     fontsize=20)
+    ax.set_xlabel(x_label,  fontsize=16)
+    ax.set_ylabel(y_label,  fontsize=16)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.tick_params(axis='both', which='minor', labelsize=12)
+    
     output_png = "{0}.png".format(output_name)
     output_pdf = "{0}.pdf".format(output_name)
-    print(output_png)
-    print(output_pdf)
+    #print(output_png)
+    #print(output_pdf)
     plt.savefig(output_png, bbox_inches='tight')
     plt.savefig(output_pdf, bbox_inches='tight')
     # close to avoid memory warning 
@@ -103,11 +123,16 @@ def makePlots(input_file, plot_dir):
                 input_values[separation]["x_values"] = amplitudes
                 input_values[separation]["y_values"] = stats_map[dataset]["averages"]
                 input_values[separation]["y_errors"] = stats_map[dataset]["std_devs"]
-                print(cable_number, separation)
-            title = "title"
-            labels = ["x", "y"]
+                #print(cable_number, separation)
+            title   = "Cable {0} Areas".format(cable_number)
+            x_label = x_axis_labels[dataset]
+            y_label = "Area"
+            labels  = [x_label, y_label]
+            xlim    = [0.0, 1.5e3]
+            ylim    = [0.0, 1.0e5]
+            limits  = [xlim, ylim]
             output_name = "{0}/ratios_{1}".format(cable_dir, dataset)
-            plot(input_values, title, labels, output_name)
+            plot(input_values, limits, title, labels, output_name)
 
 def main():
     input_file  = "data/Ernie/ErnieMeasurements-2021-10-29.csv"
