@@ -76,12 +76,18 @@ def getStats(data_map, cable_number, separation):
         result[dataset]["std_devs"] = std_devs
     return result
 
-def plot(input_values, limits, title, labels, output_name):
+def plot(input_values, limits, title, labels, output_name, doRatio):
     fig, ax = plt.subplots(figsize=(6, 6))
     for i, separation in enumerate(separations):
-        x_values = input_values[separation]["x_values"]
-        y_values = input_values[separation]["y_values"]
-        y_errors = input_values[separation]["y_errors"]
+        x_values = np.array(input_values[separation]["x_values"]) 
+        y_values = np.array(input_values[separation]["y_values"])
+        y_errors = np.array(input_values[separation]["y_errors"])
+        # for ratio, divide by central value
+        if doRatio:
+            scale = y_values[1]
+            y_values = y_values / scale 
+            y_errors = y_errors / scale 
+        #print("doRatio: {0}, y_values: {1}, y_errors: {2}".format(doRatio, y_values, y_errors))
         label = "{0} mm spacing".format(separation)
         color = colors[i]
         plt.errorbar(x_values, y_values, yerr=y_errors, fmt='o', label=label, color=color, alpha=0.5)
@@ -124,15 +130,28 @@ def makePlots(input_file, plot_dir):
                 input_values[separation]["y_values"] = stats_map[dataset]["averages"]
                 input_values[separation]["y_errors"] = stats_map[dataset]["std_devs"]
                 #print(cable_number, separation)
-            title   = "Cable {0} Areas".format(cable_number)
-            x_label = x_axis_labels[dataset]
-            y_label = "Area"
-            labels  = [x_label, y_label]
-            xlim    = [0.0, 1.5e3]
-            ylim    = [0.0, 1.0e5]
-            limits  = [xlim, ylim]
+            
+            title       = "Cable {0} Areas".format(cable_number)
+            x_label     = x_axis_labels[dataset]
+            y_label     = "Area"
+            labels      = [x_label, y_label]
+            xlim        = [0.0, 1.5e3]
+            ylim        = [0.0, 1.0e5]
+            limits      = [xlim, ylim]
+            output_name = "{0}/areas_{1}".format(cable_dir, dataset)
+            doRatio     = False
+            plot(input_values, limits, title, labels, output_name, doRatio)
+            
+            title       = "Cable {0} Ratio of Areas".format(cable_number)
+            x_label     = x_axis_labels[dataset]
+            y_label     = "Ratio of Areas"
+            labels      = [x_label, y_label]
+            xlim        = [0.0, 1.5e3]
+            ylim        = [0.0, 2.0]
+            limits      = [xlim, ylim]
             output_name = "{0}/ratios_{1}".format(cable_dir, dataset)
-            plot(input_values, limits, title, labels, output_name)
+            doRatio     = True
+            plot(input_values, limits, title, labels, output_name, doRatio)
 
 def main():
     input_file  = "data/Ernie/ErnieMeasurements-2021-10-29.csv"
