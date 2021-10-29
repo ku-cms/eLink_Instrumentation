@@ -1,10 +1,27 @@
 # Ernie.py
 
 import numpy as np
+import matplotlib.pyplot as plt
 import tools
 
+datasets = ["dataset_1", "dataset_2"]
+channels = ["A", "B", "C", "D"]
+amplitudes = [269.0, 741.0, 1119.0]
+separations = [0, 1, 2]
+colors = [
+            "xkcd:cherry red",
+            "xkcd:apple green",
+            "xkcd:bright blue",
+            "xkcd:tangerine",
+            "xkcd:electric purple",
+            "xkcd:aqua blue",
+            "xkcd:grass green",
+            "xkcd:lilac",
+            "xkcd:coral",
+            "xkcd:fuchsia"
+]
+
 def readData(input_file):
-    channels = ["A", "B", "C", "D"]
     result = {} 
     data = tools.getData(input_file)
     for i, row in enumerate(data):
@@ -38,7 +55,6 @@ def readData(input_file):
 
 def getStats(data_map, cable_number, separation):
     result = {}
-    datasets = ["dataset_1", "dataset_2"]
     datalength = 3
     for dataset in datasets:
         averages = []
@@ -55,17 +71,48 @@ def getStats(data_map, cable_number, separation):
         result[dataset]["std_devs"] = std_devs
     return result
 
-def makePlots(input_file):
+def plot(input_values, title, labels, output_name):
+    fig, ax = plt.subplots(figsize=(6, 6))
+    for i, separation in enumerate(separations):
+        x_values = input_values[separation]["x_values"]
+        y_values = input_values[separation]["y_values"]
+        y_errors = input_values[separation]["y_errors"]
+        label = "{0} mm spacing".format(separation)
+        color = colors[i]
+        plt.errorbar(x_values, y_values, yerr=y_errors, fmt='o', label=label, color=color, alpha=0.5)
+    output_png = "{0}.png".format(output_name)
+    output_pdf = "{0}.pdf".format(output_name)
+    print(output_png)
+    print(output_pdf)
+    plt.savefig(output_png, bbox_inches='tight')
+    plt.savefig(output_pdf, bbox_inches='tight')
+    # close to avoid memory warning 
+    plt.close('all')
+
+def makePlots(input_file, plot_dir):
+    tools.makeDir(plot_dir)
     data_map = readData(input_file)
     for cable_number in data_map:
-        for separation in data_map[cable_number]:
-            print(cable_number, separation)
-            stats_map = getStats(data_map, cable_number, separation)
-            print(stats_map)
+        cable_dir = "{0}/Cable_{1}".format(plot_dir, cable_number)
+        tools.makeDir(cable_dir)
+        for dataset in datasets:
+            input_values = {}
+            for separation in separations:
+                input_values[separation] = {}
+                stats_map = getStats(data_map, cable_number, separation)
+                input_values[separation]["x_values"] = amplitudes
+                input_values[separation]["y_values"] = stats_map[dataset]["averages"]
+                input_values[separation]["y_errors"] = stats_map[dataset]["std_devs"]
+                print(cable_number, separation)
+            title = "title"
+            labels = ["x", "y"]
+            output_name = "{0}/ratios_{1}".format(cable_dir, dataset)
+            plot(input_values, title, labels, output_name)
 
 def main():
-    input_file = "data/Ernie/ErnieMeasurements-2021-10-29.csv"
-    makePlots(input_file)
+    input_file  = "data/Ernie/ErnieMeasurements-2021-10-29.csv"
+    plot_dir    = "plots/Ernie"
+    makePlots(input_file, plot_dir)
 
 if __name__ == "__main__":
     main()
