@@ -76,19 +76,19 @@ def getStats(data_map, cable_number, separation):
         result[dataset]["std_devs"] = std_devs
     return result
 
-def plot(input_values, limits, title, labels, output_name, doRatio):
+def plot(input_values, ordered_keys, limits, title, labels, label_format, output_name, doRatio):
     fig, ax = plt.subplots(figsize=(6, 6))
-    for i, separation in enumerate(separations):
-        x_values = np.array(input_values[separation]["x_values"]) 
-        y_values = np.array(input_values[separation]["y_values"])
-        y_errors = np.array(input_values[separation]["y_errors"])
+    for i, key in enumerate(ordered_keys):
+        x_values = np.array(input_values[key]["x_values"]) 
+        y_values = np.array(input_values[key]["y_values"])
+        y_errors = np.array(input_values[key]["y_errors"])
         # for ratio, divide by central value
         if doRatio:
             scale = y_values[1]
             y_values = y_values / scale 
             y_errors = y_errors / scale 
         #print("doRatio: {0}, y_values: {1}, y_errors: {2}".format(doRatio, y_values, y_errors))
-        label = "{0} mm spacing".format(separation)
+        label = label_format.format(key)
         color = colors[i]
         plt.errorbar(x_values, y_values, yerr=y_errors, fmt='o', label=label, color=color, alpha=0.5)
     
@@ -98,7 +98,7 @@ def plot(input_values, limits, title, labels, output_name, doRatio):
     xlim    = limits[0]
     ylim    = limits[1]
     ax.legend(loc='upper right', prop={'size': legend_font_size})
-    ax.set_title(title,     fontsize=20)
+    ax.set_title(title,     fontsize=16)
     ax.set_xlabel(x_label,  fontsize=16)
     ax.set_ylabel(y_label,  fontsize=16)
     ax.set_xlim(xlim)
@@ -122,36 +122,66 @@ def makePlots(input_file, plot_dir):
         cable_dir = "{0}/Cable_{1}".format(plot_dir, cable_number)
         tools.makeDir(cable_dir)
         for dataset in datasets:
-            input_values = {}
+            separation_input_values = {}
             for separation in separations:
-                input_values[separation] = {}
+                print("Cable {0}: {1} mm separation".format(cable_number, separation))
                 stats_map = getStats(data_map, cable_number, separation)
-                input_values[separation]["x_values"] = amplitudes
-                input_values[separation]["y_values"] = stats_map[dataset]["averages"]
-                input_values[separation]["y_errors"] = stats_map[dataset]["std_devs"]
-                #print(cable_number, separation)
+                separation_input_values[separation] = {}
+                separation_input_values[separation]["x_values"] = amplitudes
+                separation_input_values[separation]["y_values"] = stats_map[dataset]["averages"]
+                separation_input_values[separation]["y_errors"] = stats_map[dataset]["std_devs"]
+
+                channel_input_values = {}
+                for channel in channels:
+                    #print("{0}: {1}".format(channel,
+                    #                        data_map[cable_number][separation][channel][dataset],
+                    #                       )
+                    #)
+                    channel_input_values[channel] = {} 
+                    channel_input_values[channel]["x_values"] = amplitudes
+                    channel_input_values[channel]["y_values"] = data_map[cable_number][separation][channel][dataset]
+                    channel_input_values[channel]["y_errors"] = np.zeros(len(amplitudes))
+                
+                # Vary channels
+                # No error bars
+                title        = "Cable {0} Areas ({1}mm spacing)".format(cable_number, separation)
+                x_label      = x_axis_labels[dataset]
+                y_label      = "Area"
+                labels       = [x_label, y_label]
+                label_format = "Link {0}" 
+                xlim         = [0.0, 1.5e3]
+                ylim         = [0.0, 1.0e5]
+                limits       = [xlim, ylim]
+                output_name  = "{0}/vary_channel_areas_{1}mm_spacing_{2}".format(cable_dir, separation, dataset)
+                doRatio      = False
+                plot(channel_input_values, channels, limits, title, labels, label_format, output_name, doRatio)
             
-            title       = "Cable {0} Areas".format(cable_number)
-            x_label     = x_axis_labels[dataset]
-            y_label     = "Area"
-            labels      = [x_label, y_label]
-            xlim        = [0.0, 1.5e3]
-            ylim        = [0.0, 1.0e5]
-            limits      = [xlim, ylim]
-            output_name = "{0}/areas_{1}".format(cable_dir, dataset)
-            doRatio     = False
-            plot(input_values, limits, title, labels, output_name, doRatio)
+            # Vary separations
+            # For each separation, plot average over channels
+            # The std dev over channels is used for error bars
+            title        = "Cable {0} Ave. Areas".format(cable_number)
+            x_label      = x_axis_labels[dataset]
+            y_label      = "Ave. Area"
+            labels       = [x_label, y_label]
+            label_format = "{0} mm spacing" 
+            xlim         = [0.0, 1.5e3]
+            ylim         = [0.0, 1.0e5]
+            limits       = [xlim, ylim]
+            output_name  = "{0}/vary_separation_areas_{1}".format(cable_dir, dataset)
+            doRatio      = False
+            plot(separation_input_values, separations, limits, title, labels, label_format, output_name, doRatio)
             
-            title       = "Cable {0} Ratio of Areas".format(cable_number)
-            x_label     = x_axis_labels[dataset]
-            y_label     = "Ratio of Areas"
-            labels      = [x_label, y_label]
-            xlim        = [0.0, 1.5e3]
-            ylim        = [0.0, 2.0]
-            limits      = [xlim, ylim]
-            output_name = "{0}/ratios_{1}".format(cable_dir, dataset)
-            doRatio     = True
-            plot(input_values, limits, title, labels, output_name, doRatio)
+            title        = "Cable {0} Ratios of Ave. Areas".format(cable_number)
+            x_label      = x_axis_labels[dataset]
+            y_label      = "Ratio of Ave. Areas"
+            labels       = [x_label, y_label]
+            label_format = "{0} mm spacing" 
+            xlim         = [0.0, 1.5e3]
+            ylim         = [0.0, 2.0]
+            limits       = [xlim, ylim]
+            output_name  = "{0}/vary_separation_ratios_{1}".format(cable_dir, dataset)
+            doRatio      = True
+            plot(separation_input_values, separations, limits, title, labels, label_format, output_name, doRatio)
 
 def main():
     input_file  = "data/Ernie/ErnieMeasurements-2021-10-29.csv"
