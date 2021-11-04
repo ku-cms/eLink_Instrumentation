@@ -20,7 +20,6 @@ file_names = [
 def getArea(input_file):
     data = tools.getData(input_file)
     area = int(data[6][1])
-    print("{0}: {1}".format(input_file, area))
     return area
 
 # collect all data for a cable into one csv file

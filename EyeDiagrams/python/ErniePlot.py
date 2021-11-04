@@ -119,12 +119,12 @@ def makePlots(input_file, plot_dir):
     tools.makeDir(plot_dir)
     data_map = readData(input_file)
     for cable_number in data_map:
+        print("Plotting Cable {0}".format(cable_number))
         cable_dir = "{0}/Cable_{1}".format(plot_dir, cable_number)
         tools.makeDir(cable_dir)
         for dataset in datasets:
             separation_input_values = {}
             for separation in separations:
-                print("Cable {0}: {1} mm separation".format(cable_number, separation))
                 stats_map = getStats(data_map, cable_number, separation)
                 separation_input_values[separation] = {}
                 separation_input_values[separation]["x_values"] = amplitudes
