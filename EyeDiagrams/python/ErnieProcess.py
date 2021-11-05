@@ -1,11 +1,12 @@
 # ErnieProcess.py
 
+import os
 import csv
 import tools
 
 channels = ["A", "B", "C", "D"]
 amplitudes = [269.0, 741.0, 1119.0]
-separations = [1]
+separations = [1, 2]
 #separations = [0, 1, 2]
 
 file_names = [
@@ -49,6 +50,10 @@ def process(cable_number, input_dir, output_dir, output_file):
                 for name in file_names:
                     f = name.format(channel)
                     input_file = "{0}/{1}".format(data_dir, f)
+                    # check that file exists
+                    if not os.path.exists(input_file):
+                        print("ERROR: Required input file does not exist: {0}".format(input_file))
+                        return
                     area = getArea(input_file)
                     output_row.append(area)
                 output_writer.writerow(output_row)
