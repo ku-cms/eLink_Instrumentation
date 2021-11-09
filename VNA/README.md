@@ -18,7 +18,7 @@ Also, for new Macs (2020 and later) that have an Apple M1 chip (which uses a new
 To install conda, go [here](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/index.html), choose your operating system, and follow the instructions.
 Once conda is installed, you can run these commands in your terminal (for Mac or Linux... I'm not sure about Windows!).
 ```
-conda update -n base conda
+conda update -n base -c defaults conda
 conda config --set auto_activate_base false
 ```
 Then you can create a new python environment.
