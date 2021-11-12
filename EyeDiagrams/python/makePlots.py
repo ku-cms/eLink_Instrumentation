@@ -86,6 +86,7 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
     plt.savefig(output_pdf)
 
 # primary make plots function
+# plot data for one cable
 def makePlots(cable_number, input_file, plot_dir):
     drawMean        = True
     
@@ -110,6 +111,30 @@ def makePlots(cable_number, input_file, plot_dir):
     ylim            = [0.0, 600.0]
     plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
 
+# plot data from scan
+def makePlotsScan(input_file, plot_dir):
+    drawMean        = False
+    # Heights
+    output_file     = "EyeDiagram_Heights"
+    title           = "Eye Diagram Heights"
+    column_index    = 2
+    ylim            = [0.0, 800.0]
+    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    
+    # Jitters
+    output_file     = "EyeDiagram_Jitters"
+    title           = "Eye Diagram Jitters"
+    column_index    = 3
+    ylim            = [0.0, 400.0]
+    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    
+    # Widths
+    output_file     = "EyeDiagram_Widths"
+    title           = "Eye Diagram Widths"
+    column_index    = 4
+    ylim            = [0.0, 800.0]
+    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+
 def main():
     # testing
     
@@ -127,6 +152,10 @@ def main():
     input_file      = "tables/Cable_{0}_EyeDiagrams_afterLashing.csv".format(cable_number)
     plot_dir        = "plots/Cable_{0}_afterLashing".format(cable_number)
     makePlots(cable_number, input_file, plot_dir)
+
+    input_file      = "tables/TAP0_Scan_2021_11_11.csv"
+    plot_dir        = "plots/TAP0_Scan_2021_11_11"
+    makePlotsScan(input_file, plot_dir)
 
 if __name__ == "__main__":
     main()
