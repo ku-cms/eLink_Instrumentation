@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import tools
 
 # create plot from intput data file
-def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean):
+def plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean):
     verbose = False
     tools.makeDir(plot_dir)
     data = tools.getData(input_file)
@@ -17,25 +17,27 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
     colors     = prop_cycle.by_key()['color']
 
     # get data from column
-    data_label = ""
-    x_vals     = []
-    y_vals     = []
+    x_label = ""
+    y_label = ""
+    x_vals  = []
+    y_vals  = []
 
     # loop over data
     for i, row in enumerate(data):
         # first row has labels
         if i == 0:
-            data_label = row[column_index]
+            x_label = row[x_column_index]
+            y_label = row[y_column_index]
         # second row is the beginning of data values
         else:
             # WARNING: make sure to convert strings to floats!
-            x = float(i)
-            y = float(row[column_index])
+            x = float(row[x_column_index])
+            y = float(row[y_column_index])
             x_vals.append(x)
             y_vals.append(y)
         
         if verbose:
-            print("{0}: {1}".format(i, row[column_index]))
+            print("{0}: {1}".format(i, row[y_column_index]))
     
     # plot
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -45,8 +47,9 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
     y_mean  = np.mean(y_array)
     y_std   = np.std(y_array)
     # extend x to define xlim and plot mean and std dev
-    x_extended = np.insert(x_array, 0, float(x_array[0]  - 1) )
-    x_extended = np.append(x_extended, float(x_array[-1] + 1) )
+    step = x_array[1] - x_array[0] 
+    x_extended = np.insert(x_array, 0, float(x_array[0]  - step) )
+    x_extended = np.append(x_extended, float(x_array[-1] + step) )
     xlim = [x_extended[0], x_extended[-1]]
     
     if verbose:
@@ -60,9 +63,9 @@ def plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawM
     # format plot
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    ax.set_title(title,         fontsize=16)
-    ax.set_xlabel("Channel",    fontsize=12)
-    ax.set_ylabel(data_label,   fontsize=12)
+    ax.set_title(title,      fontsize=16)
+    ax.set_xlabel(x_label,   fontsize=12)
+    ax.set_ylabel(y_label,   fontsize=12)
     
     p1 = plt.scatter(x_array, y_array, color=colors[0], label="data")
     objects = [p1]
@@ -93,23 +96,26 @@ def makePlots(cable_number, input_file, plot_dir):
     # Heights
     output_file     = "Cable_{0}_EyeDiagram_Heights".format(cable_number)
     title           = "Cable {0} Eye Diagram Heights".format(cable_number)
-    column_index    = 3
+    x_column_index  = 0
+    y_column_index  = 3
     ylim            = [0.0, 400.0]
-    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
     
     # Jitters
     output_file     = "Cable_{0}_EyeDiagram_Jitters".format(cable_number)
     title           = "Cable {0} Eye Diagram Jitters".format(cable_number)
-    column_index    = 4
+    x_column_index  = 0
+    y_column_index  = 4
     ylim            = [0.0, 400.0]
-    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
     
     # Widths
     output_file     = "Cable_{0}_EyeDiagram_Widths".format(cable_number)
     title           = "Cable {0} Eye Diagram Widths".format(cable_number)
-    column_index    = 5
+    x_column_index  = 0
+    y_column_index  = 5
     ylim            = [0.0, 600.0]
-    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
 
 # plot data from scan
 def makePlotsScan(input_file, plot_dir):
@@ -117,23 +123,26 @@ def makePlotsScan(input_file, plot_dir):
     # Heights
     output_file     = "EyeDiagram_Heights"
     title           = "Eye Diagram Heights"
-    column_index    = 2
+    x_column_index  = 1
+    y_column_index  = 2
     ylim            = [0.0, 800.0]
-    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
     
     # Jitters
     output_file     = "EyeDiagram_Jitters"
     title           = "Eye Diagram Jitters"
-    column_index    = 3
+    x_column_index  = 1
+    y_column_index  = 3
     ylim            = [0.0, 400.0]
-    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
     
     # Widths
     output_file     = "EyeDiagram_Widths"
     title           = "Eye Diagram Widths"
-    column_index    = 4
+    x_column_index  = 1
+    y_column_index  = 4
     ylim            = [0.0, 800.0]
-    plotData(input_file, output_file, plot_dir, title, column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
 
 def main():
     # testing
