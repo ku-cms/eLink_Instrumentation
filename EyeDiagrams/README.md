@@ -73,6 +73,11 @@ This step is not required.
 for f in *.csv; do mv "$f" "$(echo "$f" | sed s/wf/Stats/g)"; done
 ```
 
+New data processing script! You need to provide the path to a zip (which has raw csv data files) and the cable number.
+```
+./scripts/process.sh ~/Downloads/OneDrive_6_6-18-2021.zip 555
+```
+
 Note that you may need to use "python3" instead of "python" depending on your environment.
 
 Use -h to see the help menu, which displays the options:
