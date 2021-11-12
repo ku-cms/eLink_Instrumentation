@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import tools
 
 # create plot from intput data file
-def plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean):
+def plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean, drawFit):
     verbose = False
     tools.makeDir(plot_dir)
     data = tools.getData(input_file)
@@ -81,6 +81,22 @@ def plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_
         equation = r"$\mu = {0:.2f} \pm {1:.2f}$".format(y_mean, y_std)
         ax.text(text_x, text_y, equation, fontsize=15)
     
+    # draw fit on plot
+    if drawFit:
+        model = np.polyfit(x_array, y_array, 1)
+        predict = np.poly1d(model)
+        #print(predict)
+        p4 = plt.plot(x_array, predict(x_array), label='fit', color='red', linestyle='dashed')
+        #objects = [p1, p4]
+        # text
+        text_x = xlim[0] + 0.1 * (xlim[1] - xlim[0])
+        text_y = ylim[0] + 0.9 * (ylim[1] - ylim[0])
+        f_x = "{0}".format(predict)
+        # remove whitespace and newlines
+        f_x = f_x.strip()
+        equation = r"y = {0}".format(f_x)
+        ax.text(text_x, text_y, equation, fontsize=15)
+
     # specify order for legend
     labels = [o.get_label() for o in objects]
     
@@ -92,6 +108,7 @@ def plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_
 # plot data for one cable
 def makePlots(cable_number, input_file, plot_dir):
     drawMean        = True
+    drawFit         = False
     
     # Heights
     output_file     = "Cable_{0}_EyeDiagram_Heights".format(cable_number)
@@ -99,7 +116,7 @@ def makePlots(cable_number, input_file, plot_dir):
     x_column_index  = 0
     y_column_index  = 3
     ylim            = [0.0, 400.0]
-    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean, drawFit)
     
     # Jitters
     output_file     = "Cable_{0}_EyeDiagram_Jitters".format(cable_number)
@@ -107,7 +124,7 @@ def makePlots(cable_number, input_file, plot_dir):
     x_column_index  = 0
     y_column_index  = 4
     ylim            = [0.0, 400.0]
-    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean, drawFit)
     
     # Widths
     output_file     = "Cable_{0}_EyeDiagram_Widths".format(cable_number)
@@ -115,18 +132,20 @@ def makePlots(cable_number, input_file, plot_dir):
     x_column_index  = 0
     y_column_index  = 5
     ylim            = [0.0, 600.0]
-    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean, drawFit)
 
 # plot data from scan
 def makePlotsScan(input_file, plot_dir):
     drawMean        = False
+    drawFit         = True
+
     # Heights
     output_file     = "EyeDiagram_Heights"
     title           = "Eye Diagram Heights"
     x_column_index  = 1
     y_column_index  = 2
     ylim            = [0.0, 800.0]
-    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean, drawFit)
     
     # Jitters
     output_file     = "EyeDiagram_Jitters"
@@ -134,7 +153,7 @@ def makePlotsScan(input_file, plot_dir):
     x_column_index  = 1
     y_column_index  = 3
     ylim            = [0.0, 400.0]
-    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean, drawFit)
     
     # Widths
     output_file     = "EyeDiagram_Widths"
@@ -142,7 +161,7 @@ def makePlotsScan(input_file, plot_dir):
     x_column_index  = 1
     y_column_index  = 4
     ylim            = [0.0, 800.0]
-    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean)
+    plotData(input_file, output_file, plot_dir, title, x_column_index, y_column_index, ylim, drawMean, drawFit)
 
 def main():
     # testing
