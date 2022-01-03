@@ -14,9 +14,10 @@ options = [
             # [1, '../data',                        'johncable4.txt',               'johncable4',               '100',  2.0,  10.0, '0', '12'], #S12
             #[1, '../data/JohnCable4/', 'JohnCable4.txt', 'JohnCable4', '80',  2.0,  8.0, '0', '12'], #S12
             #[1, '../data/JohnCable5/', 'JohnCable5.txt', 'JohnCable5', '80',  2.0,  8.0, '0', '12'], #S12
-            #[1, '../data/Cable_120_beforeLashing',  'Cable_120_beforeLashing.txt',  'Cable_120_beforeLashing',   '80',  2.0,   8.0, '0', '12'], #S12
-            #[1, '../data/Cable_120_afterLashing',   'Cable_120_afterLashing.txt',   'Cable_120_afterLashing',    '80',  2.0,   8.0, '0', '12'], #S12
-            [1, '../data/Comparison_2021_07_26', 'Comparison_2021_07_26.txt', 'Comparison_2021_07_26', '100', 0.5, 1.0, '0', '12'], #S12
+            #[1, 'data/Cable_120_beforeLashing',  'data/Cable_120_beforeLashing.txt',  'Cable_120_beforeLashing',   '80',  2.0,   8.0, '0', '12'], #S12
+            #[1, 'data/Cable_120_afterLashing',   'data/Cable_120_afterLashing.txt',   'Cable_120_afterLashing',    '80',  2.0,   8.0, '0', '12'], #S12
+            #[1, '../data/Comparison_2021_07_26', 'Comparison_2021_07_26.txt', 'Comparison_2021_07_26', '100', 0.5, 1.0, '0', '12'], #S12
+            [1, 'data/Cable_203', 'Cable_203.txt', 'Cable_203', '100', 0.5, 5.5, '0', '12'], #S12
 	  ]
 
 for opt in options:

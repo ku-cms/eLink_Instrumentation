@@ -184,7 +184,7 @@ def makePlots(input_file, plot_dir):
             plot(separation_input_values, separations, limits, title, labels, label_format, output_name, doRatio)
 
 def main():
-    input_file  = "data/Ernie/ErnieMeasurements-2021-10-29.csv"
+    input_file  = "data/Ernie/ErnieMeasurements-2021-12-14.csv"
     plot_dir    = "plots/Ernie"
     makePlots(input_file, plot_dir)
 
