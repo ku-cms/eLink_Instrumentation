@@ -6,8 +6,7 @@ import tools
 
 channels = ["A", "B", "C", "D"]
 amplitudes = [269.0, 741.0, 1119.0]
-separations = [1, 2]
-#separations = [0, 1, 2]
+separations = [0, 1, 2]
 
 file_names = [
     "Scan{0}_primary_741mV_secondary_269mV.csv",

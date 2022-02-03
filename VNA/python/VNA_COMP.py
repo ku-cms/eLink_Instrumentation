@@ -77,9 +77,10 @@ parser= OptionParser()
 #elif NN == "0":
 #    print("Please change your file name")
 #    exit()
-cable_length = input("What is the cable length? (35, 80, 100, 140, 160, 200. )")
-cable_number = str(input("What is the cable number?"))
-cable_type = int(input("What is the cable type? (1,2,3,4)"))
+
+cable_number = str(input("Enter cable number: "))
+cable_type   = int(input("Enter cable type (1, 2, 3, 4): "))
+cable_length = input("Enter cable length in cm (35, 80, 100, 140, 160, 200): ")
 
 Pre_list = []
 
@@ -101,6 +102,8 @@ makeDir("Data/"+cable_number+"/Plots/s2p")
 
 IDchecker = 0
 Breaker = True
+
+
 while Breaker == True:
 
     Breaker = True
@@ -244,7 +247,7 @@ while Breaker == True:
 
         IDchecker +=1
 
-        if IDchecker >(len(Pre_list)-1):
+        if IDchecker >4:
             break
 
 print("Plots can be now found in the Plots folder of the Cable\n")
@@ -285,13 +288,15 @@ else:
 
 
 
-comps = ['11','12','21']
-subfiles = ['0','0','1']
+comps = ['11','12', '21']
+subfiles = ['0','0','1',]
 
 IDchecker = 0
 Breaker = True
 
 print("List of Cables being analysed",Pre_list,"\n")
+
+Comment = input("Any coments on this run? If this is one many trials for the same cable add T_(number of trials). If it is an important record add I: ")
 
 while Breaker == True:
     Breaker = True
@@ -301,6 +306,7 @@ while Breaker == True:
     if comp == '11' and subfile == '0': S_ij = '11'
     elif comp == '12'and subfile == '0': S_ij = '21'
     elif comp == '21' and subfile == '1': S_ij = '11'
+
 
     i = int(split(S_ij)[0])
     j = int(split(S_ij)[1])
@@ -312,8 +318,8 @@ while Breaker == True:
     net4 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename1.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net5 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename2.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net6 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename3.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-    #net8 = rf.Network(ff4+'_'+subfile+'.s2p', f_unit='ghz')
-    #net10 = rf.Network(ff5+'_'+subfile+'.s2p', f_unit='ghz')
+    net8 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename4.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
+    net10 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename5.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
 
 
 
@@ -337,15 +343,15 @@ while Breaker == True:
         net4_dc = net4[i,j].extrapolate_to_dc(kind='linear')
         net5_dc = net5[i,j].extrapolate_to_dc(kind='linear')
         net6_dc = net6[i,j].extrapolate_to_dc(kind='linear')
-        #net8_dc = net8[i,j].extrapolate_to_dc(kind='linear')
-        #net10_dc = net10[i,j].extrapolate_to_dc(kind='linear')
-        #netref_dc = netref[i,j].extrapolate_to_dc(kind='linear')
+        net8_dc = net8[i,j].extrapolate_to_dc(kind='linear')
+        net10_dc = net10[i,j].extrapolate_to_dc(kind='linear')
+    #    netref_dc = netref[i,j].extrapolate_to_dc(kind='linear')
 
         net4_dc.plot_s_db(label='S'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='b')
         net5_dc.plot_s_db(label='S'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='r')
         net6_dc.plot_s_db(label='S'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='g')
-        #net8_dc.plot_s_db(label='S'+comp+ff4, ax=ax0, color='w')
-        #net10_dc.plot_s_db(label='S'+comp+ff5, ax=ax0, color='m')
+        net8_dc.plot_s_db(label='S'+comp+ff4, ax=ax0, color='w')
+        net10_dc.plot_s_db(label='S'+comp+ff5, ax=ax0, color='m')
 
 
 
@@ -358,20 +364,21 @@ while Breaker == True:
         net6_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='g')
         display_mean_impedance(ax1, t1, t2, 'g')
 
-        #net8_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff4, ax=ax1, color='w')
-        #display_mean_impedance(ax1, 2.0, 5.0, 'w')
-        #net10_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff5, ax=ax1, color='m')
-        #display_mean_impedance(ax1, 2.0, 5.0, 'm')
+        net8_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff4, ax=ax1, color='w')
+        display_mean_impedance(ax1, 2.0, 5.0, 'w')
+        net10_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff5, ax=ax1, color='m')
+        display_mean_impedance(ax1, 2.0, 5.0, 'm')
         with open("Impedence_List.csv", "a") as Ana:
-            Ana.write(str(cable_number)+","+str(cable_length)+","+str(cable_type)+","+str(t1)+ "-"+str(t2)+",")
+            Ana.write("Cable_number,Length,Type, Time Interval, S11, S12, S21, Comments")
+            Ana.write(str(cable_number)+","+str(cable_length)+","+str(cable_type)+","+str(t1)+ "-"+str(t2)+","+str(Comment)+",")
             for i in y_plot_value:
                 Ana.write(str(i)+",")
             Ana.write("\n")
             Ana.close()
 
         with open("Data/"+cable_number+"/Impedence_List.csv", "a") as Ana2:
-            Ana2.write("Cable_number,Length,Type, Time Interval, S11, S12, S21")
-            Ana2.write(str(cable_number)+","+str(cable_length)+","+str(cable_type)+","+str(t1)+ "-"+str(t2)+",")
+            Ana2.write("Cable_number,Length,Type, Time Interval, S11, S12, , Comments")
+            Ana2.write(str(cable_number)+","+str(cable_length)+","+str(cable_type)+","+str(t1)+ "-"+str(t2)+","+str(Comment)+",")
             for i in y_plot_value:
                 Ana2.write(str(i)+",")
             Ana2.write("\n")
@@ -379,7 +386,7 @@ while Breaker == True:
 
         y_plot_value.clear()
 
-        set_axes(ax1, 'Time Domain', 0.0, 400.0, 0.0, 30.0, 0)
+        set_axes(ax1, 'Time Domain', 0.0, 300.0, 0.0, 30.0, 0)
 
 
         fig0.savefig("Data/"+cable_number+"/Plots/"+cable_number+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
