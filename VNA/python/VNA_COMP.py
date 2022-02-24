@@ -12,7 +12,6 @@ import pickle as pl
 import csv
 
 
-
 #Transfered from other Scripts
 def name(x):
     return x.strip(".vna").replace('Data/'+str(cable_number)+'/Plots/s2p/', "").strip("TP_")
@@ -65,11 +64,7 @@ def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
-
-
 parser= OptionParser()
-
-
 
 #NN = input("Are your file names have similar format to: TP_0.8m_115_M1CMD.vna.txt? (Lenght in m)(y = 1/ n = 0)")
 #if NN == "1":
@@ -89,13 +84,23 @@ for root, dirs, files in os.walk("./Data/"+cable_number, topdown=False):
    for name in files:
       if ".txt" in os.path.join(name):
         Pre_list.append(os.path.join(name))
-print(" Files detected")
+
+n_channels = len(Pre_list)
+
+print("Number of files: {0}".format(n_channels))
 print(Pre_list)
 
+ff_list = []
+filename_list = []
 
 for i in range(1,len(Pre_list)+1):
+    # this use of globals is creative but not good
     globals()[f"ff{i}"]= f"Data/"+cable_number+f"/{Pre_list[i-1]}"
     globals()[f"filename{i}"]= f"{Pre_list[i-1]}"
+    ff_list.append(f"Data/"+cable_number+f"/{Pre_list[i-1]}")
+    filename_list.append(f"{Pre_list[i-1]}")
+    print("ff_list[{0}] = {1}".format(i-1, ff_list[i-1]))
+    print("filename_list[{0}] = {1}".format(i-1, filename_list[i-1]))
 
 makeDir("Data/"+cable_number+"/Plots")
 makeDir("Data/"+cable_number+"/Plots/s2p")
@@ -107,6 +112,7 @@ Breaker = True
 while Breaker == True:
 
     Breaker = True
+    print("IDchecker: {0}".format(IDchecker))
     FILE = Pre_list[IDchecker]
     print("Creating s2p files for ", FILE)
 
@@ -244,18 +250,16 @@ while Breaker == True:
 
         fig.savefig(dir_in+cable.replace(".vna.txt","")+'_rf.png')
 
-
         IDchecker +=1
 
-        if IDchecker >4:
+        #if IDchecker >4:
+        if IDchecker >= n_channels:
             break
 
 print("Plots can be now found in the Plots folder of the Cable\n")
 
-
 print()
 print()
-
 
 if cable_length == "35":
     t1 = 2.00
@@ -285,9 +289,6 @@ else:
     t1=0
     t2=0
 
-
-
-
 comps = ['11','12', '21']
 subfiles = ['0','0','1',]
 
@@ -313,15 +314,11 @@ while Breaker == True:
 
     print("\nParameter being analyzed\n","S"+comp)
 
-
-
     net4 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename1.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net5 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename2.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net6 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename3.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net8 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename4.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net10 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename5.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-
-
 
     #netref = rf.network.Network(out_dir+'/'+sub_out_dir+'/straight_SMA.vna_'+subfile+'.s2p', f_unit='ghz')
 
@@ -338,8 +335,6 @@ while Breaker == True:
         ax0.grid(True, color='0.8', which='minor')
         ax0.grid(True, color='0.4', which='major')
 
-
-
         net4_dc = net4[i,j].extrapolate_to_dc(kind='linear')
         net5_dc = net5[i,j].extrapolate_to_dc(kind='linear')
         net6_dc = net6[i,j].extrapolate_to_dc(kind='linear')
@@ -353,10 +348,8 @@ while Breaker == True:
         net8_dc.plot_s_db(label='S'+comp+ff4, ax=ax0, color='w')
         net10_dc.plot_s_db(label='S'+comp+ff5, ax=ax0, color='m')
 
-
-
         net4_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='b')
-        display_mean_impedance(ax1,t1, t2,'b')
+        display_mean_impedance(ax1, t1, t2, 'b')
 
         net5_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='r')
         display_mean_impedance(ax1, t1, t2, 'r')
@@ -365,9 +358,11 @@ while Breaker == True:
         display_mean_impedance(ax1, t1, t2, 'g')
 
         net8_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff4, ax=ax1, color='w')
-        display_mean_impedance(ax1, 2.0, 5.0, 'w')
+        display_mean_impedance(ax1, t1, t2, 'w')
+
         net10_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff5, ax=ax1, color='m')
-        display_mean_impedance(ax1, 2.0, 5.0, 'm')
+        display_mean_impedance(ax1, t1, t2, 'm')
+
         with open("Impedence_List.csv", "a") as Ana:
             Ana.write("Cable_number,Length,Type, Time Interval, S11, S12, S21, Comments")
             Ana.write(str(cable_number)+","+str(cable_length)+","+str(cable_type)+","+str(t1)+ "-"+str(t2)+","+str(Comment)+",")
@@ -386,11 +381,10 @@ while Breaker == True:
 
         y_plot_value.clear()
 
-        set_axes(ax1, 'Time Domain', 0.0, 300.0, 0.0, 30.0, 0)
-
+        set_axes(ax1, 'Time Domain', 0.0, 200.0, 0.0, 30.0, 0)
+        set_axes(ax0, 'Time Domain', -75.0, 75.0, 0.0, 6.0, 0)
 
         fig0.savefig("Data/"+cable_number+"/Plots/"+cable_number+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
-
 
         IDchecker+=1
 
