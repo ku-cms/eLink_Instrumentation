@@ -92,6 +92,7 @@ print(Pre_list)
 
 ff_list = []
 filename_list = []
+color_list = ['b', 'r', 'g', 'w', 'm']
 
 for i in range(1,len(Pre_list)+1):
     # this use of globals is creative but not good
@@ -107,7 +108,6 @@ makeDir("Data/"+cable_number+"/Plots/s2p")
 
 IDchecker = 0
 Breaker = True
-
 
 while Breaker == True:
 
@@ -258,9 +258,7 @@ while Breaker == True:
 
 print("Plots can be now found in the Plots folder of the Cable\n")
 
-print()
-print()
-
+# specify time integration window as a function of length
 if cable_length == "35":
     t1 = 2.00
     t2 = 4.00
@@ -304,21 +302,27 @@ while Breaker == True:
     comp = comps[IDchecker]
     subfile = subfiles[IDchecker]
 
-    if comp == '11' and subfile == '0': S_ij = '11'
-    elif comp == '12'and subfile == '0': S_ij = '21'
+    if   comp == '11' and subfile == '0': S_ij = '11'
+    elif comp == '12' and subfile == '0': S_ij = '21'
     elif comp == '21' and subfile == '1': S_ij = '11'
-
 
     i = int(split(S_ij)[0])
     j = int(split(S_ij)[1])
 
     print("\nParameter being analyzed\n","S"+comp)
 
+    ### old version
+    '''
     net4 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename1.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net5 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename2.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net6 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename3.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net8 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename4.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
     net10 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename5.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
+    '''
+
+    net_list = []
+    for channel in range(n_channels):
+        net_list.append(rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename_list[channel].replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz'))
 
     #netref = rf.network.Network(out_dir+'/'+sub_out_dir+'/straight_SMA.vna_'+subfile+'.s2p', f_unit='ghz')
 
@@ -335,12 +339,15 @@ while Breaker == True:
         ax0.grid(True, color='0.8', which='minor')
         ax0.grid(True, color='0.4', which='major')
 
-        net4_dc = net4[i,j].extrapolate_to_dc(kind='linear')
-        net5_dc = net5[i,j].extrapolate_to_dc(kind='linear')
-        net6_dc = net6[i,j].extrapolate_to_dc(kind='linear')
-        net8_dc = net8[i,j].extrapolate_to_dc(kind='linear')
+        ### old version
+        '''
+        net4_dc  = net4[i,j].extrapolate_to_dc(kind='linear')
+        net5_dc  = net5[i,j].extrapolate_to_dc(kind='linear')
+        net6_dc  = net6[i,j].extrapolate_to_dc(kind='linear')
+        net8_dc  = net8[i,j].extrapolate_to_dc(kind='linear')
         net10_dc = net10[i,j].extrapolate_to_dc(kind='linear')
-    #    netref_dc = netref[i,j].extrapolate_to_dc(kind='linear')
+
+        #netref_dc = netref[i,j].extrapolate_to_dc(kind='linear')
 
         net4_dc.plot_s_db(label='S'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='b')
         net5_dc.plot_s_db(label='S'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='r')
@@ -362,6 +369,15 @@ while Breaker == True:
 
         net10_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff5, ax=ax1, color='m')
         display_mean_impedance(ax1, t1, t2, 'm')
+        '''
+
+        net_dc = []
+        for channel in range(n_channels):
+            this_net = net_list[channel]
+            net_dc.append(this_net[i,j].extrapolate_to_dc(kind='linear'))
+            net_dc[channel].plot_s_db(label='S'+comp+ff_list[channel].split('.vna')[0].split('/')[-1:][0], ax=ax0, color=color_list[channel])
+            net_dc[channel].plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff_list[channel].split('.vna')[0].split('/')[-1:][0], ax=ax1, color=color_list[channel])
+            display_mean_impedance(ax1, t1, t2, color_list[channel])
 
         with open("Impedence_List.csv", "a") as Ana:
             Ana.write("Cable_number,Length,Type, Time Interval, S11, S12, S21, Comments")
@@ -390,4 +406,5 @@ while Breaker == True:
 
         if IDchecker >2:
             break
+
 print("Data analysed. Plots stored in Plots folder.")
