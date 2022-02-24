@@ -94,14 +94,9 @@ ff_list = []
 filename_list = []
 color_list = ['b', 'r', 'g', 'w', 'm']
 
-for i in range(1,len(Pre_list)+1):
-    # this use of globals is creative but not good
-    globals()[f"ff{i}"]= f"Data/"+cable_number+f"/{Pre_list[i-1]}"
-    globals()[f"filename{i}"]= f"{Pre_list[i-1]}"
-    ff_list.append(f"Data/"+cable_number+f"/{Pre_list[i-1]}")
-    filename_list.append(f"{Pre_list[i-1]}")
-    print("ff_list[{0}] = {1}".format(i-1, ff_list[i-1]))
-    print("filename_list[{0}] = {1}".format(i-1, filename_list[i-1]))
+for i in range(n_channels):
+    ff_list.append(f"Data/"+cable_number+f"/{Pre_list[i]}")
+    filename_list.append(f"{Pre_list[i]}")
 
 makeDir("Data/"+cable_number+"/Plots")
 makeDir("Data/"+cable_number+"/Plots/s2p")
@@ -132,7 +127,6 @@ while Breaker == True:
     basename2 = basename1.replace('Data/'+str(cable_number)+'/', 'Data/'+str(cable_number)+'/'+'Plots/s2p/')
     dir_in= options.directory
     cable = basename1.replace('Data/'+str(cable_number)+'/', "")
-
 
     infile = pd.read_csv(basename1, names=['pt','f','s11R','s11I','s12R','s12I','s13R','s13I','s14R','s14I'], delim_whitespace=True, skiprows=1)
     infile.dropna(how='all')
@@ -311,15 +305,6 @@ while Breaker == True:
 
     print("\nParameter being analyzed\n","S"+comp)
 
-    ### old version
-    '''
-    net4 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename1.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-    net5 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename2.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-    net6 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename3.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-    net8 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename4.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-    net10 = rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename5.replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz')
-    '''
-
     net_list = []
     for channel in range(n_channels):
         net_list.append(rf.Network("Data/"+cable_number+"/Plots/s2p/"+filename_list[channel].replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz'))
@@ -338,38 +323,6 @@ while Breaker == True:
         ax0.yaxis.set_minor_locator(AutoMinorLocator(2))
         ax0.grid(True, color='0.8', which='minor')
         ax0.grid(True, color='0.4', which='major')
-
-        ### old version
-        '''
-        net4_dc  = net4[i,j].extrapolate_to_dc(kind='linear')
-        net5_dc  = net5[i,j].extrapolate_to_dc(kind='linear')
-        net6_dc  = net6[i,j].extrapolate_to_dc(kind='linear')
-        net8_dc  = net8[i,j].extrapolate_to_dc(kind='linear')
-        net10_dc = net10[i,j].extrapolate_to_dc(kind='linear')
-
-        #netref_dc = netref[i,j].extrapolate_to_dc(kind='linear')
-
-        net4_dc.plot_s_db(label='S'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='b')
-        net5_dc.plot_s_db(label='S'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='r')
-        net6_dc.plot_s_db(label='S'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax0, color='g')
-        net8_dc.plot_s_db(label='S'+comp+ff4, ax=ax0, color='w')
-        net10_dc.plot_s_db(label='S'+comp+ff5, ax=ax0, color='m')
-
-        net4_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff1.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='b')
-        display_mean_impedance(ax1, t1, t2, 'b')
-
-        net5_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff2.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='r')
-        display_mean_impedance(ax1, t1, t2, 'r')
-
-        net6_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff3.split('.vna')[0].split('/')[-1:][0], ax=ax1, color='g')
-        display_mean_impedance(ax1, t1, t2, 'g')
-
-        net8_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff4, ax=ax1, color='w')
-        display_mean_impedance(ax1, t1, t2, 'w')
-
-        net10_dc.plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff5, ax=ax1, color='m')
-        display_mean_impedance(ax1, t1, t2, 'm')
-        '''
 
         net_dc = []
         for channel in range(n_channels):
