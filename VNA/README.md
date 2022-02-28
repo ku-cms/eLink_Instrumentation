@@ -1,6 +1,52 @@
 # VNA Data Processing
 
-Input files: touchstone file (.s2p, .s4p) or VNA output file (.vna.txt)
+Input files: VNA output files (.vna.txt) from Matlab data taking program.
+
+## Setup
+
+### Windows 10
+
+If python is not already installed, download and install the latest version of python 3.
+
+https://www.python.org/downloads/
+
+Open CMD shell.
+
+Type “python” and hit enter to check that python is installed and in the path.
+
+Update to latest version of pip (can only be done per user due to permissions):
+
+```
+pip install --upgrade pip –user
+```
+
+Install required packages:
+
+```
+pip install numpy
+pip install pandas
+pip install matplotlib
+pip install scikit-rf
+```
+
+Check list of installed python packages:
+
+```
+pip list
+```
+
+## Processing Data
+
+Run the following python analysis script and enter the requested parameters.
+```
+python VNA_Comp.py
+```
+
+- Enter cable number.
+- Enter cable type (1, 2, 3, 4).
+- Enter cable length in cm (35, 80, 100, 140, 160, 200).
+
+Note: To analyze data for "Type 0" cables, enter "Type 1" for this script.
 
 ## Setup
 
@@ -46,77 +92,3 @@ conda deactivate
 ```
 You can now activate and deactivate your conda environment as needed.
 You will need to activate it before running the scripts that use scikit-rf and other required packages.
-
-## Processing Data
-
-First activate the conda environment with the necessary packages installed.
-```
-conda activate .venv
-```
-
-The recommended script "run_vna_basic.py" accepts a data directory (with input data) and a plot directory (for output plots).
-```
-python python/run_vna_basic.py -d data/Cable_120_beforeLashing/ -p plots/Cable_120_beforeLashing/
-```
-
-There is an alternative script "run_vna_json.py" that accepts a json file as input.
-The json file must containt data file names, data directories, and plot directories for each channel.
-```
-python python/run_vna_json.py -j json/Cable_120_beforeLashing.json
-```
-
-Finally, there is a script "create_all_s2p.py" that contains hard coded information for each cable and channel (not recommended).
-```
-python python/create_all_s2p.py
-```
-
-When you are finished, you can deactivate conda.
-```
-conda deactivate
-```
-
-## Scripts
-
-First activate the conda environment with the necessary packages installed.
-```
-conda activate .venv
-```
-
-Then you can try running some of these scripts.
-
-When you are finished, you can deactivate conda.
-```
-conda deactivate
-
-### create_all_s2p.py
-Calls 'readVNADataSKRF.py' on a list of files.
-```
-cd VNA
-python python/create_all_s2p.py
-```
-
-### draw_plots.py 
-Driver script to plot all other S-parameters options such as S12 and S21 and execute 'plotVNAFeatures.py'. 
-```
-cd VNA/python
-python draw_plots.py
-```
-
-### VNADataInspection.py
-Reads .s4p file.
-
-### readVNAData.py
-Extracts Z-impedance parameters from input text files using self defined function.
-
-### readVNADataSKRF.py
-Converts .txt files to .s2p files and analyzes S-parameter properties using skrf library.
-
-### plotImpedance.py
-Plots S11 and TD11 using .s2p input files.
-
-### plotVNAFeatures.py
-Merge of the steps of creating .s2p files and plotting the S-parameters and Impedance in frequency and time domain.
-
-### input_cable_data.txt
-The input for 'plotVNAFeatures.py' script which are set of measurements for all channels of a particular cable, with last file reserved to compare with the calibration data. 
-
