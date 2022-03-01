@@ -80,12 +80,13 @@ At the end, enter comments (if any) and press enter. If not comments, just press
 The program prints impedance values and saves them in a csv file.
 The program also creates plots.
 
-## Setup
+<details>
 
-First, follow the instrutions [here](https://github.com/ku-cms/eLink_Instrumentation).
-Then follow the conda setup instrutions in the next section.
+<summary>Conda Setup</summary>
 
-### Conda Setup
+## Conda Setup
+
+First, follow the instructions [here](https://github.com/ku-cms/eLink_Instrumentation). Then, if you want to setup conda to install necessary python packages, follow these instructions.
 
 Certain python packages are required, so you will need to setup your python environment to use them.
 The main package that is used for VNA data analysis is called scikit-rf with documentation [here](https://scikit-rf.readthedocs.io/en/latest/index.html) and installation instructions [here](https://scikit-rf.readthedocs.io/en/latest/tutorials/Installation.html).
@@ -124,3 +125,5 @@ conda deactivate
 ```
 You can now activate and deactivate your conda environment as needed.
 You will need to activate it before running the scripts that use scikit-rf and other required packages.
+
+</details>
