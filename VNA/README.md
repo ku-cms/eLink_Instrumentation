@@ -80,11 +80,11 @@ At the end, enter comments (if any) and press enter. If not comments, just press
 The program prints impedance values and saves them in a csv file.
 The program also creates plots.
 
+### macOS, Linux
+
 <details>
 
 <summary>Conda Setup</summary>
-
-## Conda Setup
 
 First, follow the instructions [here](https://github.com/ku-cms/eLink_Instrumentation). Then, if you want to setup conda to install necessary python packages, follow these instructions.
 
