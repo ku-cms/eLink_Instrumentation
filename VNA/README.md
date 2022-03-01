@@ -37,6 +37,34 @@ pip list
 
 ## Processing Data
 
+### Windows 10
+
+Python should be setup (if not, see previous section).
+
+The VNA data analysis script can be found [here](https://github.com/ku-cms/eLink_Instrumentation/blob/main/VNA/python/VNA_COMP.py).
+
+Your user will need to have access to the R drive. To access the R drive, your KU user needs to be added to the group "phsx_r_bean" on groups.ku.edu. You can ask Prof. Alice Bean to be added to this group.
+
+Make sure data has been taken for all channels of the e-link before running the script. The script analyzes data for all e-link channels.
+
+To analyze data, first create a directory for the cable that you want to analyze using the cable number in FIXME_PATH_1 and copy the VNA data files for that cable from FIXME_PATH_2 to FIXME_PATH_1.
+
+This is the path to the production version of VNA analysis script on the network R drive:
+```
+R:\BEAN_GRP\4portvnadata\VNA_analysis\VNA_Comp.py
+```
+
+Open file explorer on the Windows 10 computer and navigate to this directory:
+```
+R:\BEAN_GRP\4portvnadata\VNA_analysis
+```
+
+Click on the full path tab at the top and enter “cmd.”
+
+A Command Prompt shell should open with the working directory “R:\BEAN_GRP\4portvnadata \VNA_analysis” .
+
+You can enter the command “cd” to print the current working directory.
+
 Run the following python analysis script and enter the requested parameters.
 ```
 python VNA_Comp.py
@@ -47,6 +75,10 @@ python VNA_Comp.py
 - Enter cable length in cm (35, 80, 100, 140, 160, 200).
 
 Note: To analyze data for "Type 0" cables, enter "Type 1" for this script.
+
+At the end, enter comments (if any) and press enter. If not comments, just press enter.
+The program prints impedance values and saves them in a csv file.
+The program also creates plots.
 
 ## Setup
 
