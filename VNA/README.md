@@ -47,7 +47,18 @@ Your user will need to have access to the R drive. To access the R drive, your K
 
 Make sure data has been taken for all channels of the e-link before running the script. The script analyzes data for all e-link channels.
 
-To analyze data, first create a directory for the cable that you want to analyze using the cable number in FIXME_PATH_1 and copy the VNA data files for that cable from FIXME_PATH_2 to FIXME_PATH_1.
+To analyze data, first create a directory for the cable that you want to analyze using the cable number on the R drive with this path:
+```
+R:\BEAN_GRP\4portvnadata\VNA_analysis\Data\<cable_number>
+```
+Then, copy the VNA data files (.vna.txt) for that cable from the folder
+```
+R:\BEAN_GRP\4portvnadata\Cable_<cable_number>
+```
+to the folder
+```
+R:\BEAN_GRP\4portvnadata\VNA_analysis\Data\<cable_number>
+```
 
 This is the path to the production version of VNA analysis script on the network R drive:
 ```
