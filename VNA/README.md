@@ -17,7 +17,7 @@ Type “python” and hit enter to check that python is installed and in the pat
 Update to latest version of pip (can only be done per user due to permissions):
 
 ```
-pip install --upgrade pip –user
+pip install --upgrade pip –-user
 ```
 
 Install required packages:
