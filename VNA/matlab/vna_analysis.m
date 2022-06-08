@@ -53,5 +53,3 @@ fclose(fileID);
 fclose('all'); % belt and suspenders close of files!
 
 fprintf("\n\nAll tests run.\n");
-
-
