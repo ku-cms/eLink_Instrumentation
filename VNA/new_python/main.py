@@ -73,7 +73,7 @@ for config.cable_number in config.cable_number_list:
         config.t2 = 11.00
     elif config.cable_length == "200":
         config.t1 = 2.00
-        config.t2 = 12.00
+        config.t2 = 12.00#comment
     elif config.cable_length == "0":
         config.t1 = 0.00
         config.t2 = 1.50
