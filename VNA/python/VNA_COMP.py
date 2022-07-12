@@ -183,7 +183,7 @@ while Breaker == True:
         plt.title('Frequency')
         example_dc.s11.plot_s_db(label='S11')
         example_dc.s21.plot_s_db(label='S12')
-        plt.ylim((-200.0, 100.0))
+        plt.ylim((-100,0))
         plt.xlim((100000, 2500000000))
         ax1=plt.subplot(1,2,2)
         ax1.xaxis.set_minor_locator(AutoMinorLocator(2))
@@ -193,7 +193,7 @@ while Breaker == True:
         plt.title('Time domain reflection step response (DC extrapolation)') #The time_step component of the z-matrix vs frequency
         example_dc.s11.plot_z_time_step(attribute='z_time_step', pad=2000, window='hamming', z0=50, label='TD11')
         example_dc.s21.plot_z_time_step(attribute='z_time_step',pad=2000, window='hamming', z0=50, label='TD12')
-        plt.ylim((-500.0, 500.0))
+        plt.ylim((0,250))
         plt.xlim((0, 30))
         plt.tight_layout()
         #ax1.legend()
