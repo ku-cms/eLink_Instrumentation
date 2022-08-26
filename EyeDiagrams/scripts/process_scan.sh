@@ -3,7 +3,6 @@
 data_dir=$1
 storage_dir="/Users/caleb/CMS/Tracker/e-links/EyeDiagramData"
 
-
 # check that directory was provided
 if [ -z "$data_dir" ]
 then

@@ -184,6 +184,14 @@ def main():
     input_file      = "tables/TAP0_Scan_2021_11_11.csv"
     plot_dir        = "plots/TAP0_Scan_2021_11_11"
     makePlotsScan(input_file, plot_dir)
+    
+    input_file      = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
+    plot_dir        = "plots/RD53A_EyeDiagram_TAP0_Scan_2021_11_11"
+    makePlotsScan(input_file, plot_dir)
+    
+    input_file      = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
+    plot_dir        = "plots/RD53B_EyeDiagram_TAP0_Scan_2022_08_26"
+    makePlotsScan(input_file, plot_dir)
 
 if __name__ == "__main__":
     main()
