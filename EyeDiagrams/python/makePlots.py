@@ -137,7 +137,7 @@ def makePlots(cable_number, input_file, plot_dir):
 # plot data from scan
 def makePlotsScan(input_file, plot_dir):
     drawMean        = False
-    drawFit         = True
+    drawFit         = False
 
     # Heights
     output_file     = "EyeDiagram_Heights"
@@ -185,12 +185,20 @@ def main():
     plot_dir        = "plots/TAP0_Scan_2021_11_11"
     makePlotsScan(input_file, plot_dir)
     
+    #input_file      = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
+    #plot_dir        = "plots/RD53A_EyeDiagram_TAP0_Scan_2021_11_11_fit_v1"
+    #makePlotsScan(input_file, plot_dir)
+    #
+    #input_file      = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
+    #plot_dir        = "plots/RD53B_EyeDiagram_TAP0_Scan_2022_08_26_fit_v1"
+    #makePlotsScan(input_file, plot_dir)
+    
     input_file      = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
-    plot_dir        = "plots/RD53A_EyeDiagram_TAP0_Scan_2021_11_11"
+    plot_dir        = "plots/RD53A_EyeDiagram_TAP0_Scan_2021_11_11_nofit_v1"
     makePlotsScan(input_file, plot_dir)
     
     input_file      = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
-    plot_dir        = "plots/RD53B_EyeDiagram_TAP0_Scan_2022_08_26"
+    plot_dir        = "plots/RD53B_EyeDiagram_TAP0_Scan_2022_08_26_nofit_v1"
     makePlotsScan(input_file, plot_dir)
 
 if __name__ == "__main__":
