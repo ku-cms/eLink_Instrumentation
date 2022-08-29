@@ -105,7 +105,7 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
-def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim):
+def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, ratio_ylim, ratio_y_label):
     verbose = False
     tools.makeDir(plot_dir)
     # output file names
@@ -140,10 +140,7 @@ def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, 
     fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(6, 6))
 
     # ratio: y2_vals / y1_vals (RD53B / RD53A)
-    ratio_vals          = [a/b for a,b in zip(y2_vals, y1_vals)]
-    ratio_y_data_label  = "RD53B / RD53A"
-    ratio_ylim          = [0.0, 2.0]
-    
+    ratio_vals  = [a/b for a,b in zip(y2_vals, y1_vals)]
     x_array     = np.array(x1_vals)
     y1_array    = np.array(y1_vals)
     y2_array    = np.array(y2_vals)
@@ -164,13 +161,13 @@ def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, 
     # lower plot
     axs[1].set_xlim(xlim)
     axs[1].set_ylim(ratio_ylim)
-    axs[1].set_xlabel(x_data_label,         fontsize=12)
-    axs[1].set_ylabel(ratio_y_data_label,   fontsize=12)
+    axs[1].set_xlabel(x_data_label,     fontsize=12)
+    axs[1].set_ylabel(ratio_y_label,    fontsize=12)
     axs[1].grid(b=True, linestyle='dotted')
     
     p1 = axs[0].scatter(x_array, y1_array,      color=colors[0],    label=label_1)
     p2 = axs[0].scatter(x_array, y2_array,      color=colors[1],    label=label_2)
-    p3 = axs[1].scatter(x_array, ratio_array,   color="black",      label=ratio_y_data_label)
+    p3 = axs[1].scatter(x_array, ratio_array,   color="black",      label=ratio_y_label)
     objects_upper = [p1, p2]
     objects_lower = [p3]
     # specify order for legend
@@ -221,9 +218,11 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRa
     y_column_index  = 2
     xlim            = [0.0, 1200.0]
     ylim            = [0.0, 800.0]
+    ratio_ylim      = [0.8, 1.2]
+    ratio_y_label   = "RD53B / RD53A"
     drawMean        = False
     if plotRatio:
-        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
+        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, ratio_ylim, ratio_y_label)
     else:
         plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
     
@@ -235,9 +234,11 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRa
     y_column_index  = 3
     xlim            = [0.0, 1200.0]
     ylim            = [0.0, 150.0]
+    ratio_ylim      = [0.0, 2.0]
+    ratio_y_label   = "RD53B / RD53A"
     drawMean        = False
     if plotRatio:
-        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
+        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, ratio_ylim, ratio_y_label)
     else:
         plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
     
@@ -249,9 +250,11 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRa
     y_column_index  = 4
     xlim            = [0.0, 1200.0]
     ylim            = [0.0, 1000.0]
+    ratio_ylim      = [0.0, 2.0]
+    ratio_y_label   = "RD53B / RD53A"
     drawMean        = False
     if plotRatio:
-        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
+        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, ratio_ylim, ratio_y_label)
     else:
         plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
 
