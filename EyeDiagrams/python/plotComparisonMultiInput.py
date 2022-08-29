@@ -137,7 +137,7 @@ def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, 
         return
 
     # plot
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(6, 6))
 
     x_array  = np.array(x1_vals)
     y1_array = np.array(y1_vals)
@@ -148,18 +148,26 @@ def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, 
         print("y1 = {0}".format(y1_array))
         print("y2 = {0}".format(y2_array))
     
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
-    ax.set_title(title,             fontsize=16)
-    ax.set_xlabel(x_data_label,     fontsize=12)
-    ax.set_ylabel(y1_data_label,    fontsize=12)
+    # figure
+    fig.suptitle(title)
+    # upper plot
+    axs[0].set_xlim(xlim)
+    axs[0].set_ylim(ylim)
+    axs[0].set_ylabel(y1_data_label,    fontsize=12)
+    # lower plot
+    ratio_ylim = [0.0, 2.0]
+    ratio_y_data_label = "RD53B / RD53A"
+    axs[1].set_xlim(xlim)
+    axs[1].set_ylim(ratio_ylim)
+    axs[1].set_xlabel(x_data_label,         fontsize=12)
+    axs[1].set_ylabel(ratio_y_data_label,   fontsize=12)
     
-    p1 = plt.scatter(x_array, y1_array, color=colors[0], label=label_1)
-    p2 = plt.scatter(x_array, y2_array, color=colors[1], label=label_2)
+    p1 = axs[0].scatter(x_array, y1_array, color=colors[0], label=label_1)
+    p2 = axs[0].scatter(x_array, y2_array, color=colors[1], label=label_2)
     objects = [p1, p2]
     # specify order for legend
     labels = [o.get_label() for o in objects]
-    plt.legend(objects, labels, loc='upper right', prop={'size': 12})
+    axs[0].legend(objects, labels, loc='upper right', prop={'size': 12})
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
@@ -202,7 +210,7 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRa
     x_column_index  = 1
     y_column_index  = 2
     xlim            = [0.0, 1200.0]
-    ylim            = [0.0, 600.0]
+    ylim            = [0.0, 800.0]
     drawMean        = False
     if plotRatio:
         plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
@@ -216,7 +224,7 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRa
     x_column_index  = 1
     y_column_index  = 3
     xlim            = [0.0, 1200.0]
-    ylim            = [0.0, 120.0]
+    ylim            = [0.0, 150.0]
     drawMean        = False
     if plotRatio:
         plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
@@ -230,7 +238,7 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRa
     x_column_index  = 1
     y_column_index  = 4
     xlim            = [0.0, 1200.0]
-    ylim            = [0.0, 800.0]
+    ylim            = [0.0, 1000.0]
     drawMean        = False
     if plotRatio:
         plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
