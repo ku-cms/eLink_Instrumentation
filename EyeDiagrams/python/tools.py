@@ -34,6 +34,23 @@ def getData(input_file):
             data.append(row)
     return data
 
+# input: data (matrix), x and y column indicies; output: lists of x and y values
+def getXYData(data, x_column_index, y_column_index, verbose):
+    x_vals  = []
+    y_vals  = []
+    # get x, y, and data label
+    for i, row in enumerate(data):
+        # second row is the beginning of data values
+        if i > 0:
+            # WARNING: make sure to convert strings to floats!
+            x = float(row[x_column_index])
+            y = float(row[y_column_index])
+            x_vals.append(x)
+            y_vals.append(y)
+        if verbose:
+            print("{0}: {1}".format(i, row[y_column_index]))
+    return x_vals, y_vals
+
 def getAdditionError(dx, dy):
     # q  = x + y
     # q  = x - y

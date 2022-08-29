@@ -4,53 +4,46 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tools
 
+# TODO:
+# - Create function to plot data and ratios in two subplots
+# DONE:
+# - Create function to load data from input files
+
 def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean):
     verbose = False
     tools.makeDir(plot_dir)
-    data_1 = tools.getData(input_file_1)
-    data_2 = tools.getData(input_file_2)
+    # output file names
     output_png = "{0}/{1}.png".format(plot_dir, output_file)
     output_pdf = "{0}/{1}.pdf".format(plot_dir, output_file)
-
     # get default colors
     prop_cycle = plt.rcParams['axes.prop_cycle']
     colors     = prop_cycle.by_key()['color']
+    # get data
+    data_1 = tools.getData(input_file_1)
+    data_2 = tools.getData(input_file_2)
+    # get data label for y values
+    y1_data_label = data_1[0][y_column_index]
+    y2_data_label = data_2[0][y_column_index]
+    # check that y data labels match
+    if y1_data_label != y2_data_label:
+        print("ERROR: y1_data_label and y2_data_label do not match! Quitting.")
+        print(" - y1_data_label: {0}".format(y1_data_label))
+        print(" - y2_data_label: {0}".format(y2_data_label))
+        return
+    # get x, y values
+    x1_vals, y1_vals = tools.getXYData(data_1, x_column_index, y_column_index, verbose)
+    x2_vals, y2_vals = tools.getXYData(data_2, x_column_index, y_column_index, verbose)
+    # check that x values match
+    if x1_vals != x2_vals:
+        print("ERROR: x1_vals and x2_vals do not match! Quitting.")
+        print(" - x1_vals: {0}".format(x1_vals))
+        print(" - x2_vals: {0}".format(x2_vals))
+        return
 
-    # get data from column
-    y_data_label = ""
-    x_vals  = []
-    y1_vals = []
-    y2_vals = []
-
-    # get x, y1, and data label
-    for i, row in enumerate(data_1):
-        # first row has labels
-        if i == 0:
-            y_data_label = row[y_column_index]
-        # second row is the beginning of data values
-        else:
-            # WARNING: make sure to convert strings to floats!
-            x  = float(row[x_column_index])
-            y1 = float(row[y_column_index])
-            x_vals.append(x)
-            y1_vals.append(y1)
-        if verbose:
-            print("{0}: {1}".format(i, row[y_column_index]))
-    
-    # get y2
-    for i, row in enumerate(data_2):
-        # second row is the beginning of data values
-        if i > 0:
-            # WARNING: make sure to convert strings to floats!
-            y2 = float(row[y_column_index])
-            y2_vals.append(y2)
-        if verbose:
-            print("{0}: {1}".format(i, row[y_column_index]))
-    
     # plot
     fig, ax = plt.subplots(figsize=(6, 6))
 
-    x_array  = np.array(x_vals)
+    x_array  = np.array(x1_vals)
     y1_array = np.array(y1_vals)
     y2_array = np.array(y2_vals)
     y1_mean  = np.mean(y1_array)
@@ -81,9 +74,9 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    ax.set_title(title,         fontsize=16)
-    ax.set_xlabel(x_data_label, fontsize=12)
-    ax.set_ylabel(y_data_label, fontsize=12)
+    ax.set_title(title,             fontsize=16)
+    ax.set_xlabel(x_data_label,     fontsize=12)
+    ax.set_ylabel(y1_data_label,    fontsize=12)
     
     p1 = plt.scatter(x_array, y1_array, color=colors[0], label=label_1)
     p2 = plt.scatter(x_array, y2_array, color=colors[1], label=label_2)
@@ -212,7 +205,7 @@ def run():
     input_file_2    = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
     label_1         = "RD53A"
     label_2         = "RD53B"
-    plot_dir        = "plots/RD53_AvsB_Comparison"
+    plot_dir        = "plots/RD53_AvsB_EyeDiagram_Comparison_v1"
     makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir)
 
 def main():
