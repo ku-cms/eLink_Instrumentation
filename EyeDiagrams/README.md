@@ -136,9 +136,12 @@ Plot data from csv tables:
 python3 python/makePlots.py
 ```
 
-There is a script for making comparison plots.
-This can be used to compare different cables, or to compare different datasets for the same cable (e.g. before/after lashing).
-It can be run like this:
+To compare data from multiple csv files, use this script:
+```
+python3 python/plotComparisonMultiInput.py
+```
+
+To compare data using a signle input csv file, use this script:
 ```
 python python/plotComparison.py
 ```
