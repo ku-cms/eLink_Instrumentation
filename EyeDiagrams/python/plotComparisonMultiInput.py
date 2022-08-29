@@ -139,9 +139,15 @@ def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, 
     # plot
     fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(6, 6))
 
-    x_array  = np.array(x1_vals)
-    y1_array = np.array(y1_vals)
-    y2_array = np.array(y2_vals)
+    # ratio: y2_vals / y1_vals (RD53B / RD53A)
+    ratio_vals          = [a/b for a,b in zip(y2_vals, y1_vals)]
+    ratio_y_data_label  = "RD53B / RD53A"
+    ratio_ylim          = [0.0, 2.0]
+    
+    x_array     = np.array(x1_vals)
+    y1_array    = np.array(y1_vals)
+    y2_array    = np.array(y2_vals)
+    ratio_array = np.array(ratio_vals)
     
     if verbose:
         print("x = {0}".format(x_array))
@@ -154,20 +160,24 @@ def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, 
     axs[0].set_xlim(xlim)
     axs[0].set_ylim(ylim)
     axs[0].set_ylabel(y1_data_label,    fontsize=12)
+    axs[0].grid(b=True, linestyle='dotted')
     # lower plot
-    ratio_ylim = [0.0, 2.0]
-    ratio_y_data_label = "RD53B / RD53A"
     axs[1].set_xlim(xlim)
     axs[1].set_ylim(ratio_ylim)
     axs[1].set_xlabel(x_data_label,         fontsize=12)
     axs[1].set_ylabel(ratio_y_data_label,   fontsize=12)
+    axs[1].grid(b=True, linestyle='dotted')
     
-    p1 = axs[0].scatter(x_array, y1_array, color=colors[0], label=label_1)
-    p2 = axs[0].scatter(x_array, y2_array, color=colors[1], label=label_2)
-    objects = [p1, p2]
+    p1 = axs[0].scatter(x_array, y1_array,      color=colors[0],    label=label_1)
+    p2 = axs[0].scatter(x_array, y2_array,      color=colors[1],    label=label_2)
+    p3 = axs[1].scatter(x_array, ratio_array,   color="black",      label=ratio_y_data_label)
+    objects_upper = [p1, p2]
+    objects_lower = [p3]
     # specify order for legend
-    labels = [o.get_label() for o in objects]
-    axs[0].legend(objects, labels, loc='upper right', prop={'size': 12})
+    labels_upper = [o.get_label() for o in objects_upper]
+    labels_lower = [o.get_label() for o in objects_lower]
+    axs[0].legend(objects_upper, labels_upper, loc='upper right', prop={'size': 12})
+    axs[1].legend(objects_lower, labels_lower, loc='upper right', prop={'size': 12})
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
