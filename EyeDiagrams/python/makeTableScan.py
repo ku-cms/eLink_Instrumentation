@@ -35,6 +35,7 @@ def run(input_files, output_file):
 
 def makeTableScan(input_dir, output_dir, output_file):
     name = "{0}/{1}".format(output_dir, output_file)
+    print("Running over {0} to create {1}".format(input_dir, name))
     input_file_pattern = "{0}/TAP0_*/*.csv".format(input_dir)
     input_files = glob.glob(input_file_pattern)
     # get dictionary mapping TAP0 setting to files
@@ -51,7 +52,11 @@ def makeTableScan(input_dir, output_dir, output_file):
 def main():
     input_dir   = "data/2021_11_11_clean"
     output_dir  = "tables"
-    output_file = "TAP0_Scan_2021_11_11.csv"
+    output_file = "RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
+    makeTableScan(input_dir, output_dir, output_file)
+    input_dir   = "data/RD53B_EyeDiagrams_TAP0_2022_08_26_clean"
+    output_dir  = "tables"
+    output_file = "RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
     makeTableScan(input_dir, output_dir, output_file)
 
 if __name__ == "__main__":

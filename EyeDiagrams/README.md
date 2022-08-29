@@ -103,9 +103,45 @@ After running "python/processData.py," copy the output table and plots to a cent
 
 ### Additional Scripts
 
-There is a script for making comparison plots.
-This can be used to compare different cables, or to compare different datasets for the same cable (e.g. before/after lashing).
-It can be run like this:
+
+To process eye diagram data for RD53A/B TAP0 scans, first download the relevant data directory.
+Move the zip file to a "storage area" for eye diagram data and unzip it (e.g. /Users/caleb/CMS/Tracker/e-links/EyeDiagramData).
+Then use this script and provide a directory that is in the "storage_dir" directory defined in the script. 
+You will first need to set "storage_dir" in the script to your local "storage area."
+```
+./scripts/process_scan.sh <data_directory>
+```
+A new directory for cleaned data will be created.
+For example, running the script on this directory:
+```
+./scripts/process_scan.sh RD53B_EyeDiagrams_TAP0_2022_08_26
+```
+creates this directory to store the output:
+```
+RD53B_EyeDiagrams_TAP0_2022_08_26_clean
+```
+Copy the data to the data directory:
+```
+rsync -az /Users/caleb/CMS/Tracker/e-links/EyeDiagramData/RD53B_EyeDiagrams_TAP0_2022_08_26 data
+rsync -az /Users/caleb/CMS/Tracker/e-links/EyeDiagramData/RD53B_EyeDiagrams_TAP0_2022_08_26_clean data
+```
+
+Create csv tables of the eye diagram parameters with this script:
+```
+python3 python/makeTableScan.py
+```
+
+Plot data from csv tables:
+```
+python3 python/makePlots.py
+```
+
+To compare data from multiple csv files, use this script:
+```
+python3 python/plotComparisonMultiInput.py
+```
+
+To compare data using a signle input csv file, use this script:
 ```
 python python/plotComparison.py
 ```
