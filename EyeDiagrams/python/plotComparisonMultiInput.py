@@ -105,6 +105,64 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
+def plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim):
+    verbose = False
+    tools.makeDir(plot_dir)
+    # output file names
+    output_png = "{0}/{1}.png".format(plot_dir, output_file)
+    output_pdf = "{0}/{1}.pdf".format(plot_dir, output_file)
+    # get default colors
+    prop_cycle = plt.rcParams['axes.prop_cycle']
+    colors     = prop_cycle.by_key()['color']
+    # get data
+    data_1 = tools.getData(input_file_1)
+    data_2 = tools.getData(input_file_2)
+    # get data label for y values
+    y1_data_label = data_1[0][y_column_index]
+    y2_data_label = data_2[0][y_column_index]
+    # check that y data labels match
+    if y1_data_label != y2_data_label:
+        print("ERROR: y1_data_label and y2_data_label do not match! Quitting.")
+        print(" - y1_data_label: {0}".format(y1_data_label))
+        print(" - y2_data_label: {0}".format(y2_data_label))
+        return
+    # get x, y values
+    x1_vals, y1_vals = tools.getXYData(data_1, x_column_index, y_column_index, verbose)
+    x2_vals, y2_vals = tools.getXYData(data_2, x_column_index, y_column_index, verbose)
+    # check that x values match
+    if x1_vals != x2_vals:
+        print("ERROR: x1_vals and x2_vals do not match! Quitting.")
+        print(" - x1_vals: {0}".format(x1_vals))
+        print(" - x2_vals: {0}".format(x2_vals))
+        return
+
+    # plot
+    fig, ax = plt.subplots(figsize=(6, 6))
+
+    x_array  = np.array(x1_vals)
+    y1_array = np.array(y1_vals)
+    y2_array = np.array(y2_vals)
+    
+    if verbose:
+        print("x = {0}".format(x_array))
+        print("y1 = {0}".format(y1_array))
+        print("y2 = {0}".format(y2_array))
+    
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    ax.set_title(title,             fontsize=16)
+    ax.set_xlabel(x_data_label,     fontsize=12)
+    ax.set_ylabel(y1_data_label,    fontsize=12)
+    
+    p1 = plt.scatter(x_array, y1_array, color=colors[0], label=label_1)
+    p2 = plt.scatter(x_array, y2_array, color=colors[1], label=label_2)
+    objects = [p1, p2]
+    # specify order for legend
+    labels = [o.get_label() for o in objects]
+    plt.legend(objects, labels, loc='upper right', prop={'size': 12})
+    plt.savefig(output_png)
+    plt.savefig(output_pdf)
+
 def makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean):
     # Heights
     output_file     = "Cable_{0}_EyeDiagram_Heights".format(cable_number)
@@ -136,7 +194,7 @@ def makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, p
     ylim            = [0.0, 800.0]
     plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
 
-def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir):
+def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRatio):
     # Heights
     output_file     = "EyeDiagram_Heights"
     title           = "Eye Diagram Heights"
@@ -146,7 +204,10 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir):
     xlim            = [0.0, 1200.0]
     ylim            = [0.0, 600.0]
     drawMean        = False
-    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
+    if plotRatio:
+        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
+    else:
+        plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
     
     # Jitters
     output_file     = "EyeDiagram_Jitters"
@@ -157,7 +218,10 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir):
     xlim            = [0.0, 1200.0]
     ylim            = [0.0, 120.0]
     drawMean        = False
-    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
+    if plotRatio:
+        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
+    else:
+        plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
     
     # Widths
     output_file     = "EyeDiagram_Widths"
@@ -168,7 +232,10 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir):
     xlim            = [0.0, 1200.0]
     ylim            = [0.0, 800.0]
     drawMean        = False
-    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
+    if plotRatio:
+        plotDataAndRatio(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim)
+    else:
+        plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
 
 def run():
     # Cable 120: before lashing vs. after lashing
@@ -205,8 +272,10 @@ def run():
     input_file_2    = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
     label_1         = "RD53A"
     label_2         = "RD53B"
-    plot_dir        = "plots/RD53_AvsB_EyeDiagram_Comparison_v1"
-    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir)
+    plot_dir_1      = "plots/RD53_AvsB_EyeDiagram_Comparison_v1"
+    plot_dir_2      = "plots/RD53_AvsB_EyeDiagram_Comparison_v2"
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_1, plotRatio=False)
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_2, plotRatio=True)
 
 def main():
     run()
