@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tools
 
-def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean):
+def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean):
     verbose = False
     tools.makeDir(plot_dir)
     data_1 = tools.getData(input_file_1)
@@ -17,7 +17,7 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     colors     = prop_cycle.by_key()['color']
 
     # get data from column
-    data_label = ""
+    y_data_label = ""
     x_vals  = []
     y1_vals = []
     y2_vals = []
@@ -26,26 +26,26 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     for i, row in enumerate(data_1):
         # first row has labels
         if i == 0:
-            data_label = row[column_index]
+            y_data_label = row[y_column_index]
         # second row is the beginning of data values
         else:
             # WARNING: make sure to convert strings to floats!
-            x  = float(row[0])
-            y1 = float(row[column_index])
+            x  = float(row[x_column_index])
+            y1 = float(row[y_column_index])
             x_vals.append(x)
             y1_vals.append(y1)
         if verbose:
-            print("{0}: {1}".format(i, row[column_index]))
+            print("{0}: {1}".format(i, row[y_column_index]))
     
     # get y2
     for i, row in enumerate(data_2):
         # second row is the beginning of data values
         if i > 0:
             # WARNING: make sure to convert strings to floats!
-            y2 = float(row[column_index])
+            y2 = float(row[y_column_index])
             y2_vals.append(y2)
         if verbose:
-            print("{0}: {1}".format(i, row[column_index]))
+            print("{0}: {1}".format(i, row[y_column_index]))
     
     # plot
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -82,8 +82,8 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.set_title(title,         fontsize=16)
-    ax.set_xlabel("Channel",    fontsize=12)
-    ax.set_ylabel(data_label,   fontsize=12)
+    ax.set_xlabel(x_data_label, fontsize=12)
+    ax.set_ylabel(y_data_label, fontsize=12)
     
     p1 = plt.scatter(x_array, y1_array, color=colors[0], label=label_1)
     p2 = plt.scatter(x_array, y2_array, color=colors[1], label=label_2)
@@ -112,30 +112,70 @@ def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir
     plt.savefig(output_png)
     plt.savefig(output_pdf)
 
-def makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean):
+def makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean):
     # Heights
     output_file     = "Cable_{0}_EyeDiagram_Heights".format(cable_number)
     title           = "Cable {0} Eye Diagram Heights".format(cable_number)
-    column_index    = 3
+    x_data_label    = "Channel"
+    x_column_index  = 0
+    y_column_index  = 3
     xlim            = [0.0, 10.0]
     ylim            = [0.0, 400.0]
-    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
     
     # Jitters
     output_file     = "Cable_{0}_EyeDiagram_Jitters".format(cable_number)
     title           = "Cable {0} Eye Diagram Jitters".format(cable_number)
-    column_index    = 4
+    x_data_label    = "Channel"
+    x_column_index  = 0
+    y_column_index  = 4
     xlim            = [0.0, 10.0]
     ylim            = [0.0, 600.0]
-    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
     
     # Widths
     output_file     = "Cable_{0}_EyeDiagram_Widths".format(cable_number)
     title           = "Cable {0} Eye Diagram Widths".format(cable_number)
-    column_index    = 5
+    x_data_label    = "Channel"
+    x_column_index  = 0
+    y_column_index  = 5
     xlim            = [0.0, 10.0]
     ylim            = [0.0, 800.0]
-    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, column_index, xlim, ylim, drawMean)
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
+
+def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir):
+    # Heights
+    output_file     = "EyeDiagram_Heights"
+    title           = "Eye Diagram Heights"
+    x_data_label    = "TAP0"
+    x_column_index  = 1
+    y_column_index  = 2
+    xlim            = [0.0, 1200.0]
+    ylim            = [0.0, 600.0]
+    drawMean        = False
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
+    
+    # Jitters
+    output_file     = "EyeDiagram_Jitters"
+    title           = "Eye Diagram Jitters"
+    x_data_label    = "TAP0"
+    x_column_index  = 1
+    y_column_index  = 3
+    xlim            = [0.0, 1200.0]
+    ylim            = [0.0, 120.0]
+    drawMean        = False
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
+    
+    # Widths
+    output_file     = "EyeDiagram_Widths"
+    title           = "Eye Diagram Widths"
+    x_data_label    = "TAP0"
+    x_column_index  = 1
+    y_column_index  = 4
+    xlim            = [0.0, 1200.0]
+    ylim            = [0.0, 800.0]
+    drawMean        = False
+    plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
 
 def run():
     # Cable 120: before lashing vs. after lashing
@@ -146,7 +186,7 @@ def run():
     label_2         = "after lashing"
     plot_dir        = "plots/Cable_120_lashing"
     drawMean        = True
-    makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
     
     # Cable 120: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
     cable_number    = 120
@@ -156,7 +196,7 @@ def run():
     label_2         = "new (math1)"
     plot_dir        = "plots/Cable_120_settings"
     drawMean        = True
-    makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
     
     # Cable 121: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
     cable_number    = 121
@@ -166,7 +206,14 @@ def run():
     label_2         = "new (math1)"
     plot_dir        = "plots/Cable_121_settings"
     drawMean        = True
-    makePlots(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+
+    input_file_1    = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
+    input_file_2    = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
+    label_1         = "RD53A"
+    label_2         = "RD53B"
+    plot_dir        = "plots/RD53_AvsB_Comparison"
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir)
 
 def main():
     run()
