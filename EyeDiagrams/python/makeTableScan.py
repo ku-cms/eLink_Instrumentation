@@ -54,6 +54,12 @@ def main():
     output_dir  = "tables"
     output_file = "RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
     makeTableScan(input_dir, output_dir, output_file)
+    
+    input_dir   = "data/RD53A_EyeDiagrams_TAP0_2022_08_31_clean"
+    output_dir  = "tables"
+    output_file = "RD53A_EyeDiagrams_TAP0_2022_08_31.csv"
+    makeTableScan(input_dir, output_dir, output_file)
+    
     input_dir   = "data/RD53B_EyeDiagrams_TAP0_2022_08_26_clean"
     output_dir  = "tables"
     output_file = "RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"

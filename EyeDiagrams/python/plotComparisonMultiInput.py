@@ -259,44 +259,53 @@ def makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir, plotRa
         plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean)
 
 def run():
-    # Cable 120: before lashing vs. after lashing
-    cable_number    = 120
-    input_file_1    = "tables/Cable_120_EyeDiagrams_beforeLashing.csv"
-    input_file_2    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
-    label_1         = "before lashing"
-    label_2         = "after lashing"
-    plot_dir        = "plots/Cable_120_lashing"
-    drawMean        = True
-    makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
-    
-    # Cable 120: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
-    cable_number    = 120
-    input_file_1    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
-    input_file_2    = "tables/Cable_120_newSetup_EyeDiagrams.csv"
-    label_1         = "old (ch1)"
-    label_2         = "new (math1)"
-    plot_dir        = "plots/Cable_120_settings"
-    drawMean        = True
-    makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
-    
-    # Cable 121: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
-    cable_number    = 121
-    input_file_1    = "tables/Cable_121_EyeDiagrams.csv"
-    input_file_2    = "tables/Cable_121_newSetup_EyeDiagrams.csv"
-    label_1         = "old (ch1)"
-    label_2         = "new (math1)"
-    plot_dir        = "plots/Cable_121_settings"
-    drawMean        = True
-    makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    # # Cable 120: before lashing vs. after lashing
+    # cable_number    = 120
+    # input_file_1    = "tables/Cable_120_EyeDiagrams_beforeLashing.csv"
+    # input_file_2    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
+    # label_1         = "before lashing"
+    # label_2         = "after lashing"
+    # plot_dir        = "plots/Cable_120_lashing"
+    # drawMean        = True
+    # makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    # 
+    # # Cable 120: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
+    # cable_number    = 120
+    # input_file_1    = "tables/Cable_120_EyeDiagrams_afterLashing.csv"
+    # input_file_2    = "tables/Cable_120_newSetup_EyeDiagrams.csv"
+    # label_1         = "old (ch1)"
+    # label_2         = "new (math1)"
+    # plot_dir        = "plots/Cable_120_settings"
+    # drawMean        = True
+    # makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
+    # 
+    # # Cable 121: old settings ("ch1" used for eye diagrams) vs. new settings ("math1" used for eye diagrams)
+    # cable_number    = 121
+    # input_file_1    = "tables/Cable_121_EyeDiagrams.csv"
+    # input_file_2    = "tables/Cable_121_newSetup_EyeDiagrams.csv"
+    # label_1         = "old (ch1)"
+    # label_2         = "new (math1)"
+    # plot_dir        = "plots/Cable_121_settings"
+    # drawMean        = True
+    # makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
 
     input_file_1    = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
     input_file_2    = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
     label_1         = "RD53A"
     label_2         = "RD53B"
-    plot_dir_1      = "plots/RD53_AvsB_EyeDiagram_Comparison_v1"
-    plot_dir_2      = "plots/RD53_AvsB_EyeDiagram_Comparison_v2"
-    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_1, plotRatio=False)
-    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_2, plotRatio=True)
+    plot_dir        = "plots/RD53_AvsB_EyeDiagram_Comparison_v1"
+    plot_dir_ratio  = "plots/RD53_AvsB_EyeDiagram_Comparison_v1_ratio"
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir,       plotRatio=False)
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_ratio, plotRatio=True)
+    
+    input_file_1    = "tables/RD53A_EyeDiagrams_TAP0_2022_08_31.csv"
+    input_file_2    = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
+    label_1         = "RD53A"
+    label_2         = "RD53B"
+    plot_dir        = "plots/RD53_AvsB_EyeDiagram_Comparison_v2"
+    plot_dir_ratio  = "plots/RD53_AvsB_EyeDiagram_Comparison_v2_ratio"
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir,       plotRatio=False)
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_ratio, plotRatio=True)
 
 def main():
     run()

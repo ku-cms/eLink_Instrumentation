@@ -166,24 +166,24 @@ def makePlotsScan(input_file, plot_dir):
 def main():
     # testing
     
-    cable_number    = 158
-    input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
-    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
-    makePlots(cable_number, input_file, plot_dir)
-    
-    cable_number    = 120
-    input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
-    plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
-    makePlots(cable_number, input_file, plot_dir)
-    
-    cable_number    = 120
-    input_file      = "tables/Cable_{0}_EyeDiagrams_afterLashing.csv".format(cable_number)
-    plot_dir        = "plots/Cable_{0}_afterLashing".format(cable_number)
-    makePlots(cable_number, input_file, plot_dir)
+    #cable_number    = 158
+    #input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
+    #plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    #makePlots(cable_number, input_file, plot_dir)
+    #
+    #cable_number    = 120
+    #input_file      = "tables/Cable_{0}_EyeDiagrams_beforeLashing.csv".format(cable_number)
+    #plot_dir        = "plots/Cable_{0}_beforeLashing".format(cable_number)
+    #makePlots(cable_number, input_file, plot_dir)
+    #
+    #cable_number    = 120
+    #input_file      = "tables/Cable_{0}_EyeDiagrams_afterLashing.csv".format(cable_number)
+    #plot_dir        = "plots/Cable_{0}_afterLashing".format(cable_number)
+    #makePlots(cable_number, input_file, plot_dir)
 
-    input_file      = "tables/TAP0_Scan_2021_11_11.csv"
-    plot_dir        = "plots/TAP0_Scan_2021_11_11"
-    makePlotsScan(input_file, plot_dir)
+    #input_file      = "tables/TAP0_Scan_2021_11_11.csv"
+    #plot_dir        = "plots/TAP0_Scan_2021_11_11"
+    #makePlotsScan(input_file, plot_dir)
     
     #input_file      = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
     #plot_dir        = "plots/RD53A_EyeDiagram_TAP0_Scan_2021_11_11_fit_v1"
@@ -195,6 +195,10 @@ def main():
     
     input_file      = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
     plot_dir        = "plots/RD53A_EyeDiagram_TAP0_Scan_2021_11_11_nofit_v1"
+    makePlotsScan(input_file, plot_dir)
+    
+    input_file      = "tables/RD53A_EyeDiagrams_TAP0_2022_08_31.csv"
+    plot_dir        = "plots/RD53A_EyeDiagrams_TAP0_2022_08_31_nofit_v1"
     makePlotsScan(input_file, plot_dir)
     
     input_file      = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
