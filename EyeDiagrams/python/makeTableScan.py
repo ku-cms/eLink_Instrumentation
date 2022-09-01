@@ -48,21 +48,34 @@ def makeTableScan(input_dir, output_dir, output_file, settings):
     run(file_dict, name, settings)
 
 def main():
-    settings = [x for x in range(200, 1100, 100)]
-    
+    settings    = [x for x in range(200, 1100, 100)]
     input_dir   = "data/2021_11_11_clean"
     output_dir  = "tables"
-    output_file = "RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
+    output_file = "RD53A_EyeDiagrams_TAP0_200to1000_Scan_2021_11_11.csv"
     makeTableScan(input_dir, output_dir, output_file, settings)
     
+    settings    = [x for x in range(100, 1100, 100)]
     input_dir   = "data/RD53A_EyeDiagrams_TAP0_2022_08_31_clean"
     output_dir  = "tables"
-    output_file = "RD53A_EyeDiagrams_TAP0_2022_08_31.csv"
+    output_file = "RD53A_EyeDiagrams_TAP0_100to1000_Scan_2022_08_31.csv"
     makeTableScan(input_dir, output_dir, output_file, settings)
     
+    settings    = [x for x in range(200, 1100, 100)]
+    input_dir   = "data/RD53A_EyeDiagrams_TAP0_2022_08_31_clean"
+    output_dir  = "tables"
+    output_file = "RD53A_EyeDiagrams_TAP0_200to1000_Scan_2022_08_31.csv"
+    makeTableScan(input_dir, output_dir, output_file, settings)
+    
+    settings    = [x for x in range(100, 1100, 100)]
     input_dir   = "data/RD53B_EyeDiagrams_TAP0_2022_08_26_clean"
     output_dir  = "tables"
-    output_file = "RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
+    output_file = "RD53B_EyeDiagrams_TAP0_100to1000_Scan_2022_08_26.csv"
+    makeTableScan(input_dir, output_dir, output_file, settings)
+    
+    settings    = [x for x in range(200, 1100, 100)]
+    input_dir   = "data/RD53B_EyeDiagrams_TAP0_2022_08_26_clean"
+    output_dir  = "tables"
+    output_file = "RD53B_EyeDiagrams_TAP0_200to1000_Scan_2022_08_26.csv"
     makeTableScan(input_dir, output_dir, output_file, settings)
 
 if __name__ == "__main__":

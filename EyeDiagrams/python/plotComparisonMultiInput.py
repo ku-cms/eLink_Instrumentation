@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import tools
 
 # TODO:
-# - Create function to plot data and ratios in two subplots
 # DONE:
 # - Create function to load data from input files
+# - Create function to plot data and ratios in two subplots
 
 def plotData(input_file_1, input_file_2, label_1, label_2, output_file, plot_dir, title, x_data_label, x_column_index, y_column_index, xlim, ylim, drawMean):
     verbose = False
@@ -289,8 +289,17 @@ def run():
     # drawMean        = True
     # makePlotsCable(cable_number, input_file_1, input_file_2, label_1, label_2, plot_dir, drawMean)
 
-    input_file_1    = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
-    input_file_2    = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
+    input_file_1    = "tables/RD53A_EyeDiagrams_TAP0_200to1000_Scan_2021_11_11.csv"
+    input_file_2    = "tables/RD53A_EyeDiagrams_TAP0_200to1000_Scan_2022_08_31.csv"
+    label_1         = "RD53A (2021_11_11)"
+    label_2         = "RD53A (2022_08_31)"
+    plot_dir        = "plots/RD53_A_2021vs2022_EyeDiagram_Comparison_v1"
+    plot_dir_ratio  = "plots/RD53_A_2021vs2022_EyeDiagram_Comparison_v1_ratio"
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir,       plotRatio=False)
+    makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_ratio, plotRatio=True)
+    
+    input_file_1    = "tables/RD53A_EyeDiagrams_TAP0_200to1000_Scan_2021_11_11.csv"
+    input_file_2    = "tables/RD53B_EyeDiagrams_TAP0_200to1000_Scan_2022_08_26.csv"
     label_1         = "RD53A"
     label_2         = "RD53B"
     plot_dir        = "plots/RD53_AvsB_EyeDiagram_Comparison_v1"
@@ -298,8 +307,8 @@ def run():
     makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir,       plotRatio=False)
     makePlotsRD53(input_file_1, input_file_2, label_1, label_2, plot_dir_ratio, plotRatio=True)
     
-    input_file_1    = "tables/RD53A_EyeDiagrams_TAP0_2022_08_31.csv"
-    input_file_2    = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
+    input_file_1    = "tables/RD53A_EyeDiagrams_TAP0_100to1000_Scan_2022_08_31.csv"
+    input_file_2    = "tables/RD53B_EyeDiagrams_TAP0_100to1000_Scan_2022_08_26.csv"
     label_1         = "RD53A"
     label_2         = "RD53B"
     plot_dir        = "plots/RD53_AvsB_EyeDiagram_Comparison_v2"

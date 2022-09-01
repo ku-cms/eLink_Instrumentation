@@ -193,16 +193,16 @@ def main():
     #plot_dir        = "plots/RD53B_EyeDiagram_TAP0_Scan_2022_08_26_fit_v1"
     #makePlotsScan(input_file, plot_dir)
     
-    input_file      = "tables/RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
-    plot_dir        = "plots/RD53A_EyeDiagram_TAP0_Scan_2021_11_11_nofit_v1"
+    input_file      = "tables/RD53A_EyeDiagrams_TAP0_200to1000_Scan_2021_11_11.csv"
+    plot_dir        = "plots/RD53A_EyeDiagrams_TAP0_Scan_2021_11_11_nofit_v1"
     makePlotsScan(input_file, plot_dir)
     
-    input_file      = "tables/RD53A_EyeDiagrams_TAP0_2022_08_31.csv"
-    plot_dir        = "plots/RD53A_EyeDiagrams_TAP0_2022_08_31_nofit_v1"
+    input_file      = "tables/RD53A_EyeDiagrams_TAP0_100to1000_Scan_2022_08_31.csv"
+    plot_dir        = "plots/RD53A_EyeDiagrams_TAP0_Scan_2022_08_31_nofit_v1"
     makePlotsScan(input_file, plot_dir)
     
-    input_file      = "tables/RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
-    plot_dir        = "plots/RD53B_EyeDiagram_TAP0_Scan_2022_08_26_nofit_v1"
+    input_file      = "tables/RD53B_EyeDiagrams_TAP0_100to1000_Scan_2022_08_26.csv"
+    plot_dir        = "plots/RD53B_EyeDiagrams_TAP0_Scan_2022_08_26_nofit_v1"
     makePlotsScan(input_file, plot_dir)
 
 if __name__ == "__main__":
