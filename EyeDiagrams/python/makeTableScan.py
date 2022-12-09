@@ -4,9 +4,7 @@ import csv
 import glob
 import tools
 
-settings = [x for x in range(200, 1100, 100)]
-
-def run(input_files, output_file):
+def run(input_files, output_file, settings):
     # define decimal precision for values saved in table
     precision = 3
     # maps to define columns that contain data from raw data csv files
@@ -33,7 +31,7 @@ def run(input_files, output_file):
             output_writer.writerow(output_row)
             index += 1
 
-def makeTableScan(input_dir, output_dir, output_file):
+def makeTableScan(input_dir, output_dir, output_file, settings):
     name = "{0}/{1}".format(output_dir, output_file)
     print("Running over {0} to create {1}".format(input_dir, name))
     input_file_pattern = "{0}/TAP0_*/*.csv".format(input_dir)
@@ -47,17 +45,38 @@ def makeTableScan(input_dir, output_dir, output_file):
             if tap_match in f:
                 file_dict[tap] = f
     tools.makeDir(output_dir)
-    run(file_dict, name)
+    run(file_dict, name, settings)
 
 def main():
+    settings    = [x for x in range(200, 1100, 100)]
     input_dir   = "data/2021_11_11_clean"
     output_dir  = "tables"
-    output_file = "RD53A_EyeDiagram_TAP0_Scan_2021_11_11.csv"
-    makeTableScan(input_dir, output_dir, output_file)
+    output_file = "RD53A_EyeDiagrams_TAP0_200to1000_Scan_2021_11_11.csv"
+    makeTableScan(input_dir, output_dir, output_file, settings)
+    
+    settings    = [x for x in range(100, 1100, 100)]
+    input_dir   = "data/RD53A_EyeDiagrams_TAP0_2022_08_31_clean"
+    output_dir  = "tables"
+    output_file = "RD53A_EyeDiagrams_TAP0_100to1000_Scan_2022_08_31.csv"
+    makeTableScan(input_dir, output_dir, output_file, settings)
+    
+    settings    = [x for x in range(200, 1100, 100)]
+    input_dir   = "data/RD53A_EyeDiagrams_TAP0_2022_08_31_clean"
+    output_dir  = "tables"
+    output_file = "RD53A_EyeDiagrams_TAP0_200to1000_Scan_2022_08_31.csv"
+    makeTableScan(input_dir, output_dir, output_file, settings)
+    
+    settings    = [x for x in range(100, 1100, 100)]
     input_dir   = "data/RD53B_EyeDiagrams_TAP0_2022_08_26_clean"
     output_dir  = "tables"
-    output_file = "RD53B_EyeDiagram_TAP0_Scan_2022_08_26.csv"
-    makeTableScan(input_dir, output_dir, output_file)
+    output_file = "RD53B_EyeDiagrams_TAP0_100to1000_Scan_2022_08_26.csv"
+    makeTableScan(input_dir, output_dir, output_file, settings)
+    
+    settings    = [x for x in range(200, 1100, 100)]
+    input_dir   = "data/RD53B_EyeDiagrams_TAP0_2022_08_26_clean"
+    output_dir  = "tables"
+    output_file = "RD53B_EyeDiagrams_TAP0_200to1000_Scan_2022_08_26.csv"
+    makeTableScan(input_dir, output_dir, output_file, settings)
 
 if __name__ == "__main__":
     main()
