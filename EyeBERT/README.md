@@ -29,8 +29,10 @@ Here are the contents of "run_test.bat":
 cd C:\Users\Public\Documents\cable_tests
 
 d:\vivado\2020.2\bin\vivado.bat -mode batch -source run_test.tcl
+
 exit
 ```
+
 The paths in "run_test.bat" should be modified and set to the correct paths for your computer.
 The first path `C:\Users\Public\Documents\cable_tests` should be set to the directory for the project that you created
 (where run_test.bat, run_test.tcl, cable_test_705.bit, etc. are located).
