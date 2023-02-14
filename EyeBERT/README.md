@@ -63,31 +63,33 @@ Modify the shortcut properties to set the icon image to one of these files (take
 
 ## Running the Eye BERT Program
 
-Summary:
+Follow these instructions to run the Eye BERT program.
+Also, please refer to additional documentation and the e-link channel mapping for the yellow adapter boards.
 
-To run the Eye BERT program, first connect a KC705 to the computer.
-Turn on the KC705.
-Connect the KC705 P/N transmit and receive SMA ports using either SMA cables only (to verify the setup)
-or SMA cables, yellow SMA to e-link adapter board, and an e-link (see further documentation for connection information). 
-Then, double click on the desktop shortcut that you created for the "run_test.bat" file.
-This should start Vivado, load the project, program the KC705, setup the link, and apply the settings.
-Check that the link is stable. 
-If the link is not stable, first try reseting the link.
-If needed, close Vivado, power cycle the KC705, and try again.
+For first time setup, use two SMA cables to connect the KC705 trasmit P/N SMA ports to the receive P/N SMA ports.
+Note that P/N polarity matters!
+The positive (P) trasmit/receive SMA ports should be connected,
+and the negative (N) trasmit/receive SMA ports should be connected.
+
+Once the setup works using two SMA cables, try using four SMA cables, two yellow adapter boards, and an e-link.
+Note that the KC705 only needs to be programmed once (using the desktop shortcut) after being powered on.
+You can leave the KC705 on and programmed while changing SMA cable connections and e-link connections.
+When you are done, close Vivado and turn off the KC705.
 
 Setup the KC705:
 - Connect the KC705 power cable.
 - Connect the KC705 serial and JTAG ports to the computer using the proper USB cables.
 - Turn on the KC705.
 
-Establish a stable link:
+Establish a **stable** link:
 - Connect an e-link to two yellow adapter boards.
-- Using SMA cables, connect the KC705 SMA transmit P/N to one adapter board and connect the KC705 receive P/N to the other adapter board according to the e-link channel mapping. 
+- Review the e-link channel mapping for the type of e-link you are testing and choose a channel to test.
+- Using four SMA cables, connect the KC705 SMA **transmit** P/N to one adapter board and connect the KC705 **receive** P/N to the other adapter board according to the e-link channel mapping. 
 - Verify that the SMA cable connection matches the e-link channel mapping; note that P/N polarity matters! The direction (which side trasmits and which side receives) does not matter.
 - Double click the desktop shortcut for the Eye BERT program; this should start Vivado, load the project, program the KC705, setup the link, and apply the settings.
-- Verify that the link is stable.
+- Verify that the link is **stable**.
 
-If the link is NOT stable, try the following:
+If the link is **NOT stable**, try the following:
 - Reset the link and check if it becomes stable.
 - Check the correct orientation for the e-link cable; when inserted into the yellow adapter boards, the notch should be on the left, the same side as the white dot.
 - Reconnect the e-link to the yellow adapter boards and try again.
@@ -95,7 +97,7 @@ If the link is NOT stable, try the following:
 - Reconnect the SMA cables to the KC705 and the yellow adapter boards and try again.
 - Close Vivado, power cycle the KC705, and double click the desktop shortcut to run the program again.
 
-Once a stable link is established:
+Once a **stable** link is established:
 - Create and run a new scan to get an "Eye BERT" plot and area measurement.
 - Record the "Eye BERT" plot (take a screenshot, paste into the paint program, and save the file with a name for that e-link and channel).
 - Record the "Eye BERT" area (add to a spreadsheet and record the area for that e-link and channel).
@@ -104,8 +106,5 @@ Then, you can repeat this measurement:
 - Connect SMA cables for a different channel, verify a stable link, and repeat the measurement.
 - Repeat the measurement for all channels on that e-link cable.
 - Repeat the measurement for more e-link cables.
-
-Note that the KC705 only needs to be programmed once (using the desktop shortcut) after being powered on.
-You can leave the KC705 on and programmed while changing SMA cable connections and e-link connections.
-
+- When you are done, close Vivado and turn off the KC705.
 
