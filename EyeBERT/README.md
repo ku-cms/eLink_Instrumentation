@@ -7,10 +7,6 @@ However, the project should be able to run on Linux with some modifications.
 
 ## First Time Setup
 
-TODO: Fix typos in the TCL file and test:
-- Change "firt_bit_file" to "first_bit_file".
-- Change "targu" to "my_hw_target".
-
 First, download this repository.
 ```
 git clone https://github.com/ku-cms/eLink_Instrumentation.git
