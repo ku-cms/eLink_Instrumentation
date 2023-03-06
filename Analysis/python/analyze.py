@@ -7,16 +7,21 @@ import numpy as np
 def getColumnNum(name):
     result = -1
     column_map = {
-        "cable_name"        : 0,
-        "cable_number"      : 6,
-        "type"              : 7,
-        "gauge"             : 8,
-        "length"            : 9,
-        "eye_bert_area_D3"  : 10,
-        "eye_bert_area_D2"  : 11,
-        "eye_bert_area_D1"  : 12,
-        "eye_bert_area_D0"  : 13,
-        "eye_bert_area_CMD" : 14,
+        "cable_name"            : 0,
+        "cable_number"          : 6,
+        "type"                  : 7,
+        "gauge"                 : 8,
+        "length"                : 9,
+        "eye_bert_area_D3"      : 10,
+        "eye_bert_area_D2"      : 11,
+        "eye_bert_area_D1"      : 12,
+        "eye_bert_area_D0"      : 13,
+        "eye_bert_area_CMD"     : 14,
+        "impedance_2to5ns_CMD"  : 34,
+        "impedance_2to5ns_D0"   : 35,
+        "impedance_2to5ns_D1"   : 36,
+        "impedance_2to5ns_D2"   : 37,
+        "impedance_2to5ns_D3"   : 38,
     }
     if name in column_map:
         result = column_map[name]
@@ -52,7 +57,7 @@ def getLengths(data):
             result[cable_number] = length
     return result
 
-# get cable eye bert areas
+# get mean, std from values of specified columns
 def getMeanValues(data, column_names):
     result = {}
 
@@ -77,7 +82,9 @@ def getMeanValues(data, column_names):
 
     return result
 
+# plot area vs length
 def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
+    print(" - Plotting Eye BERT area vs. length.")
     x_vals = []
     y_vals = []
     y_errs = []
@@ -101,18 +108,47 @@ def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
     y_label = "Eye BERT area"
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label)
 
+# plot impedance vs length
+def plot_impedance_vs_length(lengths, impedances, plot_dir):
+    print(" - Plotting impedance vs. length.")
+    x_vals = []
+    y_vals = []
+    y_errs = []
+    for cable_number in impedances:
+        length  = lengths[cable_number]
+        mean    = impedances[cable_number]["mean"]
+        std     = impedances[cable_number]["std"]
+        rel_err = std / mean
+        print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
+        # do not include e-link if relative error is too large
+        if rel_err > 0.10:
+            print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
+        else:
+            x_vals.append(length)
+            y_vals.append(mean)
+            y_errs.append(std)
+
+    output_file = "{0}/eye_bert_impedance_vs_length.pdf".format(plot_dir)
+    title   = "Impedances"
+    x_label = "length (m)"
+    y_label = "impedance (ohms)"
+    plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label)
 
 def analyze(input_file, plot_dir):
-    print("Analyzing input file '{0}'".format(input_file))
+    print(" - Analyzing input file '{0}'".format(input_file))
     data = tools.getData(input_file)
 
     tools.makeDir(plot_dir)
     
     lengths = getLengths(data)
+    
     column_names = ["eye_bert_area_CMD", "eye_bert_area_D0", "eye_bert_area_D1", "eye_bert_area_D2", "eye_bert_area_D3"]
     eye_bert_areas = getMeanValues(data, column_names)
-
     plot_area_vs_length(lengths, eye_bert_areas, plot_dir)
+    
+    column_names = ["impedance_2to5ns_CMD", "impedance_2to5ns_D0", "impedance_2to5ns_D1", "impedance_2to5ns_D2", "impedance_2to5ns_D3"]
+    impedances = getMeanValues(data, column_names)
+    plot_impedance_vs_length(lengths, impedances, plot_dir)
 
 def main():
     input_file  = "data/TP_Type1_Cables_Production2020_2023_03_06.csv"
