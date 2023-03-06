@@ -106,7 +106,9 @@ def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
     title   = "Eye BERT Areas"
     x_label = "length (m)"
     y_label = "Eye BERT area"
-    plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label)
+    x_lim   = [0.0, 2.5]
+    y_lim   = [0.0, 8.0e4]
+    plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
 # plot impedance vs length
 def plot_impedance_vs_length(lengths, impedances, plot_dir):
@@ -132,7 +134,9 @@ def plot_impedance_vs_length(lengths, impedances, plot_dir):
     title   = "Impedances"
     x_label = "length (m)"
     y_label = "impedance (ohms)"
-    plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label)
+    x_lim   = [0.0, 2.5]
+    y_lim   = [0.0, 200.0]
+    plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
 def analyze(input_file, plot_dir):
     print(" - Analyzing input file '{0}'".format(input_file))
