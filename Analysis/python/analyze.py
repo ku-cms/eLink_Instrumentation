@@ -22,6 +22,8 @@ def getColumnNum(name):
         "impedance_2to5ns_D1"   : 36,
         "impedance_2to5ns_D2"   : 37,
         "impedance_2to5ns_D3"   : 38,
+        "RD53A_MinTAP0_D0"      : 48,
+        "RD53A_MinTAP0_D3"      : 50,
     }
     if name in column_map:
         result = column_map[name]
@@ -95,7 +97,7 @@ def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
         rel_err = std / mean
         print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
         # do not include e-link if relative error is too large
-        if rel_err > 0.10:
+        if rel_err > 0.20:
             print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
         else:
             x_vals.append(length)
@@ -123,19 +125,47 @@ def plot_impedance_vs_length(lengths, impedances, plot_dir):
         rel_err = std / mean
         print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
         # do not include e-link if relative error is too large
-        if rel_err > 0.10:
+        if rel_err > 0.20:
             print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
         else:
             x_vals.append(length)
             y_vals.append(mean)
             y_errs.append(std)
 
-    output_file = "{0}/eye_bert_impedance_vs_length.pdf".format(plot_dir)
+    output_file = "{0}/impedance_vs_length.pdf".format(plot_dir)
     title   = "Impedances"
     x_label = "length (m)"
     y_label = "impedance (ohms)"
     x_lim   = [0.0, 2.5]
     y_lim   = [0.0, 200.0]
+    plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
+
+# plot RD53A_MinTAP0 vs length
+def plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir):
+    print(" - Plotting RD53A MinTAP0 vs. length.")
+    x_vals = []
+    y_vals = []
+    y_errs = []
+    for cable_number in RD53A_MinTAP0s:
+        length  = lengths[cable_number]
+        mean    = RD53A_MinTAP0s[cable_number]["mean"]
+        std     = RD53A_MinTAP0s[cable_number]["std"]
+        rel_err = std / mean
+        print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
+        # do not include e-link if relative error is too large
+        if rel_err > 0.20:
+            print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
+        else:
+            x_vals.append(length)
+            y_vals.append(mean)
+            y_errs.append(std)
+
+    output_file = "{0}/RD53A_MinTAP0_vs_length.pdf".format(plot_dir)
+    title   = "RD53A Min TAP0"
+    x_label = "length (m)"
+    y_label = "RD53A Min TAP0"
+    x_lim   = [0.0, 2.5]
+    y_lim   = [0.0, 400.0]
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
 def analyze(input_file, plot_dir):
@@ -153,6 +183,10 @@ def analyze(input_file, plot_dir):
     column_names = ["impedance_2to5ns_CMD", "impedance_2to5ns_D0", "impedance_2to5ns_D1", "impedance_2to5ns_D2", "impedance_2to5ns_D3"]
     impedances = getMeanValues(data, column_names)
     plot_impedance_vs_length(lengths, impedances, plot_dir)
+    
+    column_names = ["RD53A_MinTAP0_D0", "RD53A_MinTAP0_D3"]
+    RD53A_MinTAP0s = getMeanValues(data, column_names)
+    plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir)
 
 def main():
     input_file  = "data/TP_Type1_Cables_Production2020_2023_03_06.csv"
