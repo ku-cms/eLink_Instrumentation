@@ -7,6 +7,22 @@ import numpy as np
 # general error code
 ERROR_CODE = -999
 
+# check if string can be converted to int
+def is_int(num):
+    try:
+        int(num)
+        return True
+    except ValueError:
+        return False
+
+# check if string can be converted to float
+def is_float(num):
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
+
 # creates directory if it does not exist
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
