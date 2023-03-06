@@ -4,6 +4,23 @@ import plot
 import tools
 import numpy as np
 
+# -------------------------------------
+# TODO: 
+# - make function to get x, y, and y_err values for x = length
+# - write number of e-links included in plot and channels used
+# - plot DC resistance vs. length
+# - plot RD53A Min TAP0 vs. Eye BERT area
+# - plot impedance vs. Eye BERT area
+# - plot DC resistance vs. Eye BERT area
+#
+# DONE:
+# - plot Eye BERT area vs. length
+# - plot impedance area vs. length
+# - plot RD53A Min TAP0 vs. length
+# -------------------------------------
+
+# given column name, return column index (starting from 0)
+# based on TP_Cables_Production2020_2023 spreadsheet (version from March 6, 2023), data for Type 1 cables
 def getColumnNum(name):
     result = -1
     column_map = {
@@ -168,24 +185,26 @@ def plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir):
     y_lim   = [0.0, 400.0]
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
+# analyze data from input file
 def analyze(input_file, plot_dir):
     print(" - Analyzing input file '{0}'".format(input_file))
-    data = tools.getData(input_file)
-
     tools.makeDir(plot_dir)
-    
+    data    = tools.getData(input_file)
     lengths = getLengths(data)
     
-    column_names = ["eye_bert_area_CMD", "eye_bert_area_D0", "eye_bert_area_D1", "eye_bert_area_D2", "eye_bert_area_D3"]
-    eye_bert_areas = getMeanValues(data, column_names)
+    # area vs length
+    column_names    = ["eye_bert_area_CMD", "eye_bert_area_D0", "eye_bert_area_D1", "eye_bert_area_D2", "eye_bert_area_D3"]
+    eye_bert_areas  = getMeanValues(data, column_names)
     plot_area_vs_length(lengths, eye_bert_areas, plot_dir)
     
-    column_names = ["impedance_2to5ns_CMD", "impedance_2to5ns_D0", "impedance_2to5ns_D1", "impedance_2to5ns_D2", "impedance_2to5ns_D3"]
-    impedances = getMeanValues(data, column_names)
+    # impedance vs length
+    column_names    = ["impedance_2to5ns_CMD", "impedance_2to5ns_D0", "impedance_2to5ns_D1", "impedance_2to5ns_D2", "impedance_2to5ns_D3"]
+    impedances      = getMeanValues(data, column_names)
     plot_impedance_vs_length(lengths, impedances, plot_dir)
     
-    column_names = ["RD53A_MinTAP0_D0", "RD53A_MinTAP0_D3"]
-    RD53A_MinTAP0s = getMeanValues(data, column_names)
+    # RD53A Min TAP0 vs length
+    column_names    = ["RD53A_MinTAP0_D0", "RD53A_MinTAP0_D3"]
+    RD53A_MinTAP0s  = getMeanValues(data, column_names)
     plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir)
 
 def main():
