@@ -73,21 +73,7 @@ def getAreas(data):
 
 def analyze(input_file):
     print("Analyzing input file '{0}'".format(input_file))
-    #tools.printData(input_file)
     data = tools.getData(input_file)
-    #print(data[0])
-    length_index = getColumnNum("length")
-    eye_bert_area_CMD_index = getColumnNum("eye_bert_area_CMD")
-    #oops = getColumnNum("oops")
-
-
-    #print(length_index)
-    #for row in data:
-        #print(row)
-        #print(len(row))
-        #print(row[length_index])
-        #print("{0} : {1}".format(row[length_index], row[eye_bert_area_CMD_index]))
-        #print("{0} : {1}".format(row[length_index], type(row[eye_bert_area_CMD_index])))
     
     eye_bert_areas = getAreas(data)
 
