@@ -56,24 +56,11 @@ def getLengths(data):
 def getMeanValues(data, column_names):
     result = {}
 
-    cable_number_index      = getColumnNum("cable_number")
-    #eye_bert_area_CMD_index = getColumnNum("eye_bert_area_CMD")
-    #eye_bert_area_D0_index  = getColumnNum("eye_bert_area_D0")
-    #eye_bert_area_D1_index  = getColumnNum("eye_bert_area_D1")
-    #eye_bert_area_D2_index  = getColumnNum("eye_bert_area_D2")
-    #eye_bert_area_D3_index  = getColumnNum("eye_bert_area_D3")
-
+    cable_number_index = getColumnNum("cable_number")
     value_indices = [getColumnNum(name) for name in column_names]
     
     for row in data:
         cable_number = row[cable_number_index]
-        #raw_areas = []
-        #raw_areas.append(row[eye_bert_area_CMD_index])
-        #raw_areas.append(row[eye_bert_area_D0_index])
-        #raw_areas.append(row[eye_bert_area_D1_index])
-        #raw_areas.append(row[eye_bert_area_D2_index])
-        #raw_areas.append(row[eye_bert_area_D3_index])
-        
         raw_values = [row[i] for i in value_indices]
         
         # check that cable number and values are valid
