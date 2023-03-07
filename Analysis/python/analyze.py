@@ -8,7 +8,6 @@ import numpy as np
 # -------------------------------------
 # TODO: 
 # - require gauge to be 36
-# - write number of e-links included in plot and channels used
 # - plot RD53A Min TAP0 vs. Eye BERT area
 # - plot impedance vs. Eye BERT area
 # - plot DC resistance vs. Eye BERT area
@@ -20,6 +19,7 @@ import numpy as np
 # - plot RD53A Min TAP0 vs. length
 # - make function to get x, y, and y_err values for x = length
 # - do not use 'inf' or 'nan' values
+# - write number of e-links included in plot
 # -------------------------------------
 
 # given column name, return column index (starting from 0)
@@ -124,7 +124,7 @@ def getMeanValues(data, column_names):
 
 # get x, y, and y_err values for x = length
 def getValues(length_map, value_map, max_rel_err):
-    verbose = True
+    verbose = False
     x_vals = []
     y_vals = []
     y_errs = []
@@ -144,13 +144,15 @@ def getValues(length_map, value_map, max_rel_err):
             y_vals.append(mean)
             y_errs.append(std)
     
+    print("Number of values: {0}".format(len(x_vals)))
     return x_vals, y_vals, y_errs
 
 # plot resistance vs length
 def plot_resistance_vs_length(lengths, resistances, plot_dir):
     print(" - Plotting resistance vs. length.")
     
-    max_rel_err = 0.20
+    #max_rel_err = 0.20
+    max_rel_err = 0.30
     #max_rel_err = 1.00
     x_vals, y_vals, y_errs = getValues(lengths, resistances, max_rel_err) 
 
@@ -166,7 +168,8 @@ def plot_resistance_vs_length(lengths, resistances, plot_dir):
 def plot_impedance_vs_length(lengths, impedances, plot_dir):
     print(" - Plotting impedance vs. length.")
     
-    max_rel_err = 0.20
+    #max_rel_err = 0.20
+    max_rel_err = 0.30
     #max_rel_err = 1.00
     x_vals, y_vals, y_errs = getValues(lengths, impedances, max_rel_err) 
 
@@ -182,7 +185,8 @@ def plot_impedance_vs_length(lengths, impedances, plot_dir):
 def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
     print(" - Plotting Eye BERT area vs. length.")
 
-    max_rel_err = 0.20
+    #max_rel_err = 0.20
+    max_rel_err = 0.30
     #max_rel_err = 1.00
     x_vals, y_vals, y_errs = getValues(lengths, eye_bert_areas, max_rel_err) 
     
@@ -199,7 +203,8 @@ def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
 def plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir):
     print(" - Plotting RD53A MinTAP0 vs. length.")
     
-    max_rel_err = 0.20
+    #max_rel_err = 0.20
+    max_rel_err = 0.30
     #max_rel_err = 1.00
     x_vals, y_vals, y_errs = getValues(lengths, RD53A_MinTAP0s, max_rel_err) 
 
