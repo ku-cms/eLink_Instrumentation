@@ -49,6 +49,15 @@ def validValues(values):
             return False
     return True
 
+# get keys common to two dictionaries
+def getMatchingKeys(dict_1, dict_2):
+    keys = []
+    for key in dict_1:
+        if key in dict_2:
+            keys.append(key)
+    keys.sort()
+    return keys
+
 # prints csv file
 def printData(input_file):
     with open(input_file, "r") as f:
