@@ -6,8 +6,6 @@ import numpy as np
 
 # -------------------------------------
 # TODO: 
-# - plot RD53A Min TAP0 vs. Eye BERT area
-# - plot impedance vs. Eye BERT area
 # - plot DC resistance vs. Eye BERT area
 # - plot impedance vs. DC resistance 
 #
@@ -16,6 +14,8 @@ import numpy as np
 # - plot impedance area vs. length
 # - plot Eye BERT area vs. length
 # - plot RD53A Min TAP0 vs. length
+# - plot RD53A Min TAP0 vs. Eye BERT area
+# - plot impedance vs. Eye BERT area
 # - make function to get x, y, and y_err values for x = length
 # - do not use 'inf' or 'nan' values
 # - write number of e-links included in plot
@@ -278,6 +278,23 @@ def plot_RD53A_MinTAP0_vs_area(gauges, eye_bert_areas, RD53A_MinTAP0s, plot_dir)
     y_lim   = [0.0, 400.0]
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
+# plot impedance vs area
+def plot_impedance_vs_area(gauges, eye_bert_areas, impedances, plot_dir):
+    print(" - Plotting impedance vs. area.")
+    
+    #max_rel_err = 0.20
+    max_rel_err = 0.30
+    #max_rel_err = 1.00
+    x_vals, y_vals, y_errs = getXYValuesGeneral(gauges, eye_bert_areas, impedances, max_rel_err) 
+
+    output_file = "{0}/impedance_vs_area.pdf".format(plot_dir)
+    title   = "Impedance"
+    x_label = "Avg. Eye BERT area"
+    y_label = "Avg. impedance (ohms)"
+    x_lim   = [2.5e4, 6.5e4]
+    y_lim   = [0.0, 200.0]
+    plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
+
 # analyze data from input file
 def analyze(input_file, plot_dir):
     print(" - Analyzing input file '{0}'".format(input_file))
@@ -312,6 +329,9 @@ def analyze(input_file, plot_dir):
     
     # RD53A Min TAP0 vs area
     plot_RD53A_MinTAP0_vs_area(gauges, eye_bert_areas, RD53A_MinTAP0s, plot_dir)
+    
+    # impedance vs area
+    plot_impedance_vs_area(gauges, eye_bert_areas, impedances, plot_dir)
     
 
 def main():
