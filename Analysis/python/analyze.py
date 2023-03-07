@@ -7,7 +7,6 @@ import numpy as np
 
 # -------------------------------------
 # TODO: 
-# - require gauge to be 36
 # - plot RD53A Min TAP0 vs. Eye BERT area
 # - plot impedance vs. Eye BERT area
 # - plot DC resistance vs. Eye BERT area
@@ -20,6 +19,7 @@ import numpy as np
 # - make function to get x, y, and y_err values for x = length
 # - do not use 'inf' or 'nan' values
 # - write number of e-links included in plot
+# - require gauge to be 36
 # -------------------------------------
 
 # given column name, return column index (starting from 0)
@@ -97,6 +97,22 @@ def getLengths(data):
             result[cable_number] = length
     return result
 
+# get cable gauges
+def getGauges(data):
+    result = {}
+    cable_number_index  = getColumnNum("cable_number")
+    gauge_index         = getColumnNum("gauge")
+    for row in data:
+        cable_number    = row[cable_number_index]
+        gauge           = row[gauge_index]
+        valid_cable     = tools.is_int(cable_number)
+        valid_gauge     = tools.is_int(gauge)
+        if valid_cable and valid_gauge:
+            cable_number    = int(cable_number)
+            gauge           = int(gauge)
+            result[cable_number] = gauge
+    return result
+
 # get mean, std from values of specified columns
 def getMeanValues(data, column_names):
     result = {}
@@ -123,38 +139,41 @@ def getMeanValues(data, column_names):
     return result
 
 # get x, y, and y_err values for x = length
-def getValues(length_map, value_map, max_rel_err):
+def getValues(gauge_map, length_map, value_map, max_rel_err):
     verbose = False
     x_vals = []
     y_vals = []
     y_errs = []
     
     for cable_number in value_map:
+        gauge   = gauge_map[cable_number]
         length  = length_map[cable_number]
         mean    = value_map[cable_number]["mean"]
         std     = value_map[cable_number]["std"]
         rel_err = std / mean
-        if verbose:
-            print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
-        # do not include e-link if relative error is too large
-        if rel_err > max_rel_err:
-            print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
-        else:
-            x_vals.append(length)
-            y_vals.append(mean)
-            y_errs.append(std)
+        # require gauge = 36
+        if gauge == 36:
+            if verbose:
+                print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
+            # do not include e-link if relative error is too large
+            if rel_err > max_rel_err:
+                print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
+            else:
+                x_vals.append(length)
+                y_vals.append(mean)
+                y_errs.append(std)
     
     print("Number of values: {0}".format(len(x_vals)))
     return x_vals, y_vals, y_errs
 
 # plot resistance vs length
-def plot_resistance_vs_length(lengths, resistances, plot_dir):
+def plot_resistance_vs_length(gauges, lengths, resistances, plot_dir):
     print(" - Plotting resistance vs. length.")
     
     #max_rel_err = 0.20
     max_rel_err = 0.30
     #max_rel_err = 1.00
-    x_vals, y_vals, y_errs = getValues(lengths, resistances, max_rel_err) 
+    x_vals, y_vals, y_errs = getValues(gauges, lengths, resistances, max_rel_err) 
 
     output_file = "{0}/resistance_vs_length.pdf".format(plot_dir)
     title   = "DC 4-point Resistance"
@@ -165,13 +184,13 @@ def plot_resistance_vs_length(lengths, resistances, plot_dir):
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
 # plot impedance vs length
-def plot_impedance_vs_length(lengths, impedances, plot_dir):
+def plot_impedance_vs_length(gauges, lengths, impedances, plot_dir):
     print(" - Plotting impedance vs. length.")
     
     #max_rel_err = 0.20
     max_rel_err = 0.30
     #max_rel_err = 1.00
-    x_vals, y_vals, y_errs = getValues(lengths, impedances, max_rel_err) 
+    x_vals, y_vals, y_errs = getValues(gauges, lengths, impedances, max_rel_err) 
 
     output_file = "{0}/impedance_vs_length.pdf".format(plot_dir)
     title   = "Impedance"
@@ -182,13 +201,13 @@ def plot_impedance_vs_length(lengths, impedances, plot_dir):
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
 # plot area vs length
-def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
+def plot_area_vs_length(gauges, lengths, eye_bert_areas, plot_dir):
     print(" - Plotting Eye BERT area vs. length.")
 
     #max_rel_err = 0.20
     max_rel_err = 0.30
     #max_rel_err = 1.00
-    x_vals, y_vals, y_errs = getValues(lengths, eye_bert_areas, max_rel_err) 
+    x_vals, y_vals, y_errs = getValues(gauges, lengths, eye_bert_areas, max_rel_err) 
     
     output_file = "{0}/eye_bert_area_vs_length.pdf".format(plot_dir)
     title       = "Eye BERT Area"
@@ -200,13 +219,13 @@ def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
 
 # plot RD53A_MinTAP0 vs length
-def plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir):
+def plot_RD53A_MinTAP0_vs_length(gauges, lengths, RD53A_MinTAP0s, plot_dir):
     print(" - Plotting RD53A MinTAP0 vs. length.")
     
     #max_rel_err = 0.20
     max_rel_err = 0.30
     #max_rel_err = 1.00
-    x_vals, y_vals, y_errs = getValues(lengths, RD53A_MinTAP0s, max_rel_err) 
+    x_vals, y_vals, y_errs = getValues(gauges, lengths, RD53A_MinTAP0s, max_rel_err) 
 
     output_file = "{0}/RD53A_MinTAP0_vs_length.pdf".format(plot_dir)
     title   = "RD53A Min TAP0"
@@ -221,27 +240,28 @@ def analyze(input_file, plot_dir):
     print(" - Analyzing input file '{0}'".format(input_file))
     tools.makeDir(plot_dir)
     data    = tools.getData(input_file)
+    gauges  = getGauges(data)
     lengths = getLengths(data)
     
     # resistance vs length
     column_names    = ["DC_4pt_resistance_CMD_P", "DC_4pt_resistance_CMD_N", "DC_4pt_resistance_D0_P", "DC_4pt_resistance_D0_N", "DC_4pt_resistance_D1_P", "DC_4pt_resistance_D1_N", "DC_4pt_resistance_D2_P", "DC_4pt_resistance_D2_N", "DC_4pt_resistance_D3_P", "DC_4pt_resistance_D3_N"]
     resistances      = getMeanValues(data, column_names)
-    plot_resistance_vs_length(lengths, resistances, plot_dir)
+    plot_resistance_vs_length(gauges, lengths, resistances, plot_dir)
     
     # impedance vs length
     column_names    = ["impedance_2to5ns_CMD", "impedance_2to5ns_D0", "impedance_2to5ns_D1", "impedance_2to5ns_D2", "impedance_2to5ns_D3"]
     impedances      = getMeanValues(data, column_names)
-    plot_impedance_vs_length(lengths, impedances, plot_dir)
+    plot_impedance_vs_length(gauges, lengths, impedances, plot_dir)
     
     # area vs length
     column_names    = ["eye_bert_area_CMD", "eye_bert_area_D0", "eye_bert_area_D1", "eye_bert_area_D2", "eye_bert_area_D3"]
     eye_bert_areas  = getMeanValues(data, column_names)
-    plot_area_vs_length(lengths, eye_bert_areas, plot_dir)
+    plot_area_vs_length(gauges, lengths, eye_bert_areas, plot_dir)
     
     # RD53A Min TAP0 vs length
     column_names    = ["RD53A_MinTAP0_D0", "RD53A_MinTAP0_D3"]
     RD53A_MinTAP0s  = getMeanValues(data, column_names)
-    plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir)
+    plot_RD53A_MinTAP0_vs_length(gauges, lengths, RD53A_MinTAP0s, plot_dir)
     
 
 def main():
