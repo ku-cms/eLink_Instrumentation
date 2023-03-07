@@ -2,12 +2,12 @@
 
 import plot
 import tools
+import math
 import numpy as np
 
 # -------------------------------------
 # TODO: 
 # - require gauge to be 36
-# - do not use 'inf' values
 # - write number of e-links included in plot and channels used
 # - plot RD53A Min TAP0 vs. Eye BERT area
 # - plot impedance vs. Eye BERT area
@@ -19,6 +19,7 @@ import numpy as np
 # - plot Eye BERT area vs. length
 # - plot RD53A Min TAP0 vs. length
 # - make function to get x, y, and y_err values for x = length
+# - do not use 'inf' or 'nan' values
 # -------------------------------------
 
 # given column name, return column index (starting from 0)
@@ -60,10 +61,18 @@ def getColumnNum(name):
         print("ERROR in getColumnNum(): the name '{0}' is not a valid column!".format(name))
     return result
 
-# check that all values are floats
+# check that all values are valid
 def validValues(values):
     for value in values:
-        if not tools.is_float(value):
+        # require that values are floats
+        if tools.is_float(value): 
+            # require that values are not inf
+            if math.isinf(float(value)):
+                return False
+            # require that values are not nan
+            if math.isnan(float(value)):
+                return False
+        else: 
             return False
     return True
 
