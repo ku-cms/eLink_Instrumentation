@@ -2,7 +2,6 @@
 
 import plot
 import tools
-import math
 import numpy as np
 
 # -------------------------------------
@@ -62,26 +61,6 @@ def getColumnNum(name):
         print("ERROR in getColumnNum(): the name '{0}' is not a valid column!".format(name))
     return result
 
-# check that all values are valid
-def validValues(values):
-    for value in values:
-        # require that values are floats
-        if tools.is_float(value): 
-            # require that values are not inf
-            if math.isinf(float(value)):
-                return False
-            # require that values are not nan
-            if math.isnan(float(value)):
-                return False
-        else: 
-            return False
-    return True
-
-# convert values to floats
-def convertToFloats(values):
-    result = [float(value) for value in values]
-    return result
-
 # get cable lengths
 def getLengths(data):
     result = {}
@@ -127,10 +106,10 @@ def getMeanValues(data, column_names):
         
         # check that cable number and values are valid
         valid_cable     = tools.is_int(cable_number)
-        valid_values    = validValues(raw_values)
+        valid_values    = tools.validValues(raw_values)
         if valid_cable and valid_values:
             cable_number = int(cable_number)
-            values  = convertToFloats(raw_values)
+            values  = tools.convertToFloats(raw_values)
             mean    = np.mean(values) 
             std     = np.std(values) 
             result[cable_number] = {}
@@ -166,6 +145,10 @@ def getValues(gauge_map, length_map, value_map, max_rel_err):
     
     print("Number of values: {0}".format(len(x_vals)))
     return x_vals, y_vals, y_errs
+
+# ----------------------------------- #
+# --- Plot measurements vs length --- # 
+# ----------------------------------- #
 
 # plot resistance vs length
 def plot_resistance_vs_length(gauges, lengths, resistances, plot_dir):
@@ -235,6 +218,10 @@ def plot_RD53A_MinTAP0_vs_length(gauges, lengths, RD53A_MinTAP0s, plot_dir):
     x_lim   = [0.0, 2.5]
     y_lim   = [0.0, 400.0]
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
+
+# ----------------------------------------- #
+# --- Plot measurements vs measurements --- # 
+# ----------------------------------------- #
 
 # analyze data from input file
 def analyze(input_file, plot_dir):
