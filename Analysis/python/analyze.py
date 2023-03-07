@@ -10,6 +10,7 @@ import numpy as np
 # - plot RD53A Min TAP0 vs. Eye BERT area
 # - plot impedance vs. Eye BERT area
 # - plot DC resistance vs. Eye BERT area
+# - plot impedance vs. DC resistance 
 #
 # DONE:
 # - plot DC resistance vs. length
@@ -178,7 +179,7 @@ def plot_resistance_vs_length(gauges, lengths, resistances, plot_dir):
     output_file = "{0}/resistance_vs_length.pdf".format(plot_dir)
     title   = "DC 4-point Resistance"
     x_label = "length (m)"
-    y_label = "resistance (ohms)"
+    y_label = "Avg. resistance (ohms)"
     x_lim   = [0.0, 2.5]
     y_lim   = [0.0, 5.0]
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
@@ -195,7 +196,7 @@ def plot_impedance_vs_length(gauges, lengths, impedances, plot_dir):
     output_file = "{0}/impedance_vs_length.pdf".format(plot_dir)
     title   = "Impedance"
     x_label = "length (m)"
-    y_label = "impedance (ohms)"
+    y_label = "Avg. impedance (ohms)"
     x_lim   = [0.0, 2.5]
     y_lim   = [0.0, 200.0]
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
@@ -212,7 +213,7 @@ def plot_area_vs_length(gauges, lengths, eye_bert_areas, plot_dir):
     output_file = "{0}/eye_bert_area_vs_length.pdf".format(plot_dir)
     title       = "Eye BERT Area"
     x_label     = "length (m)"
-    y_label     = "Eye BERT area"
+    y_label     = "Avg. Eye BERT area"
     x_lim       = [0.0, 2.5]
     y_lim       = [0.0, 8.0e4]
     
@@ -228,9 +229,9 @@ def plot_RD53A_MinTAP0_vs_length(gauges, lengths, RD53A_MinTAP0s, plot_dir):
     x_vals, y_vals, y_errs = getValues(gauges, lengths, RD53A_MinTAP0s, max_rel_err) 
 
     output_file = "{0}/RD53A_MinTAP0_vs_length.pdf".format(plot_dir)
-    title   = "RD53A Min TAP0"
+    title   = "RD53A BERT TAP0 Scans"
     x_label = "length (m)"
-    y_label = "RD53A Min TAP0"
+    y_label = "Avg. TAP0 for BER = 1e-10"
     x_lim   = [0.0, 2.5]
     y_lim   = [0.0, 400.0]
     plot.plot(x_vals, y_vals, y_errs, output_file, title, x_label, y_label, x_lim, y_lim)
