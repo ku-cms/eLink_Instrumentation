@@ -128,24 +128,9 @@ def getValues(length_map, value_map, max_rel_err):
 # plot area vs length
 def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
     print(" - Plotting Eye BERT area vs. length.")
-    #x_vals = []
-    #y_vals = []
-    #y_errs = []
-    #for cable_number in eye_bert_areas:
-    #    length  = lengths[cable_number]
-    #    mean    = eye_bert_areas[cable_number]["mean"]
-    #    std     = eye_bert_areas[cable_number]["std"]
-    #    rel_err = std / mean
-    #    print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
-    #    # do not include e-link if relative error is too large
-    #    if rel_err > 0.20:
-    #        print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
-    #    else:
-    #        x_vals.append(length)
-    #        y_vals.append(mean)
-    #        y_errs.append(std)
 
     max_rel_err = 0.20
+    #max_rel_err = 1.00
     x_vals, y_vals, y_errs = getValues(lengths, eye_bert_areas, max_rel_err) 
     
     output_file = "{0}/eye_bert_area_vs_length.pdf".format(plot_dir)
@@ -160,24 +145,9 @@ def plot_area_vs_length(lengths, eye_bert_areas, plot_dir):
 # plot impedance vs length
 def plot_impedance_vs_length(lengths, impedances, plot_dir):
     print(" - Plotting impedance vs. length.")
-    #x_vals = []
-    #y_vals = []
-    #y_errs = []
-    #for cable_number in impedances:
-    #    length  = lengths[cable_number]
-    #    mean    = impedances[cable_number]["mean"]
-    #    std     = impedances[cable_number]["std"]
-    #    rel_err = std / mean
-    #    print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
-    #    # do not include e-link if relative error is too large
-    #    if rel_err > 0.20:
-    #        print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
-    #    else:
-    #        x_vals.append(length)
-    #        y_vals.append(mean)
-    #        y_errs.append(std)
     
     max_rel_err = 0.20
+    #max_rel_err = 1.00
     x_vals, y_vals, y_errs = getValues(lengths, impedances, max_rel_err) 
 
     output_file = "{0}/impedance_vs_length.pdf".format(plot_dir)
@@ -191,24 +161,9 @@ def plot_impedance_vs_length(lengths, impedances, plot_dir):
 # plot RD53A_MinTAP0 vs length
 def plot_RD53A_MinTAP0_vs_length(lengths, RD53A_MinTAP0s, plot_dir):
     print(" - Plotting RD53A MinTAP0 vs. length.")
-    #x_vals = []
-    #y_vals = []
-    #y_errs = []
-    #for cable_number in RD53A_MinTAP0s:
-    #    length  = lengths[cable_number]
-    #    mean    = RD53A_MinTAP0s[cable_number]["mean"]
-    #    std     = RD53A_MinTAP0s[cable_number]["std"]
-    #    rel_err = std / mean
-    #    print("cable number: {0}, length: {1} m, mean: {2:.1f}, std: {3:.1f}, rel_err: {4:.3f}".format(cable_number, length, mean, std, rel_err))
-    #    # do not include e-link if relative error is too large
-    #    if rel_err > 0.20:
-    #        print("WARNING: not including e-link {0}, length {1} m due to a large relative error: {2:.3f}".format(cable_number, length, rel_err))
-    #    else:
-    #        x_vals.append(length)
-    #        y_vals.append(mean)
-    #        y_errs.append(std)
     
     max_rel_err = 0.20
+    #max_rel_err = 1.00
     x_vals, y_vals, y_errs = getValues(lengths, RD53A_MinTAP0s, max_rel_err) 
 
     output_file = "{0}/RD53A_MinTAP0_vs_length.pdf".format(plot_dir)
