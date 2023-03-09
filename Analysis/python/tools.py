@@ -2,10 +2,16 @@
 
 import csv
 import os
+import math
 import numpy as np
 
 # general error code
 ERROR_CODE = -999
+
+# creates directory if it does not exist
+def makeDir(dir_name):
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
 
 # check if string can be converted to int
 def is_int(num):
@@ -23,10 +29,34 @@ def is_float(num):
     except ValueError:
         return False
 
-# creates directory if it does not exist
-def makeDir(dir_name):
-    if not os.path.exists(dir_name):
-        os.makedirs(dir_name)
+# convert values to floats
+def convertToFloats(values):
+    result = [float(value) for value in values]
+    return result
+
+# check that all values are valid
+def validValues(values):
+    for value in values:
+        # require that values are floats
+        if is_float(value): 
+            # require that values are not inf
+            if math.isinf(float(value)):
+                return False
+            # require that values are not nan
+            if math.isnan(float(value)):
+                return False
+        else: 
+            return False
+    return True
+
+# get keys common to two dictionaries
+def getMatchingKeys(dict_1, dict_2):
+    keys = []
+    for key in dict_1:
+        if key in dict_2:
+            keys.append(key)
+    keys.sort()
+    return keys
 
 # prints csv file
 def printData(input_file):
