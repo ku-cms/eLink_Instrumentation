@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Jul  8 11:43:26 2022
 
-@author: jsewell
-"""
+# Created by the KU CMS team.
+
 #Predefined Libraries
 import os
 from optparse import OptionParser
@@ -71,17 +69,12 @@ def makeDir(dir_name):
 
 parser= OptionParser()
 
-#NN = input("Are your file names have similar format to: TP_0.8m_115_M1CMD.vna.txt? (Lenght in m)(y = 1/ n = 0)")
-#if NN == "1":
-#    print("Extraction Possible")
-#elif NN == "0":
-#    print("Please change your file name")
-#    exit()
-
+# Input parameters from user
 cable_number = int(input("Enter cable number: "))
-cable_type   = int(input("Enter cable type (1, 2, 3, 4): "))
+cable_type   = int(input("Enter cable type [0, 1, 2, 3, 4]: "))
 cable_length = int(input("Enter cable length in cm [0, 35, 80, 100, 140, 160, 180, 200]: "))
-int_window   = int(input('integration window 2-5ns (0), 8-11ns (1), or variable (2)? [0,1,2]:'))
+int_window   = int(input("Enter integration window [2-5ns (0), 8-11ns (1), variable (2)]: "))
+Comment      = input("Enter comments for this run; if there are no comments, leave blank: ")
 
 cable_number_str = str(cable_number)
 cable_type_str   = str(cable_type)
@@ -90,7 +83,8 @@ cable_length_str = str(cable_length)
 Pre_list = []
 y_plot_value=[]
 
-print("Loading files")
+print("")
+print("Loading files...")
 for root, dirs, files in os.walk("./Data/"+cable_number_str, topdown=False):
    for name in files:
       if ".txt" in os.path.join(name):
@@ -98,8 +92,8 @@ for root, dirs, files in os.walk("./Data/"+cable_number_str, topdown=False):
 
 n_channels = len(Pre_list)
 
+print("List of cables to analyze: {0}".format(Pre_list))
 print("Number of files: {0}".format(n_channels))
-print(Pre_list)
 
 ff_list = []
 filename_list = []
@@ -116,11 +110,10 @@ IDchecker = 0
 Breaker = True
 
 while Breaker == True:
-
     Breaker = True
-    print("IDchecker: {0}".format(IDchecker))
     FILE = Pre_list[IDchecker]
-    print("Creating s2p files for ", FILE)
+    #print("IDchecker: {0}".format(IDchecker))
+    print("Creating s2p files for {0}".format(FILE))
 
     parser.add_option('--basename', metavar='T', type='string', action='store',
                       default='Data/'+cable_number_str+'/'+FILE, #31, 15, 33 #calibration_test.vna
@@ -175,8 +168,7 @@ while Breaker == True:
 
     example = rf.Network(basename2.replace(".txt","")+'_0.s2p', f_unit='ghz')
 
-
-    print("Plotting the data.\n")
+    # Create Plots
     with style.context('seaborn-ticks'):
         #Time domain reflectometry, measurement vs simulation
         fig0 = plt.figure(figsize=(8,4))
@@ -261,8 +253,6 @@ while Breaker == True:
         if IDchecker >= n_channels:
             break
 
-print("Plots can be now found in the Plots folder of the Cable\n")
-
 # specify time integration window as a function of length
 if int_window == 0:
     t1 = 2.00
@@ -310,12 +300,8 @@ subfiles = ['0','0','1',]
 IDchecker = 0
 Breaker = True
 
-print("List of Cables being analysed",Pre_list,"\n")
-
-Comment = input("Any coments on this run? If this is one many trials for the same cable add T_(number of trials). If it is an important record add I: ")
-
+# Create plots
 while Breaker == True:
-    Breaker = True
     comp = comps[IDchecker]
     subfile = subfiles[IDchecker]
 
@@ -378,9 +364,10 @@ while Breaker == True:
 
         fig0.savefig("Data/"+cable_number_str+"/Plots/"+cable_number_str+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
 
-        IDchecker+=1
+        IDchecker += 1
 
-        if IDchecker >2:
+        if IDchecker > 2:
             break
 
-print("Data analysed. Plots stored in Plots folder.")
+print("")
+print("Analysis complete for cable {0}! To view plots, see the 'Plots' directory for cable {0}.".format(cable_number_str))
