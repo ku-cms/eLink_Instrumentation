@@ -64,53 +64,45 @@ def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
         ax.set_ylim((ymin, ymax))
     plt.tight_layout()
 
-def main():
+# Analyze data for one cable; iterates over all files (e.g. channels) for a cable
+def analyze(cable_number, cable_type, cable_length, int_window, Comment):
     parser = OptionParser()
-    
-    # Input parameters from user
-    cable_number = int(input("Enter cable number: "))
-    cable_type   = int(input("Enter cable type [0, 1, 2, 3, 4]: "))
-    cable_length = int(input("Enter cable length in cm [0, 35, 80, 100, 140, 160, 180, 200]: "))
-    int_window   = int(input("Enter integration window [2-5ns (0), 8-11ns (1), variable (2)]: "))
-    Comment      = input("Enter comments for this run; if there are no comments, leave blank: ")
     
     cable_number_str = str(cable_number)
     cable_type_str   = str(cable_type)
     cable_length_str = str(cable_length)
     
-    Pre_list = []
+    file_list = []
     y_plot_value = []
     
-    print("")
+    print()
     print("Loading files...")
     for root, dirs, files in os.walk("./Data/"+cable_number_str, topdown=False):
        for name in files:
           if ".txt" in os.path.join(name):
-            Pre_list.append(os.path.join(name))
+            file_list.append(os.path.join(name))
     
-    n_channels = len(Pre_list)
+    n_channels = len(file_list)
     
-    print("List of cables to analyze: {0}".format(Pre_list))
-    print("Number of files: {0}".format(n_channels))
+    print("Found {0} files to analyze.".format(n_channels))
+    print("List of files: {0}".format(file_list))
     
     ff_list = []
     filename_list = []
     color_list = ['b', 'r', 'g', 'w', 'm']
     
     for i in range(n_channels):
-        ff_list.append(f"Data/"+cable_number_str+f"/{Pre_list[i]}")
-        filename_list.append(f"{Pre_list[i]}")
+        ff_list.append(f"Data/"+cable_number_str+f"/{file_list[i]}")
+        filename_list.append(f"{file_list[i]}")
     
     makeDir("Data/"+cable_number_str+"/Plots")
     makeDir("Data/"+cable_number_str+"/Plots/s2p")
     
-    IDchecker = 0
+    iterator = 0
     Breaker = True
     
     while Breaker == True:
-        Breaker = True
-        FILE = Pre_list[IDchecker]
-        #print("IDchecker: {0}".format(IDchecker))
+        FILE = file_list[iterator]
         print("Creating s2p files for {0}".format(FILE))
     
         parser.add_option('--basename', metavar='T', type='string', action='store',
@@ -127,7 +119,7 @@ def main():
         # ==========end: options =============
         basename1 = options.basename
         basename2 = basename1.replace('Data/'+cable_number_str+'/', 'Data/'+cable_number_str+'/'+'Plots/s2p/')
-        dir_in= options.directory
+        dir_in = options.directory
         cable = basename1.replace('Data/'+cable_number_str+'/', "")
     
         infile = pd.read_csv(basename1, names=['pt','f','s11R','s11I','s12R','s12I','s13R','s13I','s14R','s14I'], delim_whitespace=True, skiprows=1)
@@ -245,9 +237,9 @@ def main():
     
             fig.savefig(dir_in+cable.replace(".vna.txt","")+'_rf.png')
     
-            IDchecker +=1
+            iterator +=1
     
-            if IDchecker >= n_channels:
+            if iterator >= n_channels:
                 break
     
     # specify time integration window as a function of length
@@ -294,13 +286,14 @@ def main():
     comps = ['11','12', '21']
     subfiles = ['0','0','1',]
     
-    IDchecker = 0
+    iterator = 0
     Breaker = True
     
     # Create plots
     while Breaker == True:
-        comp = comps[IDchecker]
-        subfile = subfiles[IDchecker]
+        comp = comps[iterator]
+        subfile = subfiles[iterator]
+        S_name = "S" + comp
     
         if   comp == '11' and subfile == '0': S_ij = '11'
         elif comp == '12' and subfile == '0': S_ij = '21'
@@ -308,8 +301,9 @@ def main():
     
         i = int(split(S_ij)[0])
         j = int(split(S_ij)[1])
-    
-        print("\nParameter being analyzed\n","S"+comp)
+        
+        print()
+        print("Parameter being analyzed: {0}".format(S_name))
     
         net_list = []
         for channel in range(n_channels):
@@ -361,13 +355,28 @@ def main():
     
             fig0.savefig("Data/"+cable_number_str+"/Plots/"+cable_number_str+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
     
-            IDchecker += 1
+            iterator += 1
     
-            if IDchecker > 2:
+            if iterator > 2:
                 break
     
     print()
-    print("Analysis complete for cable {0}! To view plots, see the 'Plots' directory for cable {0}.".format(cable_number_str))
+    print("Analysis complete for cable {0}. To view plots, see the 'Plots' directory for cable {0}.".format(cable_number_str))
+
+# run analysis
+def run():
+    # Input parameters from user
+    cable_number = int(input("Enter cable number: "))
+    cable_type   = int(input("Enter cable type [0, 1, 2, 3, 4]: "))
+    cable_length = int(input("Enter cable length in cm [0, 35, 80, 100, 140, 160, 180, 200]: "))
+    int_window   = int(input("Enter integration window [2-5ns (0), 8-11ns (1), variable (2)]: "))
+    Comment      = input("Enter comments for this run; if there are no comments, leave blank: ")
+    
+    # Analyze data for cable
+    analyze(cable_number, cable_type, cable_length, int_window, Comment)
+
+def main():
+    run()
 
 if __name__ == "__main__":
     main()
