@@ -3,7 +3,7 @@
 
 # Created by the KU CMS team.
 
-#Predefined Libraries
+# Import libraries
 import os
 from optparse import OptionParser
 import pandas as pd
