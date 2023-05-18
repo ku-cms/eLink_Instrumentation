@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# ------------------------------------- #
 # Created by the KU CMS team.
+# - Analyzes VNA data
+# - Creates plots
+# - Calculates impedance
+# - Uses the scikit-rf library (skrf)
+# - See https://scikit-rf.readthedocs.io/en/latest/index.html
+# ------------------------------------- #
 
 # Import libraries
 import os
@@ -16,9 +23,13 @@ import csv
 
 # TODO:
 # - Fix output csv files
-# - Improve plot colors
+# - Test a smaller, lower integration window near 1.0 ns (e.g. 0.5 to 1.5 ns); this should give smaller Z values.
+# - Integration window: time = 1 / frequency, with frequency = 1.28 GHz
 # DONE
 # - Improve impedance print statements
+# - Improve plot colors
+# - Fix frequency summary plot (with all channels)
+# - Fix grid: major/minor emphasis
 
 # Make directory if directory does not exist
 def makeDir(dir_name):
@@ -39,9 +50,15 @@ def getChannelFromLine(line):
     result = result.replace(")", "")
     return result
 
-# Calculate mean impedance 
+# Get channel name from file name
+def getChannelFromFile(file_name):
+    f = file_name.split("/")[-1]
+    channel_name = f.replace(".vna.txt", "")
+    return channel_name
+
+# Calculate, print, and plot mean impedance 
 # See https://www.tutorialfor.com/questions-285739.htm
-def calc_and_plot_mean_impedance(ax, t1, t2, col, y_plot_value):
+def calc_and_plot_mean_impedance(ax, t1, t2, color, y_plot_value):
     lines = ax.get_lines()
 
     # Delete any other array correponding to a line drawn in ax but the last one.
@@ -75,18 +92,17 @@ def calc_and_plot_mean_impedance(ax, t1, t2, col, y_plot_value):
     # plot the average line
     x_coor = [t1, t2]
     y_coor = [Z_mean, Z_mean]
-    ax.plot(x_coor, y_coor, color=col, linewidth=1, label='', linestyle='--')
+    ax.plot(x_coor, y_coor, color=color, linewidth=1, label='', linestyle='--')
 
-def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
+# Setup axes
+def setup_axes(ax, title, xlim, ylim):
     ax.xaxis.set_minor_locator(AutoMinorLocator(2))
     ax.yaxis.set_minor_locator(AutoMinorLocator(2))
-    ax.grid(True, color='0.8', which='minor')
-    ax.grid(True, color='0.4', which='major')
-    ax.set_title(title) #Time domain
-    if nolim == False:
-        ax.set_xlim((xmin, xmax))
-        ax.set_ylim((ymin, ymax))
-    plt.tight_layout()
+    ax.grid(True, color='1.0', which='major')
+    ax.grid(True, color='0.5', which='minor')
+    ax.set_title(title)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
 
 # Analyze data for one cable; iterates over all files (e.g. channels) for a cable
 def analyze(cable_number, cable_type, cable_length, int_window, Comment):
@@ -98,6 +114,30 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
     
     file_list = []
     y_plot_value = []
+    ff_list = []
+    filename_list = []
+    
+    # list of colors for plots
+    color_list = [
+        "xkcd:shamrock green",
+        "xkcd:cyan",
+        "xkcd:bright blue",
+        "xkcd:bright violet",
+        "xkcd:bright magenta",
+        "xkcd:cerise",
+        "xkcd:jade green",
+        "xkcd:bright turquoise",
+        "xkcd:cerulean blue",
+        "xkcd:bright lavender",
+    ]
+    # titles
+    signal_vs_freq_title = "Signal magnitude vs. frequency"
+    impedance_vs_time_title = "Impedance vs. time"
+    # x and y axis limits for plots
+    signal_vs_freq_xlim     = [1.0e5, 2.5e9]
+    signal_vs_freq_ylim     = [-100.0, 0.0]
+    impedance_vs_time_xlim  = [0.0, 30.0]
+    impedance_vs_time_ylim  = [0.0, 200.0]
     
     print()
     print("Loading files...")
@@ -108,12 +148,16 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
     
     n_channels = len(file_list)
     
+    # Print files that are found.
     print("Found {0} files to analyze.".format(n_channels))
     print("List of files: {0}".format(file_list))
-    
-    ff_list = []
-    filename_list = []
-    color_list = ['b', 'r', 'g', 'w', 'm']
+
+    # If no files are found, print helpful error message and return.
+    if n_channels == 0:
+        print("ERROR: No files found for the cable '{0}'.".format(cable_number))
+        print(" - Create directory for this cable in the 'Data' directory.")
+        print(" - Copy the VNA data files for this cable to the directory that you created.")
+        return
     
     for i in range(n_channels):
         ff_list.append(f"Data/"+cable_number_str+f"/{file_list[i]}")
@@ -180,81 +224,82 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
             except:
                 pass
     
+        # Get Network
+        # - Class: skrf.network
+        # - See https://scikit-rf.readthedocs.io/en/latest/api/network.html
         example = rf.Network(basename2.replace(".txt","")+'_0.s2p', f_unit='ghz')
     
-        # Create Plots
+        # --- Create plots for each channel --- #
         with style.context('seaborn-ticks'):
-            #Time domain reflectometry, measurement vs simulation
+            # setup plot
             fig0 = plt.figure(figsize=(8,4))
             fig0.patch.set_facecolor('xkcd:black')
             plt.style.use('dark_background')
-            ax0=plt.subplot(1,2,1)
-            #major_ticks = np.arange(0, 6.5, 0.5)
-            #minor_ticks = np.arange(0, 6.5, 0.1)
-            ax0.xaxis.set_minor_locator(AutoMinorLocator(2))
-            ax0.yaxis.set_minor_locator(AutoMinorLocator(2))
-            ax0.grid(True, color='0.8', which='minor')
-            ax0.grid(True, color='0.4', which='major')
-            #ax0.legend()
+            # get axes
+            ax0 = plt.subplot(1,2,1)
+            ax1 = plt.subplot(1,2,2)
+
+            # Signal magnitude vs frequency subplot
+            # - Method: skrf.network.Network.plot_s_db
+            # - See https://scikit-rf.readthedocs.io/en/latest/api/generated/skrf.network.Network.plot_s_db.html
             example_dc = example.extrapolate_to_dc(kind='linear')
-            plt.title('Frequency')
-            example_dc.s11.plot_s_db(label='S11')
-            example_dc.s21.plot_s_db(label='S12')
-            plt.ylim((-100.0, 0))
-            plt.xlim((100000, 2500000000))
-            ax1=plt.subplot(1,2,2)
-            ax1.xaxis.set_minor_locator(AutoMinorLocator(2))
-            ax1.yaxis.set_minor_locator(AutoMinorLocator(2))
-            ax1.grid(True, color='0.8', which='minor')
-            ax1.grid(True, color='0.4', which='major')
-            plt.title('Time domain reflection step response (DC extrapolation)') #The time_step component of the z-matrix vs frequency
-            example_dc.s11.plot_z_time_step(attribute='z_time_step', pad=2000, window='hamming', z0=50, label='TD11')
-            example_dc.s21.plot_z_time_step(attribute='z_time_step',pad=2000, window='hamming', z0=50, label='TD12')
-            plt.ylim((0.0, 250.0))
-            plt.xlim((0, 30))
+            example_dc.s11.plot_s_db(ax=ax0, label='S11', color=color_list[0])
+            example_dc.s21.plot_s_db(ax=ax0, label='S12', color=color_list[1])
+            
+            # Impedance vs time subplot
+            # - Method: skrf.network.Network.plot_z_time_step
+            # - See https://scikit-rf.readthedocs.io/en/latest/api/generated/skrf.network.Network.plot_z_time_step.html
+            example_dc.s11.plot_z_time_step(ax=ax1, attribute='z_time_step', pad=2000, window='hamming', z0=50, label='TD11', color=color_list[0])
+            example_dc.s21.plot_z_time_step(ax=ax1, attribute='z_time_step', pad=2000, window='hamming', z0=50, label='TD12', color=color_list[1])
+            
+            # setup axes
+            setup_axes(ax0, signal_vs_freq_title, signal_vs_freq_xlim, signal_vs_freq_ylim)
+            setup_axes(ax1, impedance_vs_time_title, impedance_vs_time_xlim, impedance_vs_time_ylim)
             plt.tight_layout()
-            #ax1.legend()
+
             fig0.savefig(dir_in+cable.replace(".vna.txt","")+'_freq_time_Z_rf.png')
     
             # Gating the Reflection of Interest
-            s11_gated = example.s11.time_gate()#(center=0, span=.2)#autogate on the fly
-            s11_gated.name='gated '
+            s11_gated = example.s11.time_gate() # (center=0, span=.2) # autogate on the fly
+            s11_gated.name='gated'
             fig1 = plt.figure(figsize=(8,4))
+            # Frequency Domain Plot 
             plt.subplot(121)
-            example.s11.plot_s_db()
-            s11_gated.plot_s_db() #s11.time_gate()
+            example.s11.plot_s_db(color=color_list[0])
+            s11_gated.plot_s_db(color=color_list[1])        # s11.time_gate()
             plt.title('Frequency Domain')
+            # Time Domain Plot 
             plt.subplot(122)
-            example.s11.plot_s_db_time()
-            s11_gated.plot_s_db_time()
+            example.s11.plot_s_db_time(color=color_list[0])
+            s11_gated.plot_s_db_time(color=color_list[1])   # s11.time_gate()
             plt.title('Time Domain')
             plt.xlim((-5, 5))
             plt.tight_layout()
-            #plt.show()
             fig1.savefig(dir_in+cable.replace(".vna.txt","")+'_fref_time_rf.png')
     
+            # Create 6 plots in a grid
             fig = plt.figure(figsize=(14,6))
             for i in range(6):
                ax = fig.add_subplot(2,3,i+1)
                if i == 0 :
                  plt.axis([-1.1,2.1,-1.1,1.1])
-                 example.plot_s_smith(draw_labels=True,m=0, n=0, label='S11')
-                 example.plot_s_smith(draw_labels=True,m=1, n=0, label='S12')
+                 example.plot_s_smith(draw_labels=True,m=0, n=0, label='S11', color=color_list[0])
+                 example.plot_s_smith(draw_labels=True,m=1, n=0, label='S12', color=color_list[1])
                elif i == 1:
-                   example.plot_z_re(m=0,n=0,label='Z11')
-                   example.plot_z_re(m=1,n=0,label='Z12')
+                   example.plot_z_re(m=0,n=0,label='Z11', color=color_list[0])
+                   example.plot_z_re(m=1,n=0,label='Z12', color=color_list[1])
                elif i == 2:
-                   example.plot_z_im(m=0,n=0,label='Z11')
-                   example.plot_z_im(m=1,n=0,label='Z12')
+                   example.plot_z_im(m=0,n=0,label='Z11', color=color_list[0])
+                   example.plot_z_im(m=1,n=0,label='Z12', color=color_list[1])
                elif i == 3:
-                   example.plot_s_db(m=0, n=0, label='S11') # 10
-                   example.plot_s_db(m=1, n=0, label='S12')
+                   example.plot_s_db(m=0, n=0, label='S11', color=color_list[0]) # 10
+                   example.plot_s_db(m=1, n=0, label='S12', color=color_list[1])
                elif i == 4:
-                   example.plot_s_db_time(m=0, n=0, label='S11') # employs windowing before plotting to enhance impluse resolution.
-                   example.plot_s_db_time(m=1, n=0, label='S12')
+                   example.plot_s_db_time(m=0, n=0, label='S11', color=color_list[0]) # employs windowing before plotting to enhance impluse resolution.
+                   example.plot_s_db_time(m=1, n=0, label='S12', color=color_list[1])
                elif i == 5:
-                   example.plot_z_time_db(m=0, n=0, label='Z11')    #plot_z_re_time
-                   example.plot_z_time_db(m=1, n=0, label='Z12')
+                   example.plot_z_time_db(m=0, n=0, label='Z11', color=color_list[0]) # plot_z_re_time
+                   example.plot_z_time_db(m=1, n=0, label='Z12', color=color_list[1])
     
             parser.remove_option('--basename')
             parser.remove_option('--directory')
@@ -313,7 +358,6 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
     iterator = 0
     Breaker = True
     
-    # Create plots
     while Breaker == True:
         comp = comps[iterator]
         subfile = subfiles[iterator]
@@ -330,31 +374,35 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
         print("Parameter: {0}".format(S_name))
         print("Time range: [{0} ns, {1} ns]".format(t1, t2))
     
-        net_list = []
+        # Get list of networks
+        network_list = []
         for channel in range(n_channels):
-            net_list.append(rf.Network("Data/"+cable_number_str+"/Plots/s2p/"+filename_list[channel].replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz'))
+            network_list.append(rf.Network("Data/"+cable_number_str+"/Plots/s2p/"+filename_list[channel].replace(".txt","")+'_'+subfile+'.s2p', f_unit='ghz'))
     
-        #netref = rf.network.Network(out_dir+'/'+sub_out_dir+'/straight_SMA.vna_'+subfile+'.s2p', f_unit='ghz')
-    
-        with style.context('seaborn-darkgrid'):
-    
-            fig0 = plt.figure(figsize=(10,4))
+        # --- Create summary plots with all channels --- #
+        with style.context('seaborn-ticks'):
+            # setup plot
+            fig0 = plt.figure(figsize=(8,4))
             fig0.patch.set_facecolor('xkcd:black')
             plt.style.use('dark_background')
+            # get axes
             ax0 = plt.subplot(1,2,1)
             ax1 = plt.subplot(1,2,2)
     
-            ax0.xaxis.set_minor_locator(AutoMinorLocator(2))
-            ax0.yaxis.set_minor_locator(AutoMinorLocator(2))
-            ax0.grid(True, color='0.8', which='minor')
-            ax0.grid(True, color='0.4', which='major')
-    
             net_dc = []
             for channel in range(n_channels):
-                this_net = net_list[channel]
+                file_name = ff_list[channel]
+                channel_name = getChannelFromFile(file_name)
+                #print("File name: {0}".format(file_name))
+                #print("Channel name: {0}".format(channel_name))
+                S_label = "S{0}_{1}".format(comp, channel_name) 
+                T_label = "TD{0}_{1}".format(comp, channel_name)
+                # plot data
+                this_net = network_list[channel]
                 net_dc.append(this_net[i,j].extrapolate_to_dc(kind='linear'))
-                net_dc[channel].plot_s_db(label='S'+comp+ff_list[channel].split('.vna')[0].split('/')[-1:][0], ax=ax0, color=color_list[channel])
-                net_dc[channel].plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff_list[channel].split('.vna')[0].split('/')[-1:][0], ax=ax1, color=color_list[channel])
+                net_dc[channel].plot_s_db(label=S_label, ax=ax0, color=color_list[channel])
+                net_dc[channel].plot_z_time_step(pad=0, window='hamming', z0=50, label=T_label, ax=ax1, color=color_list[channel])
+                # calculate and plot impedance
                 calc_and_plot_mean_impedance(ax1, t1, t2, color_list[channel], y_plot_value)
     
             with open("Impedence_List.csv", "a") as Ana:
@@ -375,10 +423,12 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
     
             y_plot_value.clear()
     
-            set_axes(ax1, 'Time Domain', 0.0, 200.0, 0.0, 30.0, 0)
-            set_axes(ax0, 'Time Domain', -75.0, 75.0, 0.0, 6.0, 0)
+            # setup axes
+            setup_axes(ax0, signal_vs_freq_title, signal_vs_freq_xlim, signal_vs_freq_ylim)
+            setup_axes(ax1, impedance_vs_time_title, impedance_vs_time_xlim, impedance_vs_time_ylim)
+            plt.tight_layout()
     
-            fig0.savefig("Data/"+cable_number_str+"/Plots/"+cable_number_str+'cm_freq_time_Z_rf_'+"S"+comp+'.png')
+            fig0.savefig("Data/"+cable_number_str+"/Plots/"+cable_number_str+'_freq_time_Z_rf_'+"S"+comp+'.png')
     
             iterator += 1
     
