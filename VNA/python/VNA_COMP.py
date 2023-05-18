@@ -14,6 +14,13 @@ from matplotlib import style
 import pickle as pl
 import csv
 
+# TODO:
+# - Fix output csv files
+# - Improve plot colors
+# DONE
+# - Improve impedance print statements
+
+# Make directory if directory does not exist
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
@@ -24,8 +31,17 @@ def name(x):
 def split(word):
     return [char for char in word]
 
-# https://www.tutorialfor.com/questions-285739.htm
-def display_mean_impedance(ax, t1, t2, col, y_plot_value):
+# Get channel name from 2D line object
+def getChannelFromLine(line): 
+    result = str(line)
+    result = result.replace("Line2D", "")
+    result = result.replace("(", "")
+    result = result.replace(")", "")
+    return result
+
+# Calculate mean impedance 
+# See https://www.tutorialfor.com/questions-285739.htm
+def calc_and_plot_mean_impedance(ax, t1, t2, col, y_plot_value):
     lines = ax.get_lines()
 
     # Delete any other array correponding to a line drawn in ax but the last one.
@@ -37,6 +53,7 @@ def display_mean_impedance(ax, t1, t2, col, y_plot_value):
     # store the line arrays into list. Every line drawn on the ax is considered as data
     X = [line.get_xdata() for line in lines]
     Y = [line.get_ydata() for line in lines]
+    channel = getChannelFromLine(lines[0])
 
     # create a table, and since the list X and Y should have size=1, place the first
     # element (array) in pandas table columns t and Z
@@ -44,13 +61,20 @@ def display_mean_impedance(ax, t1, t2, col, y_plot_value):
     df['t'] = X[0]
     df['Z'] = Y[0]
 
-    # get the mean value of Z for a given time difference
-    Z_mean =  df.query('t >=@t1 & t<=@t2').agg({'Z': 'mean'})
-    print('Mean impedance from', t1, 'ns to', t2, 'ns =', Z_mean.values, 'for', lines[0])
+    # get the mean value of Z for a given time range
+    Z_mean_query = df.query('t >=@t1 & t<=@t2').agg({'Z': 'mean'})
+    Z_mean = Z_mean_query.values[0]
+    Z_mean_int = round(Z_mean) 
+    
+    # print mean Z value
+    print("{0}: Z = {1:.2f} ohms = {2} ohms".format(channel, Z_mean, Z_mean_int))
+
+    # add Z mean to list
+    y_plot_value.append(Z_mean)
+    
     # plot the average line
     x_coor = [t1, t2]
     y_coor = [Z_mean, Z_mean]
-    y_plot_value.append(int(Z_mean.values))
     ax.plot(x_coor, y_coor, color=col, linewidth=1, label='', linestyle='--')
 
 def set_axes(ax, title, ymin, ymax, xmin, xmax, nolim):
@@ -303,7 +327,8 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
         j = int(split(S_ij)[1])
         
         print()
-        print("Parameter being analyzed: {0}".format(S_name))
+        print("Parameter: {0}".format(S_name))
+        print("Time range: [{0} ns, {1} ns]".format(t1, t2))
     
         net_list = []
         for channel in range(n_channels):
@@ -330,7 +355,7 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
                 net_dc.append(this_net[i,j].extrapolate_to_dc(kind='linear'))
                 net_dc[channel].plot_s_db(label='S'+comp+ff_list[channel].split('.vna')[0].split('/')[-1:][0], ax=ax0, color=color_list[channel])
                 net_dc[channel].plot_z_time_step(pad=0, window='hamming', z0=50, label='TD'+comp+ff_list[channel].split('.vna')[0].split('/')[-1:][0], ax=ax1, color=color_list[channel])
-                display_mean_impedance(ax1, t1, t2, color_list[channel], y_plot_value)
+                calc_and_plot_mean_impedance(ax1, t1, t2, color_list[channel], y_plot_value)
     
             with open("Impedence_List.csv", "a") as Ana:
                 Ana.write("Cable_number,Length,Type, Time Interval, S11, S12, S21, Comments")
