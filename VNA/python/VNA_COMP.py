@@ -125,19 +125,27 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
         "xkcd:bright violet",
         "xkcd:bright magenta",
         "xkcd:cerise",
-        "xkcd:jade green",
-        "xkcd:bright turquoise",
+        "xkcd:aqua",
+        "xkcd:green apple",
         "xkcd:cerulean blue",
         "xkcd:bright lavender",
     ]
+    
     # titles
     signal_vs_freq_title = "Signal magnitude vs. frequency"
     impedance_vs_time_title = "Impedance vs. time"
-    # x and y axis limits for plots
-    signal_vs_freq_xlim     = [1.0e5, 2.5e9]
-    signal_vs_freq_ylim     = [-100.0, 0.0]
-    impedance_vs_time_xlim  = [0.0, 30.0]
-    impedance_vs_time_ylim  = [0.0, 200.0]
+    
+    # x and y axis limits for plots (v1)
+    signal_vs_freq_xlim     = [0.0, 2.5e9]
+    signal_vs_freq_ylim     = [-200.0, 0.0]
+    impedance_vs_time_xlim  = [0.0, 10.0]
+    impedance_vs_time_ylim  = [0.0, 300.0]
+    
+    # x and y axis limits for plots (v2)
+    #signal_vs_freq_xlim     = [0.0, 2.5e9]
+    #signal_vs_freq_ylim     = [-100.0, 0.0]
+    #impedance_vs_time_xlim  = [0.0, 10.0]
+    #impedance_vs_time_ylim  = [0.0, 200.0]
     
     print()
     print("Loading files...")
@@ -305,8 +313,11 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
             parser.remove_option('--directory')
     
             fig.savefig(dir_in+cable.replace(".vna.txt","")+'_rf.png')
+
+            # close all plots to avoid memory warning 
+            plt.close('all')
     
-            iterator +=1
+            iterator += 1
     
             if iterator >= n_channels:
                 break
@@ -429,6 +440,9 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
             plt.tight_layout()
     
             fig0.savefig("Data/"+cable_number_str+"/Plots/"+cable_number_str+'_freq_time_Z_rf_'+"S"+comp+'.png')
+            
+            # close all plots to avoid memory warning 
+            plt.close('all')
     
             iterator += 1
     
