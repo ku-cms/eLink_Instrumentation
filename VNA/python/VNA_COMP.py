@@ -22,14 +22,16 @@ import pickle as pl
 import csv
 
 # TODO:
-# - Fix output csv files
+# - Make function and dictionary to get integration window.
 # - Test a smaller, lower integration window near 1.0 ns (e.g. 0.5 to 1.5 ns); this should give smaller Z values.
 # - Integration window: time = 1 / frequency, with frequency = 1.28 GHz
+
 # DONE
 # - Improve impedance print statements
 # - Improve plot colors
 # - Fix frequency summary plot (with all channels)
 # - Fix grid: major/minor emphasis
+# - Fix output csv files
 
 # Make directory if directory does not exist
 def makeDir(dir_name):
@@ -41,6 +43,13 @@ def name(x):
 
 def split(word):
     return [char for char in word]
+
+# write csv file: takes data matrix as input and outputs a csv file 
+def writeCSV(output_file, data):
+    with open(output_file, mode="w", newline='') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for row in data:
+            writer.writerow(row)
 
 # Get channel name from 2D line object
 def getChannelFromLine(line): 
@@ -58,7 +67,7 @@ def getChannelFromFile(file_name):
 
 # Calculate, print, and plot mean impedance 
 # See https://www.tutorialfor.com/questions-285739.htm
-def calc_and_plot_mean_impedance(ax, t1, t2, color, y_plot_value):
+def calc_and_plot_mean_impedance(ax, t1, t2, color):
     lines = ax.get_lines()
 
     # Delete any other array correponding to a line drawn in ax but the last one.
@@ -86,13 +95,13 @@ def calc_and_plot_mean_impedance(ax, t1, t2, color, y_plot_value):
     # print mean Z value
     print("{0}: Z = {1:.2f} ohms = {2} ohms".format(channel, Z_mean, Z_mean_int))
 
-    # add Z mean to list
-    y_plot_value.append(Z_mean)
-    
     # plot the average line
     x_coor = [t1, t2]
     y_coor = [Z_mean, Z_mean]
     ax.plot(x_coor, y_coor, color=color, linewidth=1, label='', linestyle='--')
+
+    # return mean impedance 
+    return Z_mean
 
 # Setup axes
 def setup_axes(ax, title, xlim, ylim):
@@ -113,7 +122,6 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
     cable_length_str = str(cable_length)
     
     file_list = []
-    y_plot_value = []
     ff_list = []
     filename_list = []
     
@@ -322,6 +330,7 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
             if iterator >= n_channels:
                 break
     
+    # TODO: Improve getting t1 and t2 using a function and dictionary!
     # specify time integration window as a function of length
     if int_window == 0:
         t1 = 2.00
@@ -401,6 +410,12 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
             ax1 = plt.subplot(1,2,2)
     
             net_dc = []
+            data_for_csv = []
+            
+            # add header to csv data
+            header = ["Channel", "Parameter", "Mean Impedance (ohms)"]
+            data_for_csv.append(header)
+            
             for channel in range(n_channels):
                 file_name = ff_list[channel]
                 channel_name = getChannelFromFile(file_name)
@@ -413,26 +428,18 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
                 net_dc.append(this_net[i,j].extrapolate_to_dc(kind='linear'))
                 net_dc[channel].plot_s_db(label=S_label, ax=ax0, color=color_list[channel])
                 net_dc[channel].plot_z_time_step(pad=0, window='hamming', z0=50, label=T_label, ax=ax1, color=color_list[channel])
+                
                 # calculate and plot impedance
-                calc_and_plot_mean_impedance(ax1, t1, t2, color_list[channel], y_plot_value)
+                mean_impedance = calc_and_plot_mean_impedance(ax1, t1, t2, color_list[channel])
+                
+                # add row to csv data
+                row = [channel_name, S_name, mean_impedance]
+                data_for_csv.append(row)
     
-            with open("Impedence_List.csv", "a") as Ana:
-                Ana.write("Cable_number,Length,Type, Time Interval, S11, S12, S21, Comments")
-                Ana.write(cable_number_str+","+cable_length_str+","+cable_type_str+","+str(t1)+ "-"+str(t2)+","+str(Comment)+",")
-                for i in y_plot_value:
-                    Ana.write(str(i)+",")
-                Ana.write("\n")
-                Ana.close()
-    
-            with open("Data/"+cable_number_str+"/Impedence_List.csv", "a") as Ana2:
-                Ana2.write("Cable_number,Length,Type, Time Interval, S11, S12, , Comments")
-                Ana2.write(cable_number_str+","+cable_length_str+","+cable_type_str+","+str(t1)+ "-"+str(t2)+","+str(Comment)+",")
-                for i in y_plot_value:
-                    Ana2.write(str(i)+",")
-                Ana2.write("\n")
-                Ana2.close()
-    
-            y_plot_value.clear()
+            # Note: we should only record S12 impedance values
+            if S_name == "S12":
+                output_csv_file = "Data/{0}/Mean_Impedance.csv".format(cable_number_str)
+                writeCSV(output_csv_file, data_for_csv)
     
             # setup axes
             setup_axes(ax0, signal_vs_freq_title, signal_vs_freq_xlim, signal_vs_freq_ylim)
