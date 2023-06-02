@@ -22,7 +22,7 @@ import pickle as pl
 import csv
 
 # TODO:
-# - Make function and dictionary to get integration window.
+# - For output csv, make separate columns for e-link number and channel number. Add column for comments.
 # - Test a smaller, lower integration window near 1.0 ns (e.g. 0.5 to 1.5 ns); this should give smaller Z values.
 # - Integration window: time = 1 / frequency, with frequency = 1.28 GHz
 
@@ -32,6 +32,7 @@ import csv
 # - Fix frequency summary plot (with all channels)
 # - Fix grid: major/minor emphasis
 # - Fix output csv files
+# - Make function and dictionary to get integration window.
 
 # Make directory if directory does not exist
 def makeDir(dir_name):
@@ -65,53 +66,37 @@ def getChannelFromFile(file_name):
     channel_name = f.replace(".vna.txt", "")
     return channel_name
 
-# Get integration window based on window selection and cable length
+# Get integration window (ns) based on window selection and cable length (cm)
 def getWindow(window_selection, cable_length):
+    # Default starting values
     t1 = 0.00
     t2 = 0.00
+
+    # Integration windows (ns) based on cable length (cm)
+    windows_for_lengths = {
+        0   : [0.0, 1.5],
+        35  : [2.0, 4.0],
+        80  : [2.0, 6.0],
+        100 : [2.0, 7.0],
+        140 : [2.0, 9.0],
+        160 : [2.0, 10.0],
+        180 : [2.0, 11.0],
+        200 : [2.0, 12.0],
+    }
     
     if window_selection == 0:
         t1 = 2.00
         t2 = 5.00
-    
     elif window_selection == 1:
         t1 = 8.00
         t2 = 11.00
-    
     elif window_selection == 2:
-        if cable_length == 0:
-            t1 = 0.00
-            t2 = 1.50
-        elif cable_length == 35:
-            t1 = 2.00
-            t2 = 4.00
-        elif cable_length == 80:
-            t1 = 2.00
-            t2 = 6.00
-        elif cable_length == 100:
-            t1 = 2.00
-            t2 = 7.00
-        elif cable_length == 140:
-            t1 = 2.00
-            t2 = 9.00
-        elif cable_length == 160:
-            t1 = 2.00
-            t2 = 10.00
-        elif cable_length == 180:
-            t1 = 2.00
-            t2 = 11.00
-        elif cable_length == 200:
-            t1 = 2.00
-            t2 = 12.00
+        if cable_length in windows_for_lengths: 
+            t1, t2 = windows_for_lengths[cable_length]
         else:
             print("ERROR: the cable length '{0}' is not valid; it must be one of these: [0, 35, 80, 100, 140, 160, 180, 200] cm.".format(cable_length))
-            t1 = 0.00
-            t2 = 0.00
-    
     else:
         print("ERROR: the integration window '{0}' is not valid; it must be one of these: [0,1,2].".format(window_selection))
-        t1 = 0.00
-        t2 = 0.00
     
     return t1, t2
 
@@ -380,49 +365,7 @@ def analyze(cable_number, cable_type, cable_length, window_selection, Comment):
             if iterator >= n_channels:
                 break
     
-    # TODO: Improve getting t1 and t2 using a function and dictionary!
-    # specify time integration window as a function of length
-    #if window_selection == 0:
-    #    t1 = 2.00
-    #    t2 = 5.00
-    #elif window_selection == 1:
-    #    t1 = 8.00
-    #    t2 = 11.00
-    #elif window_selection == 2:
-    #    if cable_length == 0:
-    #        t1 = 0.00
-    #        t2 = 1.50
-    #    elif cable_length == 35:
-    #        t1 = 2.00
-    #        t2 = 4.00
-    #    elif cable_length == 80:
-    #        t1 = 2.00
-    #        t2 = 6.00
-    #    elif cable_length == 100:
-    #        t1 = 2.00
-    #        t2 = 7.00
-    #    elif cable_length == 140:
-    #        t1 = 2.00
-    #        t2 = 9.00
-    #    elif cable_length == 160:
-    #        t1 = 2.00
-    #        t2 = 10.00
-    #    elif cable_length == 180:
-    #        t1 = 2.00
-    #        t2 = 11.00
-    #    elif cable_length == 200:
-    #        t1 = 2.00
-    #        t2 = 12.00
-    #    else:
-    #        print("ERROR: the cable length '{0}' is not valid; it must be one of these: [0, 35, 80, 100, 140, 160, 180, 200] cm.".format(cable_length))
-    #        t1 = 0.00
-    #        t2 = 0.00
-    #else:
-    #    print("ERROR: the integration window '{0}' is not valid; it must be one of these: [0,1,2].".format(window_selection))
-    #    t1 = 0.00
-    #    t2 = 0.00
-
-    # Get integration window
+    # Get integration window (ns)
     t1, t2 = getWindow(window_selection, cable_length)
     
     comps       = ['11', '12', '21']
