@@ -65,6 +65,56 @@ def getChannelFromFile(file_name):
     channel_name = f.replace(".vna.txt", "")
     return channel_name
 
+# Get integration window based on window selection and cable length
+def getWindow(window_selection, cable_length):
+    t1 = 0.00
+    t2 = 0.00
+    
+    if window_selection == 0:
+        t1 = 2.00
+        t2 = 5.00
+    
+    elif window_selection == 1:
+        t1 = 8.00
+        t2 = 11.00
+    
+    elif window_selection == 2:
+        if cable_length == 0:
+            t1 = 0.00
+            t2 = 1.50
+        elif cable_length == 35:
+            t1 = 2.00
+            t2 = 4.00
+        elif cable_length == 80:
+            t1 = 2.00
+            t2 = 6.00
+        elif cable_length == 100:
+            t1 = 2.00
+            t2 = 7.00
+        elif cable_length == 140:
+            t1 = 2.00
+            t2 = 9.00
+        elif cable_length == 160:
+            t1 = 2.00
+            t2 = 10.00
+        elif cable_length == 180:
+            t1 = 2.00
+            t2 = 11.00
+        elif cable_length == 200:
+            t1 = 2.00
+            t2 = 12.00
+        else:
+            print("ERROR: the cable length '{0}' is not valid; it must be one of these: [0, 35, 80, 100, 140, 160, 180, 200] cm.".format(cable_length))
+            t1 = 0.00
+            t2 = 0.00
+    
+    else:
+        print("ERROR: the integration window '{0}' is not valid; it must be one of these: [0,1,2].".format(window_selection))
+        t1 = 0.00
+        t2 = 0.00
+    
+    return t1, t2
+
 # Calculate, print, and plot mean impedance 
 # See https://www.tutorialfor.com/questions-285739.htm
 def calc_and_plot_mean_impedance(ax, t1, t2, color):
@@ -114,7 +164,7 @@ def setup_axes(ax, title, xlim, ylim):
     ax.set_ylim(ylim)
 
 # Analyze data for one cable; iterates over all files (e.g. channels) for a cable
-def analyze(cable_number, cable_type, cable_length, int_window, Comment):
+def analyze(cable_number, cable_type, cable_length, window_selection, Comment):
     parser = OptionParser()
     
     cable_number_str = str(cable_number)
@@ -332,48 +382,51 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
     
     # TODO: Improve getting t1 and t2 using a function and dictionary!
     # specify time integration window as a function of length
-    if int_window == 0:
-        t1 = 2.00
-        t2 = 5.00
-    elif int_window == 1:
-        t1 = 8.00
-        t2 = 11.00
-    elif int_window == 2:
-        if cable_length == 0:
-            t1 = 0.00
-            t2 = 1.50
-        elif cable_length == 35:
-            t1 = 2.00
-            t2 = 4.00
-        elif cable_length == 80:
-            t1 = 2.00
-            t2 = 6.00
-        elif cable_length == 100:
-            t1 = 2.00
-            t2 = 7.00
-        elif cable_length == 140:
-            t1 = 2.00
-            t2 = 9.00
-        elif cable_length == 160:
-            t1 = 2.00
-            t2 = 10.00
-        elif cable_length == 180:
-            t1 = 2.00
-            t2 = 11.00
-        elif cable_length == 200:
-            t1 = 2.00
-            t2 = 12.00
-        else:
-            print("ERROR: the cable length '{0}' is not valid; it must be one of these: [0, 35, 80, 100, 140, 160, 180, 200] cm.".format(cable_length))
-            t1 = 0.00
-            t2 = 0.00
-    else:
-        print("ERROR: the integration window '{0}' is not valid; it must be one of these: [0,1,2].".format(int_window))
-        t1 = 0.00
-        t2 = 0.00
+    #if window_selection == 0:
+    #    t1 = 2.00
+    #    t2 = 5.00
+    #elif window_selection == 1:
+    #    t1 = 8.00
+    #    t2 = 11.00
+    #elif window_selection == 2:
+    #    if cable_length == 0:
+    #        t1 = 0.00
+    #        t2 = 1.50
+    #    elif cable_length == 35:
+    #        t1 = 2.00
+    #        t2 = 4.00
+    #    elif cable_length == 80:
+    #        t1 = 2.00
+    #        t2 = 6.00
+    #    elif cable_length == 100:
+    #        t1 = 2.00
+    #        t2 = 7.00
+    #    elif cable_length == 140:
+    #        t1 = 2.00
+    #        t2 = 9.00
+    #    elif cable_length == 160:
+    #        t1 = 2.00
+    #        t2 = 10.00
+    #    elif cable_length == 180:
+    #        t1 = 2.00
+    #        t2 = 11.00
+    #    elif cable_length == 200:
+    #        t1 = 2.00
+    #        t2 = 12.00
+    #    else:
+    #        print("ERROR: the cable length '{0}' is not valid; it must be one of these: [0, 35, 80, 100, 140, 160, 180, 200] cm.".format(cable_length))
+    #        t1 = 0.00
+    #        t2 = 0.00
+    #else:
+    #    print("ERROR: the integration window '{0}' is not valid; it must be one of these: [0,1,2].".format(window_selection))
+    #    t1 = 0.00
+    #    t2 = 0.00
+
+    # Get integration window
+    t1, t2 = getWindow(window_selection, cable_length)
     
-    comps = ['11','12', '21']
-    subfiles = ['0','0','1',]
+    comps       = ['11', '12', '21']
+    subfiles    = ['0', '0', '1']
     
     iterator = 0
     Breaker = True
@@ -462,14 +515,14 @@ def analyze(cable_number, cable_type, cable_length, int_window, Comment):
 # run analysis
 def run():
     # Input parameters from user
-    cable_number = int(input("Enter cable number: "))
-    cable_type   = int(input("Enter cable type [0, 1, 2, 3, 4]: "))
-    cable_length = int(input("Enter cable length in cm [0, 35, 80, 100, 140, 160, 180, 200]: "))
-    int_window   = int(input("Enter integration window [2-5ns (0), 8-11ns (1), variable (2)]: "))
-    Comment      = input("Enter comments for this run; if there are no comments, leave blank: ")
+    cable_number        = int(input("Enter cable number: "))
+    cable_type          = int(input("Enter cable type [0, 1, 2, 3, 4]: "))
+    cable_length        = int(input("Enter cable length in cm [0, 35, 80, 100, 140, 160, 180, 200]: "))
+    window_selection    = int(input("Enter integration window [2-5ns (0), 8-11ns (1), variable (2)]: "))
+    Comment             = input("Enter comments for this run; if there are no comments, leave blank: ")
     
     # Analyze data for cable
-    analyze(cable_number, cable_type, cable_length, int_window, Comment)
+    analyze(cable_number, cable_type, cable_length, window_selection, Comment)
 
 def main():
     run()
