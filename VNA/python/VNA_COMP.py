@@ -22,7 +22,6 @@ import pickle as pl
 import csv
 
 # TODO:
-# - For output csv, make separate columns for e-link number and channel number. Add column for comments.
 # - Test a smaller, lower integration window near 1.0 ns (e.g. 0.5 to 1.5 ns); this should give smaller Z values.
 # - Integration window: time = 1 / frequency, with frequency = 1.28 GHz
 
@@ -33,6 +32,7 @@ import csv
 # - Fix grid: major/minor emphasis
 # - Fix output csv files
 # - Make function and dictionary to get integration window.
+# - For output csv, make separate columns for cable number and channel number. Add column for comments.
 
 # Make directory if directory does not exist
 def makeDir(dir_name):
@@ -63,8 +63,13 @@ def getChannelFromLine(line):
 # Get channel name from file name
 def getChannelFromFile(file_name):
     f = file_name.split("/")[-1]
-    channel_name = f.replace(".vna.txt", "")
-    return channel_name
+    result = f.replace(".vna.txt", "")
+    return result
+
+# Get short channel name from long channel name
+def getShortChannelName(long_channel_name):
+    result = long_channel_name.split("_")[-1]
+    return result
 
 # Get integration window (ns) based on window selection and cable length (cm)
 def getWindow(window_selection, cable_length):
@@ -102,7 +107,7 @@ def getWindow(window_selection, cable_length):
 
 # Calculate, print, and plot mean impedance 
 # See https://www.tutorialfor.com/questions-285739.htm
-def calc_and_plot_mean_impedance(ax, t1, t2, color):
+def calc_and_plot_mean_impedance(long_channel_name, ax, t1, t2, color):
     lines = ax.get_lines()
 
     # Delete any other array correponding to a line drawn in ax but the last one.
@@ -114,8 +119,7 @@ def calc_and_plot_mean_impedance(ax, t1, t2, color):
     # store the line arrays into list. Every line drawn on the ax is considered as data
     X = [line.get_xdata() for line in lines]
     Y = [line.get_ydata() for line in lines]
-    channel = getChannelFromLine(lines[0])
-
+    
     # create a table, and since the list X and Y should have size=1, place the first
     # element (array) in pandas table columns t and Z
     df = pd.DataFrame()
@@ -128,7 +132,7 @@ def calc_and_plot_mean_impedance(ax, t1, t2, color):
     Z_mean_int = round(Z_mean) 
     
     # print mean Z value
-    print("{0}: Z = {1:.2f} ohms = {2} ohms".format(channel, Z_mean, Z_mean_int))
+    print("{0}: Z = {1:.2f} ohms = {2} ohms".format(long_channel_name, Z_mean, Z_mean_int))
 
     # plot the average line
     x_coor = [t1, t2]
@@ -149,7 +153,7 @@ def setup_axes(ax, title, xlim, ylim):
     ax.set_ylim(ylim)
 
 # Analyze data for one cable; iterates over all files (e.g. channels) for a cable
-def analyze(cable_number, cable_type, cable_length, window_selection, Comment):
+def analyze(cable_number, cable_type, cable_length, window_selection, Comments):
     parser = OptionParser()
     
     cable_number_str = str(cable_number)
@@ -409,16 +413,19 @@ def analyze(cable_number, cable_type, cable_length, window_selection, Comment):
             data_for_csv = []
             
             # add header to csv data
-            header = ["Channel", "Parameter", "Mean Impedance (ohms)"]
+            header = ["Cable", "Channel", "Parameter", "Mean Impedance (ohms)", "Comments"]
             data_for_csv.append(header)
             
             for channel in range(n_channels):
-                file_name = ff_list[channel]
-                channel_name = getChannelFromFile(file_name)
-                #print("File name: {0}".format(file_name))
-                #print("Channel name: {0}".format(channel_name))
-                S_label = "S{0}_{1}".format(comp, channel_name) 
-                T_label = "TD{0}_{1}".format(comp, channel_name)
+                file_name           = ff_list[channel]
+                long_channel_name   = getChannelFromFile(file_name)
+                short_channel_name  = getShortChannelName(long_channel_name)
+                
+                #print("file_name: {0}, long_channel_name: {1}, short_channel_name: {2}".format(file_name, long_channel_name, short_channel_name))
+                
+                S_label = "S{0}_{1}".format(comp, long_channel_name) 
+                T_label = "TD{0}_{1}".format(comp, long_channel_name)
+                
                 # plot data
                 this_net = network_list[channel]
                 net_dc.append(this_net[i,j].extrapolate_to_dc(kind='linear'))
@@ -426,10 +433,10 @@ def analyze(cable_number, cable_type, cable_length, window_selection, Comment):
                 net_dc[channel].plot_z_time_step(pad=0, window='hamming', z0=50, label=T_label, ax=ax1, color=color_list[channel])
                 
                 # calculate and plot impedance
-                mean_impedance = calc_and_plot_mean_impedance(ax1, t1, t2, color_list[channel])
+                mean_impedance = calc_and_plot_mean_impedance(long_channel_name, ax1, t1, t2, color_list[channel])
                 
                 # add row to csv data
-                row = [channel_name, S_name, mean_impedance]
+                row = [cable_number, short_channel_name, S_name, mean_impedance, Comments]
                 data_for_csv.append(row)
     
             # Note: we should only record S12 impedance values
@@ -462,10 +469,10 @@ def run():
     cable_type          = int(input("Enter cable type [0, 1, 2, 3, 4]: "))
     cable_length        = int(input("Enter cable length in cm [0, 35, 80, 100, 140, 160, 180, 200]: "))
     window_selection    = int(input("Enter integration window [2-5ns (0), 8-11ns (1), variable (2)]: "))
-    Comment             = input("Enter comments for this run; if there are no comments, leave blank: ")
+    Comments            = input("Enter comments for this run; if there are no comments, leave blank: ")
     
     # Analyze data for cable
-    analyze(cable_number, cable_type, cable_length, window_selection, Comment)
+    analyze(cable_number, cable_type, cable_length, window_selection, Comments)
 
 def main():
     run()
