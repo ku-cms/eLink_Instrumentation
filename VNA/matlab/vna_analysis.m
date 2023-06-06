@@ -1,25 +1,30 @@
-clc;
+% Script to take VNA data.
+
+% Input cable number
 cable_num = input('Cable number: ','s');
 
-% create folder for cable
+% Create folder for cable
 newSubFolder = ['Cable_' cable_num];
 if ~exist(newSubFolder, 'dir')
   mkdir(newSubFolder);
 end
 
-filename = input('Assign base filename : ','s');
+% Input file name
+filename = input('Assign base file name: ','s');
 filename = ['R:\BEAN_GRP\4portvnadata\' newSubFolder '\' filename '.vna.txt'];
 
-x=input('connect cables, press return when done.');
+x = input('Connect cables. Press return when done.');
 
 fileID = fopen(filename, 'at');
 if fileID == -1
-    disp('failed to open file. Early exit!');
+    disp('ERROR: Failed to open file. Early exit!');
     return;
 end
 disp('Saving data to');
 fprintf('\t%s\n', filename);
 
+% Open serial port
+% Note: 'serial' will be removed in a future release; we should update to use 'serialport'.
 sport = serial('COM4');
 sport.BaudRate = 57600;
 sport.Terminator = 'LF';
@@ -36,7 +41,7 @@ fopen(sport);
 config_gpib;
 config_vna;
 
-s1x; %s11, s12, etc test
+s1x; % s11, s12, s13, s14
 s2x;
 s3x;
 s4x;
@@ -48,8 +53,9 @@ MMSDD(sport, fileID, 'mm1p14', SweepDelay);
 MMSDD(sport, fileID, 'mm1p24', SweepDelay);
 MMSDD(sport, fileID, 'mm1p34', SweepDelay);
 
+% Close all the things.
 fclose(sport);
 fclose(fileID);
-fclose('all'); % belt and suspenders close of files!
+fclose('all');
 
-fprintf("\n\nAll tests run.\n");
+fprintf("\nAll VNA tests are complete!\n");
