@@ -226,6 +226,10 @@ def analyze(cable_number, cable_type, cable_length, window_selection, Comments):
     Breaker = True
 
     while Breaker == True:
+        # ---------------------------------------------- #
+        # --- Use .vna.txt files to create s2p files --- #
+        # ---------------------------------------------- #
+        
         FILE = file_list[iterator]
         print("Creating s2p files for {0}".format(FILE))
 
@@ -288,6 +292,10 @@ def analyze(cable_number, cable_type, cable_length, window_selection, Comments):
                     pass
             except:
                 pass
+
+        # -------------------------------------------- #
+        # --- Analyze/plot VNA data from s2p files --- #
+        # -------------------------------------------- #
 
         # Get Network
         # - Class: skrf.network
@@ -382,6 +390,30 @@ def analyze(cable_number, cable_type, cable_length, window_selection, Comments):
     # Get integration window (ns)
     t1, t2 = getWindow(window_selection, cable_length)
 
+    # ------------------------------------------
+    # The strange S parameter mapping
+    # See https://github.com/skhalil/Instrumentation/blob/master/VNA/readVNADataSKRF.py#L101-L111
+    #
+    # The map to read the correct values is the one on right side:
+    #
+    # S11 S13          00  01            S11 S12
+    #            ---->           ----> 
+    # S12 S14          10  11            S21 S22
+    #
+    # Do the following to read the right elements rather than the default in touchstone files:
+    #
+    # S11 : s[:,0,0]
+    # S12 : s[:,1,0]
+    # S13 : s[:,0,1]
+    # S14 : s[:,1,1]
+    #
+    # s2p file contents:
+    # - subfile 0 contains S11, S12, S13, S14
+    # - subfile 1 contains S21, S22, S23, S24
+    # - subfile 2 contains S31, S32, S33, S34
+    # - subfile 3 contains S41, S42, S43, S44
+    # ------------------------------------------
+
     comps       = ['11', '12', '21']
     subfiles    = ['0', '0', '1']
 
@@ -393,15 +425,22 @@ def analyze(cable_number, cable_type, cable_length, window_selection, Comments):
         subfile = subfiles[iterator]
         S_name = "S" + comp
 
+        # comp is the S parameter we want to measure
+        # S_ij is the matrix element of the ith row, jth column
+        # subfile is the s2p file index for different s2p files
+        # Note: The S21 parameter is stored in a different subfile;
+        #       for S21, we use subfile '1' and matrix element '11'.
         if   comp == '11' and subfile == '0': S_ij = '11'
         elif comp == '12' and subfile == '0': S_ij = '21'
         elif comp == '21' and subfile == '1': S_ij = '11'
 
-        i = int(split(S_ij)[0])
-        j = int(split(S_ij)[1])
+        i = int(S_ij[0])
+        j = int(S_ij[1])
 
         print()
         print("Parameter: {0}".format(S_name))
+        #print("S_ij = {0}".format(S_ij))
+        #print("i = {0}, j = {1}".format(i, j))
         print("Time range: [{0} ns, {1} ns]".format(t1, t2))
 
         # Get list of networks
