@@ -3,6 +3,13 @@
 % get cable number
 cable_num = input('Cable number: ', 's');
 
+% connection type is either 1 or 2
+% 1 for SDD pairs 1:3 vs 2:4
+% 2 for SDD pairs 1:2 vs 3:4 - matches label on FR4 test coupon board
+connection_type = input('Connection type [1, 2]: ', 's');
+connection_type = str2num(connection_type);
+fprintf("Connection type: %d", connection_type);
+
 % create folder for cable
 newSubFolder = ['Cable_' cable_num];
 if ~exist(newSubFolder, 'dir')
@@ -152,7 +159,7 @@ fprintf("\nAll VNA tests are complete.\n");
 % 1 for SDD pairs 1:3 vs 2:4
 % 2 for SDD pairs 1:2 vs 3:4 - matches label on FR4 test coupon board
 if timeout == 0
-    plot_vna_s4p(filename, 1);
+    plot_vna_s4p(filename, connection_type);
 end
 
 fprintf("\nEND\n");
