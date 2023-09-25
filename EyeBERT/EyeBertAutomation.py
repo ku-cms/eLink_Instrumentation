@@ -32,23 +32,37 @@ from pathvalidate import is_valid_filename
 import eyebertserial
 
 #
-# sample connection dictionaries
+# The e-link connection mapping is defined by a dictionary
+# - Define e-link mappings as needed
+# - Use the desired e-link mapping
 #
 
-typeSMA2 = {                        # sma test cables
-    "cmd" :{"tx" : "0", "rx" : "0"},
-    "d0" : {"tx" : "3", "rx" : "3"}
+# SMA cables: testing in loopback mode
+mapping_SMA_test = {
+    "cmd" : {"tx" : "0", "rx" : "0"},
+    "d0"  : {"tx" : "3", "rx" : "3"}
 }
 
-type1B = {
+# Type 1 e-links
+mapping_type1 = {
     "cmd" : {"tx" : "7", "rx" : "7"},
-    "d0" : {"tx" : "0", "rx" : "0"},
-    "d1" : {"tx" : "1", "rx" : "1"},
-    "d2" : {"tx" : "2", "rx" : "2"},
-    "d3" : {"tx" : "3", "rx" : "3"}
+    "d0"  : {"tx" : "0", "rx" : "0"},
+    "d1"  : {"tx" : "1", "rx" : "1"},
+    "d2"  : {"tx" : "2", "rx" : "2"},
+    "d3"  : {"tx" : "3", "rx" : "3"}
 }
 
-cable_type_to_test = type1B
+# Type 5 e-links
+mapping_type5 = {
+    "cmd" : {"tx" : "7", "rx" : "7"},
+    "d0"  : {"tx" : "0", "rx" : "0"},
+    "d1"  : {"tx" : "1", "rx" : "1"},
+    "d2"  : {"tx" : "2", "rx" : "2"},
+    "d3"  : {"tx" : "3", "rx" : "3"}
+}
+
+# Choose e-link mapping:
+cable_mapping = mapping_type5
 
 test_results = {}
 
@@ -92,12 +106,12 @@ if ctypes.WinDLL("User32.dll").GetKeyState(0x14) :
 
 # loop starts here
 
-keys = list(cable_type_to_test.keys())
+keys = list(cable_mapping.keys())
 for key in keys :
     temp_name = filename + "_" + str(key) # change for looping version
     test_name = temp_name.replace(" ", "_")
-    txpath = b"tx " + bytes(cable_type_to_test[key]['tx'], 'utf-8')
-    rxpath = b"rx " + bytes(cable_type_to_test[key]['rx'], 'utf-8')
+    txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
+    rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
     
     print(Fore.GREEN + Style.BRIGHT + f"{test_name}" + Style.NORMAL)
     print(Fore.GREEN + f"\ttxpath = {txpath.decode()}")
