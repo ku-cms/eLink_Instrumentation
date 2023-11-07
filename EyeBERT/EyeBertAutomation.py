@@ -12,10 +12,13 @@
 #       : repeat tests as needed
 #       : much better error recovery & data validation!
 
+version = 1.05
+
 from colorama import Fore, Back, Style, init
 
 init(convert=True)
 print(Fore.GREEN + "KU-CMS KC705 EyeBERT Automated Test")
+print(f"Version {version}")
 print(Fore.RESET + "Loading libraries...")
 
 import pyautogui as pygui
@@ -25,6 +28,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 import datetime
 import os
+import shutil
 import time
 import sys
 import ctypes
@@ -78,9 +82,19 @@ if eb.initialize() == False :
 eb.Blinky(5)
 
 #
+# get operator name/initials
+#
+operator = input(Fore.GREEN + "Enter operator name: ")
+operator = operator.strip()
+while operator == "" :
+    operator = input("Enter operator name: ")
+    operator = operator.strip()
+
+#
 # get a valid cable name to use as directory and root filename
 #
 file_path = "C:/Users/Public/Documents/automation_results"
+r_file_path = "R:/BEAN_GRP/EyeBERTAutomation/automation_results"
 is_valid = False
 while is_valid == False :
     filename = input(Fore.GREEN + "Enter cable name : ")
@@ -92,10 +106,17 @@ while is_valid == False :
 # get ready to use this as our destination path
 #
 cable_path = file_path + "/" + filename
+r_cable_path = r_file_path + "/" + filename
 isExist = os.path.exists(cable_path)
 if isExist == False :
     # create the path
     os.makedirs(cable_path)
+
+isExist = os.path.exists(r_cable_path)
+if isExist == False :
+    #create the path
+    os.makedirs(r_cable_path)
+
 
 #
 # guarantee caps lock is off
@@ -227,6 +248,10 @@ for key in keys :
 
     os.rename(src,dest)
 
+    copyfilename = dest.replace(file_path+"/","")
+    newdest = r_file_path + "/" + copyfilename
+    shutil.copyfile(dest, newdest)
+    
     # make the screen capture
     print(Fore.GREEN + "Creating screen capture...")
     pygui.moveTo(355,800)
@@ -238,17 +263,23 @@ for key in keys :
         counter = counter + 1
 
     pygui.screenshot(screenshot,(360,190,1300,540))
-
+    copyfilename = screenshot.replace(file_path+"/","")
+    newdest = r_file_path + "/" + copyfilename
+    shutil.copyfile(screenshot, newdest)
+    
     # add results to dataset for future write
     now = datetime.datetime.now()
+    channel_name = key
     test_results.update(
         {key : 
-         {"test_name" : test_name, 
+         {"test_name" : test_name.replace("_"+channel_name,""),
+          "channel" : channel_name,
           "date" : now.strftime("%Y-%m-%d"),
           "time" : now.strftime("%H:%M:%S"),
           "open_area" : open_area, 
           "top_eye" : top_of_eye, 
-          "bottom_eye" : bottom_of_eye}
+          "bottom_eye" : bottom_of_eye,
+          "operator" : operator}
         }
     )
 #end keys loop
@@ -274,7 +305,8 @@ if isExist == False :
     # create file
     print(Fore.LIGHTRED_EX + "\tXLSX summary file does not exist. Creating file.")
     ws = wb.active
-    newdata = ["Cable name", "date", "time", "open_area", "topy_eye", "bottom_eye"]
+    newdata = ["Cable name", "channel", "date", "time", "open_area", "topy_eye",
+               "bottom_eye", "operator", "notes"]
     ws.append(newdata)
     col = get_column_letter(1)
     ws.column_dimensions[col].bestFit = True
@@ -289,12 +321,14 @@ print(Fore.GREEN + "Adding data...")
 cablename = test_name
 keys = list(test_results)
 for key in keys :
-    newdata = [test_results[key]["test_name"], 
+    newdata = [test_results[key]["test_name"],
+               test_results[key]["channel"],
                test_results[key]["date"],
                test_results[key]["time"],
                test_results[key]["open_area"],
                test_results[key]["top_eye"],
-               test_results[key]["bottom_eye"]]
+               test_results[key]["bottom_eye"],
+               test_results[key]["operator"]]
     ws.append(newdata)
 col = get_column_letter(1)
 ws.column_dimensions[col].bestFit = True
