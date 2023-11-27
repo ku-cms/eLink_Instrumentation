@@ -12,7 +12,7 @@
 #       : repeat tests as needed
 #       : much better error recovery & data validation!
 
-version = 1.05
+version = 1.07
 
 from colorama import Fore, Back, Style, init
 
@@ -43,12 +43,14 @@ import eyebertserial
 
 # SMA cables: testing in loopback mode
 mapping_SMA_test = {
+    "name" : "garbage",
     "cmd" : {"tx" : "0", "rx" : "0"},
     "d0"  : {"tx" : "3", "rx" : "3"}
 }
 
 # Type 1 e-links
 mapping_type1 = {
+    "name" : "type 1 tfpix",
     "cmd" : {"tx" : "7", "rx" : "7"},
     "d0"  : {"tx" : "0", "rx" : "0"},
     "d1"  : {"tx" : "1", "rx" : "1"},
@@ -58,6 +60,7 @@ mapping_type1 = {
 
 # Type 5 e-links
 mapping_type5 = {
+    "name" : "type 5 tbpix",
     "cmd" : {"tx" : "7", "rx" : "7"},
     "d0"  : {"tx" : "0", "rx" : "0"},
     "d1"  : {"tx" : "1", "rx" : "1"},
@@ -67,6 +70,8 @@ mapping_type5 = {
 
 # Choose e-link mapping:
 cable_mapping = mapping_type5
+print(Fore.GREEN + "Mapping Dictionary : " + Fore.RED + 
+      cable_mapping["name"] + Fore.GREEN + " selected.")
 
 test_results = {}
 
@@ -84,11 +89,13 @@ eb.Blinky(5)
 #
 # get operator name/initials
 #
-operator = input(Fore.GREEN + "Enter operator name: ")
+operator = input(Fore.RED + "Enter operator name: " + Fore.GREEN)
 operator = operator.strip()
 while operator == "" :
-    operator = input("Enter operator name: ")
+    operator = input(Fore.RED + "Enter operator name: " + Fore.GREEN)
     operator = operator.strip()
+
+#operator = operator.upper()
 
 #
 # get a valid cable name to use as directory and root filename
@@ -97,7 +104,7 @@ file_path = "C:/Users/Public/Documents/automation_results"
 r_file_path = "R:/BEAN_GRP/EyeBERTAutomation/automation_results"
 is_valid = False
 while is_valid == False :
-    filename = input(Fore.GREEN + "Enter cable name : ")
+    filename = input(Fore.RED + "Enter cable name: " + Fore.GREEN)
     is_valid = is_valid_filename(filename)
     if is_valid == False :
         print(Fore.RED + f"{filename} cannot be used as a directory or filename. Re-enter.")
@@ -116,6 +123,29 @@ isExist = os.path.exists(r_cable_path)
 if isExist == False :
     #create the path
     os.makedirs(r_cable_path)
+    
+#
+# get serial number of test boards
+#
+left_serialnumber = input(Fore.RED + "Enter SN of left board: " + Fore.GREEN)
+left_serialnumber = left_serialnumber.strip()
+while left_serialnumber == "" :
+    left_serialnumber = input(Fore.RED + "Enter SN of left board: " + Fore.GREEN)
+    left_serialnumber = left_serialnumber.strip()
+
+right_serialnumber = input(Fore.RED + "Enter SN of right board: " + Fore.GREEN)
+right_serialnumber = right_serialnumber.strip()
+while right_serialnumber == "" :
+    right_serialnumber = input(Fore.RED + "Enter SN of right board: " + Fore.GREEN)
+    right_serialnumber = right_serialnumber.strip()
+    
+left_serialnumber = left_serialnumber.upper()
+right_serialnumber = right_serialnumber.upper()
+    
+#
+# brief operator notes
+#
+operator_notes = input(Fore.RED + "Operator notes: " + Fore.GREEN)
 
 
 #
@@ -129,6 +159,8 @@ if ctypes.WinDLL("User32.dll").GetKeyState(0x14) :
 
 keys = list(cable_mapping.keys())
 for key in keys :
+    if key == "name" :
+        continue
     temp_name = filename + "_" + str(key) # change for looping version
     test_name = temp_name.replace(" ", "_")
     txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
@@ -279,7 +311,10 @@ for key in keys :
           "open_area" : open_area, 
           "top_eye" : top_of_eye, 
           "bottom_eye" : bottom_of_eye,
-          "operator" : operator}
+          "operator" : operator,
+          "left_SN" : left_serialnumber, 
+          "right_SN" : right_serialnumber,
+          "notes" : operator_notes}
         }
     )
 #end keys loop
@@ -305,8 +340,8 @@ if isExist == False :
     # create file
     print(Fore.LIGHTRED_EX + "\tXLSX summary file does not exist. Creating file.")
     ws = wb.active
-    newdata = ["Cable name", "channel", "date", "time", "open_area", "topy_eye",
-               "bottom_eye", "operator", "notes"]
+    newdata = ["Cable name", "channel", "date", "time", "open_area", "top_eye",
+               "bottom_eye", "operator", "left_SN", "right_SN", "notes"]
     ws.append(newdata)
     col = get_column_letter(1)
     ws.column_dimensions[col].bestFit = True
@@ -328,7 +363,10 @@ for key in keys :
                test_results[key]["open_area"],
                test_results[key]["top_eye"],
                test_results[key]["bottom_eye"],
-               test_results[key]["operator"]]
+               test_results[key]["operator"],
+               test_results[key]["left_SN"],
+               test_results[key]["right_SN"],
+               test_results[key]["notes"]]
     ws.append(newdata)
 col = get_column_letter(1)
 ws.column_dimensions[col].bestFit = True
@@ -336,5 +374,8 @@ wb.save(path + file_name)
 
 pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
 print(Fore.GREEN + Style.BRIGHT + "Done!" + Fore.RESET + Style.RESET_ALL)
+
+#excel_start_return = os.system('start "excel" ' + path + file_name)
+
 
     

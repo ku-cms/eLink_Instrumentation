@@ -8,21 +8,21 @@ from colorama import Fore, init
 # sample connection dictionaries
 #
 typeV_45_15 = {
-    "cmd" :{"tx" : "0", "rx" : "0"},
-    "d0" : {"tx" : "1", "rx" : "1"},
-    "d1" : {"tx" : "2", "rx" : "2"},
-    "d2" : {"tx" : "3", "rx" : "3"},
-    "d3" : {"tx" : "4", "rx" : "4"}
+     "cmd" :{"tx" : "0", "rx" : "0"},
+     "d0" : {"tx" : "1", "rx" : "1"},
+     "d1" : {"tx" : "2", "rx" : "2"},
+     "d2" : {"tx" : "3", "rx" : "3"},
+     "d3" : {"tx" : "4", "rx" : "4"}
 }
 
 typeV_45_33 = {
-    "cmd" :{"tx" : "0", "rx" : "0"},
-    "d0" : {"tx" : "1", "rx" : "1"},
-    "d1" : {"tx" : "2", "rx" : "2"},
-    "d2" : {"tx" : "3", "rx" : "3"},
-    "d3" : {"tx" : "4", "rx" : "4"},
-    "d4" : {"tx" : "5", "rx" : "5"},
-    "d5" : {"tx" : "6", "rx" : "6"}
+     "cmd" :{"tx" : "0", "rx" : "0"},
+     "d0" : {"tx" : "1", "rx" : "1"},
+     "d1" : {"tx" : "2", "rx" : "2"},
+     "d2" : {"tx" : "3", "rx" : "3"},
+     "d3" : {"tx" : "4", "rx" : "4"},
+     "d4" : {"tx" : "5", "rx" : "5"},
+     "d5" : {"tx" : "6", "rx" : "6"}
 }
 
 init(convert=True) # for colorama to work correctly
