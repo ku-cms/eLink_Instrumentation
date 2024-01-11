@@ -5,16 +5,15 @@ import os
 
 # To-Do:
 # Clean up code
-# Verification function
-# Write counts/properties to separate .txt file 
+# Comparing templates
 # Interface class?
 
-# creates directory if it does not exist
+# Creates directory if it does not exist
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
-# write csv file: takes data matrix as input and outputs a csv file 
+# Write csv file: takes data matrix as input and outputs a csv file 
 def writeCSV(output_file, data):
     with open(output_file, mode="w", newline='') as f:
         writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -25,32 +24,32 @@ class EyeBERTFile:
     def __init__(self, cable, channel):
         self.cable = cable
         self.channel = channel
-        self.path = "EyeBERT/EyeBERT_data/" + self.cable # Need to change
+        self.path = "EyeBERT/EyeBERT_data/" + self.cable # Path to get Eye-BERT data
 
-    def get_file(self):
+    def getFile(self):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
         # Initialize empty list to store file names
-        channel_files = [] 
+        channelFiles = [] 
 
         # Append all .csv files with the corresponding channel from the directory to the list
         for file in os.listdir(self.path):
             if self.channel in file and ".csv" in file:
-                channel_files.append(file)
+                channelFiles.append(file)
 
         # Sort file names in descending order to ensure latest file will always be at index 0 
-        channel_files.sort(reverse=True)
+        channelFiles.sort(reverse=True)
 
         # Return the file name at index 0 (latest file for that channel)
-        return channel_files[0]
+        return channelFiles[0]
 
-    def get_filename(self):
+    def getFilename(self):
         """Returns corresponding filename to cable and channel."""
-        filename = self.path + "/" + self.get_file()
+        filename = self.path + "/" + self.getFile()
         return filename
 
-    def read_file(self):
+    def readFile(self):
         """Reads data from file to return raw data."""
-        filename = self.get_filename()
+        filename = self.getFilename()
 
         data = []
 
@@ -63,17 +62,17 @@ class EyeBERTFile:
                     row.append(value)
                 data.append(row)
 
-        writeCSV("AnalysisOutputs/" + self.cable + "/Data.csv", data)
+        writeCSV("AnalysisOutputs/" + self.cable + "/data.csv", data)
                 
         return data
 
-    def get_data(self):
+    def getData(self):
         """Returns raw data from file as list of lists."""
-        return self.read_file()
+        return self.readFile()
 
-    def get_template(self):
+    def getTemplate(self):
         """Returns template data as list of lists."""
-        data = self.get_data()
+        data = self.getData()
         
         template = []
         
@@ -86,7 +85,7 @@ class EyeBERTFile:
                     row.append(1)
             template.append(row)
 
-        writeCSV("AnalysisOutputs/" + self.cable + "/Template.csv", template)
+        writeCSV("AnalysisOutputs/" + self.cable + "/template.csv", template)
         
         return template
 
@@ -98,7 +97,7 @@ class EyeBERTFile:
         # Make directory for cable if one does not already exist
         makeDir("AnalysisOutputs/" + self.cable)
         
-        return EyeBERTAnalysis(self.cable, self.channel, self.get_data(), self.get_template())
+        return EyeBERTAnalysis(self.cable, self.channel, self.getData(), self.getTemplate())
 
 
 class EyeBERTAnalysis:
@@ -108,8 +107,8 @@ class EyeBERTAnalysis:
         self.data = np.array(data)
         self.template = np.array(template)
 
-        self.name = self.cable + "_" + self.channel
-        self.path = "AnalysisOutputs/" + self.cable + "/"
+        self.name = self.cable + "_" + self.channel + "_" # Prefix for new outputted files
+        self.path = "AnalysisOutputs/" + self.cable + "/" # Path to save new outputted files
 
     def graph(self):
         """Returns plots for raw Eye-BERT data and Eye-BERT template."""
@@ -131,33 +130,63 @@ class EyeBERTAnalysis:
     
         #plt.show()
 
-        fig.savefig(self.path + self.name + ".pdf")   # save the figure to file
+        fig.savefig(self.path + self.name + "plots.pdf")   # save the figure to file
         plt.close(fig)    # close the figure window
 
 
     # To output to text file:
 
-    def write_text(self):
-        np.savetxt(self.name + "_template.txt", self.template)
-        np.savetxt(self.name + "_raw.txt", self.data)
-
-        #f = open(self.name + "_template.txt", "a")
-        #f.write(self.counts())
-        #f.close()
-
-        #np.savetxt(self.name + "_template.csv", self.template, delimiter=",")
-        #np.savetxt(self.name + "_raw.csv", self.data, delimiter=",")
+    def writeText(self):
+        """Write properties to output text file."""
+        f = open(self.path + self.name + "properties.txt", "w")
+        f.write(self.counts())
+        f.close()
 
     def counts(self):
         """Returns the counts of 1's and 0's in the template."""
-        #total = template.size
         count_0s = np.count_nonzero(self.template==0)
         count_1s = np.count_nonzero(self.template==1)
-        total = count_0s + count_1s
-        actual_total = self.template.size
+        total = self.template.size
+        #actual_total = self.template.size
 
-        return f"Total: {total}, {actual_total}\n0s: {count_0s}\n1s: {count_1s}"
+        return f"TEMPLATE COUNTS:\nTotal: {total}\nNumber of 0's: {count_0s}\nNumber of 1's: {count_1s}"
 
+    def verify(self):
+        """Verify values in template are correct based on raw data values."""
+        for i in range(0, 25):
+            for j in range(0, 65):
+                if self.data[i][j] < 2.0e-7 and self.template[i][j] != 0:
+                    return False
+                if self.data[i][j] > 2.0e-7 and self.template[i][j] != 1:
+                    return False
+        return True
+
+class Template:
+    def __init__(self, templateData):
+        self.templateData = templateData.astype(int)
+        self.ones = np.count_nonzero(self.templateData==1)
+        self.zeros = np.count_nonzero(self.templateData==0)
+        self.total = self.templateData.size
+
+    def verify(self):
+        if self.ones + self.zeros != self.total:
+            return False
+        return True
+
+    def __gt___(self, other):
+        if self.zeros > other.zeros:
+            return True
+        return False
+
+    def __lt__(self, other):
+        if self.zeros < other.zeros:
+            return True
+        return False
+
+    def __eq__(self, other):
+        if self.templateData == other.templateData:
+            return True
+        return False
 
 def main():
     # Obtain cable and channel from user
@@ -170,11 +199,13 @@ def main():
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
 
-    analysis.graph()
-    #analysis.counts()
+    if analysis.verify(): # Only continue if template passes verifcation
+        analysis.graph()
+       #analysis.counts()
 
-    # TESTING -- writing to text file output
-    #analysis.write_text()
+        # TESTING -- writing to text file output
+        analysis.writeText()
+
 
 if __name__ == "__main__":
     main()
