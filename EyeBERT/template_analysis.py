@@ -4,10 +4,11 @@ import numpy as np
 import os
 
 # To-Do:
-# Template comparisons
+# Template comparisons --- standard template to compare to?
 # Working with Windows & existing code
 # Edit properties text file (ex. open area vs. number of 0's, etc., utilize Template class)
 # Display original EyeBERT plot with other plots?
+# Account cable lengths?
 
 # Creates directory if it does not exist
 def makeDir(dir_name):
@@ -116,22 +117,18 @@ class EyeBERTAnalysis(EyeBERT):
         plt.close(fig)    
 
     def createTemplate(self):
-        """Returns template as an object from Template class."""
+        """Returns template as Template class object."""
         return Template(self.template, self.cable, self.channel)
 
     # To output to text file:
     def writeText(self):
         """Write properties to output text file."""
-        f = open(self.path + "properties.txt", "w")
-        f.write(self.counts())
-        f.close()
+        templateObj = self.createTemplate()
 
-    def counts(self):
-        """Returns the counts of 1's and 0's in the template."""
-        count_0s = np.count_nonzero(self.template==0)
-        count_1s = np.count_nonzero(self.template==1)
-        total = self.template.size
-        return f"TEMPLATE COUNTS:\nTotal: {total}\nNumber of 0's: {count_0s}\nNumber of 1's: {count_1s}"
+        f = open(self.path + "properties.txt", "w")
+        if templateObj.verify(): # Check if template is correct
+            f.write(f"Cable {self.cable}, Channel {self.channel.upper()}\nNUMBER OF 0s: {templateObj.zeros}\nNUMBER OF 1s: {templateObj.ones}")
+        f.close()
 
     def verify(self):
         """Verify values in template are correct based on raw data values."""
@@ -186,10 +183,7 @@ def main():
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
     if analysis.verify(): # Only continue if template passes verifcation
-        analysis.createTemplate()
-        analysis.graph()
-
-        # TESTING -- writing to text file output
+        analysis.graph() 
         analysis.writeText()
 
 if __name__ == "__main__":
