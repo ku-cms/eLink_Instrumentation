@@ -3,8 +3,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-# To-Do: Writing to text files, saving outputs in new directory based on cable
+# To-Do:
+# Clean up code
+# Verification function
+# Write counts/properties to separate .txt file 
 # Interface class?
+
+# creates directory if it does not exist
+def makeDir(dir_name):
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+
+# write csv file: takes data matrix as input and outputs a csv file 
+def writeCSV(output_file, data):
+    with open(output_file, mode="w", newline='') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for row in data:
+            writer.writerow(row)
 
 class EyeBERTFile:
     def __init__(self, cable, channel):
@@ -47,6 +62,8 @@ class EyeBERTFile:
                     value = float(search[r][c]) 
                     row.append(value)
                 data.append(row)
+
+        writeCSV("AnalysisOutputs/" + self.cable + "/Data.csv", data)
                 
         return data
 
@@ -68,16 +85,18 @@ class EyeBERTFile:
                 else:
                     row.append(1)
             template.append(row)
+
+        writeCSV("AnalysisOutputs/" + self.cable + "/Template.csv", template)
         
         return template
 
     def analyze(self):
         """Returns EyeBERTAnalysis object using data read from file."""
         # Make directory to store results if one does not already exist
-        #try:
-            #os.mkdir("Analysis_Outputs")
-        #except:
-            #pass
+        makeDir("AnalysisOutputs")
+
+        # Make directory for cable if one does not already exist
+        makeDir("AnalysisOutputs/" + self.cable)
         
         return EyeBERTAnalysis(self.cable, self.channel, self.get_data(), self.get_template())
 
@@ -90,13 +109,7 @@ class EyeBERTAnalysis:
         self.template = np.array(template)
 
         self.name = self.cable + "_" + self.channel
-
-    #def make_directory(self):
-        # Make a directory to store results 
-        #try:
-            #os.mkdir("Analysis/" + self.cable)
-        #except:
-            #return
+        self.path = "AnalysisOutputs/" + self.cable + "/"
 
     def graph(self):
         """Returns plots for raw Eye-BERT data and Eye-BERT template."""
@@ -107,7 +120,7 @@ class EyeBERTAnalysis:
         fig.tight_layout(h_pad=3)
 
         # Plot for raw Eye-BERT data
-        im = ax0.pcolormesh(self.data, cmap="nipy_spectral") # Different colors 
+        im = ax0.pcolormesh(self.data, cmap="nipy_spectral")
         ax0.set_title("Raw Eye-BERT Data")
         fig.colorbar(im, ax=ax0, location="bottom")
 
@@ -118,8 +131,8 @@ class EyeBERTAnalysis:
     
         #plt.show()
 
-        fig.savefig(self.cable + "_" + self.channel + ".pdf")   
-        plt.close(fig)    
+        fig.savefig(self.path + self.name + ".pdf")   # save the figure to file
+        plt.close(fig)    # close the figure window
 
 
     # To output to text file:
@@ -128,9 +141,9 @@ class EyeBERTAnalysis:
         np.savetxt(self.name + "_template.txt", self.template)
         np.savetxt(self.name + "_raw.txt", self.data)
 
-        f = open(self.name + "_template.txt", "a")
-        f.write(self.counts())
-        f.close()
+        #f = open(self.name + "_template.txt", "a")
+        #f.write(self.counts())
+        #f.close()
 
         #np.savetxt(self.name + "_template.csv", self.template, delimiter=",")
         #np.savetxt(self.name + "_raw.csv", self.data, delimiter=",")
@@ -161,7 +174,7 @@ def main():
     #analysis.counts()
 
     # TESTING -- writing to text file output
-    analysis.write_text()
+    #analysis.write_text()
 
 if __name__ == "__main__":
     main()
