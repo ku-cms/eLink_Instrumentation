@@ -4,11 +4,8 @@ import numpy as np
 import os
 
 # To-Do:
-# Template comparisons --- standard template to compare to?
 # Working with Windows & existing code
 # Edit properties text file (ex. open area vs. number of 0's, etc., utilize Template class)
-# Display original EyeBERT plot with other plots?
-# Account cable lengths?
 
 # Creates directory if it does not exist
 def makeDir(dir_name):
@@ -140,6 +137,7 @@ class EyeBERTAnalysis(EyeBERT):
                     return False
         return True
 
+
 # Template Class to compare templates
 class Template:
     def __init__(self, templateData, cable, channel):
@@ -170,9 +168,85 @@ class Template:
         return False
 
     def __eq__(self, other):
-        if self.templateData == other.templateData:
+        if np.array_equal(self.templateData, other.templateData):
             return True
-        return False
+        else:
+            return False
+        
+        # ALTERNATE: using iteration 
+        # for i in range(0, 25):
+        #     for j in range(0, 65):
+        #         if self.templateData[i][j] != other.templateData[i][j]:
+        #             return False
+        # return True
+    
+    def __sub__(self, other):
+        # Initialize array of zeros to store difference template values
+        diffArr = other.templateData
+        diffCounts = 0
+        for i in range(0, 25):
+            for j in range(0, 65):
+                # Update count of points not in the eye of the reference
+                if other.templateData[i][j] == 0 and self.templateData[i][j] != 0:
+                    diffCounts += 1
+                if self.templateData[i][j] == 0:
+                    diffArr[i][j] = diffArr[i][j] - 1
+                else:
+                    if self.templateData[i][j] != other.templateData[i][j]:
+                        diffArr[i][j] = diffArr[i][j] - 2
+
+        # ALTERNATIVE: only marking differing values on difference array
+        # diffArr = np.zeros((25, 65))
+        # for i in range(0, 25):
+        #     for j in range(0, 65):
+        #         if self.templateData[i][j] != other.templateData[i][j]:
+        #             # Set element to be -1 if values between templates conflict
+        #             diffArr[i][j] = -1
+        #         else:
+        #             # If values at position in both templates are the same, set element as that value
+        #             diffArr[i][j] = self.templateData[i][j]
+        print(diffCounts)
+        return diffArr
+    
+    def plot(self, reference):
+        # Difference array as Template Object
+        #diff = self.__sub__(reference) 
+        fig, (ax0, ax1, ax2) = plt.subplots(3, 1)
+        fig.suptitle(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
+        fig.tight_layout(h_pad=3)
+        # Original template plot
+        im = ax0.pcolormesh(self.templateData, cmap="binary")
+        ax0.set_title("Eye-BERT Original Template")
+        #fig.colorbar(im, ax=ax0, location="bottom")
+
+        im = ax1.pcolormesh(reference.templateData, cmap="binary")
+        ax1.set_title(f"Reference Template (Cable: {reference.cable}, Channel: {reference.channel.upper()})")
+        #fig.colorbar(im, ax=ax1, location="bottom")
+
+        diff = self.__sub__(reference) 
+        # Difference template plot
+        im = ax2.pcolormesh(diff, cmap="binary")
+        ax2.set_title("Eye-BERT Difference Template")
+        #fig.colorbar(im, ax=ax2, location="bottom")
+
+        plt.show()
+        #fig.savefig(self.path + "plots.pdf")   
+        plt.close(fig)    
+        
+    
+    #def __sub__(self, other):
+        # np.subtract(self.templateData, other.templateData) <--- will subtract regardless of shape
+        #difference = self.templateData - other.templateData
+        #return difference 
+
+
+# Creating reference templates to compare to as objects of the Template class
+# Current template references: 539 CMD, 540 CMD
+ref539cmd = EyeBERTFile("539", "cmd").analyze()
+ref540cmd = EyeBERTFile("540", "cmd").analyze()
+if ref539cmd.verify() and ref540cmd.verify():
+    ref539cmd = ref539cmd.createTemplate()
+    ref540cmd = ref540cmd.createTemplate()
 
 def main():
     # Obtain cable and channel from user
@@ -183,8 +257,13 @@ def main():
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
     if analysis.verify(): # Only continue if template passes verifcation
-        analysis.graph() 
-        analysis.writeText()
+        #analysis.graph() 
+        #analysis.writeText()
+
+        # In progress testing for comparison analysis:
+        template = analysis.createTemplate()
+        #diff = template.templateDiff(ref539cmd)
+        template.plot(ref540cmd)
 
 if __name__ == "__main__":
     main()
