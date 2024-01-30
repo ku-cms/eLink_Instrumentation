@@ -5,7 +5,9 @@ import os
 
 # To-Do:
 # Working with Windows & existing code
-# Edit properties text file (ex. open area vs. number of 0's, etc., utilize Template class)
+# Display properties (counts for 0s & 1s, counts outside reference template when comparing, etc.)
+# Refine comparison templates and construct copy of .csv for comparisons
+# Clean up code/classes (maximize reusability)
 
 # Creates directory if it does not exist
 def makeDir(dir_name):
@@ -18,6 +20,20 @@ def writeCSV(output_file, data):
         writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for row in data:
             writer.writerow(row)
+
+# Assign to a class --- for later:
+# def getReference():
+#     data = []
+#     with open("reference_temp.csv", "r") as file: 
+#         search = list(csv.reader(file)) 
+#         for r in range(0, 25): 
+#             row = [] 
+#             for c in range(0, 65): 
+#                 value = int(search[r][c])
+#                 row.append(value)
+#             data.append(row)    
+#     return data
+
 
 class EyeBERT:
     def __init__(self, cable, channel):
@@ -173,7 +189,7 @@ class Template:
         else:
             return False
         
-        # ALTERNATE: using iteration 
+        # ALTERNATE: Iteratively 
         # for i in range(0, 25):
         #     for j in range(0, 65):
         #         if self.templateData[i][j] != other.templateData[i][j]:
@@ -205,8 +221,9 @@ class Template:
         #         else:
         #             # If values at position in both templates are the same, set element as that value
         #             diffArr[i][j] = self.templateData[i][j]
-        print(diffCounts)
-        return diffArr
+        print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix 
+        # ADDITION: count for elements that are the same
+        return diffArr 
     
     def plot(self, reference):
         # Difference array as Template Object
@@ -259,11 +276,16 @@ def main():
     if analysis.verify(): # Only continue if template passes verifcation
         #analysis.graph() 
         #analysis.writeText()
+        
+        #writeCSV("AnalysisOutputs/" + "reference_temp.csv", ref540cmd.templateData)
+        ref = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
+        #print(ref)
 
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
-        #diff = template.templateDiff(ref539cmd)
-        template.plot(ref540cmd)
+        
+        # EDIT: reference needs to be a template object
+        #template.plot(ref) 
 
 if __name__ == "__main__":
     main()
