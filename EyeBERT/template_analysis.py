@@ -152,6 +152,28 @@ class EyeBERTAnalysis(EyeBERT):
                 if self.data[i][j] > 2.0e-7 and self.template[i][j] != 1:
                     return False
         return True
+    
+# Reference Class
+class Reference:
+    def __init__(self, cable, channel, filename):
+        self.cable = cable
+        self.channel = channel
+        self.filename = filename
+
+    def getReference(self):
+        data = []
+        with open(self.filename, "r") as file: 
+            search = list(csv.reader(file)) 
+            for r in range(0, 25): 
+                row = [] 
+                for c in range(0, 65): 
+                    value = int(search[r][c])
+                    row.append(value)
+                data.append(row)    
+        return data    
+    
+    def createTemplate(self):
+        return Template(np.array(self.getReference()), self.cable, self.channel)
 
 
 # Template Class to compare templates
@@ -202,31 +224,21 @@ class Template:
         # Initialize array of zeros to store difference template values
         diffArr = other.templateData
         outCounts = 0
+        inCounts = 0
         for i in range(0, 25):
             for j in range(0, 65):
                 # Update count of points not in the eye of the reference
                 #if other.templateData[i][j] == 0 and self.templateData[i][j] != 0:
                 if self.templateData[i][j] == 0 and other.templateData[i][j] != 0:
                     outCounts += 1 # update count for elements in eye of current cable, but not in eye of reference 
+                if other.templateData[i][j] == 0 and self.templateData[i][j] != 0:
+                    inCounts += 1
                 if self.templateData[i][j] == 0:
                     diffArr[i][j] = diffArr[i][j] - 1
                 else:
                     if self.templateData[i][j] != other.templateData[i][j]:
                         diffArr[i][j] = diffArr[i][j] - 2
-
-        # ALTERNATIVE: only marking differing values on difference array
-        # diffArr = np.zeros((25, 65))
-        # for i in range(0, 25):
-        #     for j in range(0, 65):
-        #         if self.templateData[i][j] != other.templateData[i][j]:
-        #             # Set element to be -1 if values between templates conflict
-        #             diffArr[i][j] = -1
-        #         else:
-        #             # If values at position in both templates are the same, set element as that value
-        #             diffArr[i][j] = self.templateData[i][j]
-
-        # Add separate method/class for printing properties?
-        self.print_properties(outCounts)
+        self.counts(outCounts, inCounts)
 
         #print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix outside of reference's eye 
         # ADDITION: count for elements that are the same
@@ -239,17 +251,20 @@ class Template:
         fig.suptitle(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
         fig.tight_layout(h_pad=3)
         # Original template plot
-        im = ax0.pcolormesh(self.templateData, cmap="binary")
+        #im = ax0.pcolormesh(self.templateData, cmap="binary")
+        im = ax0.pcolormesh(self.templateData, cmap="binary", vmin=0, vmax=1)
         ax0.set_title("Eye-BERT Original Template")
         #fig.colorbar(im, ax=ax0, location="bottom")
 
-        im = ax1.pcolormesh(reference.templateData, cmap="binary")
-        ax1.set_title(f"Reference Template (Cable: {reference.cable}, Channel: {reference.channel.upper()})")
+        #im = ax1.pcolormesh(reference.templateData, cmap="binary")
+        im = ax1.pcolormesh(reference.templateData, cmap="binary", vmin=0, vmax=1)
+        ax1.set_title("Reference Template")
         #fig.colorbar(im, ax=ax1, location="bottom")
 
         diff = self.__sub__(reference) 
         # Difference template plot
-        im = ax2.pcolormesh(diff, cmap="binary")
+        #im = ax2.pcolormesh(diff, cmap="binary")
+        im = ax2.pcolormesh(diff, cmap="binary", vmin=-2, vmax=1)
         ax2.set_title("Eye-BERT Difference Template")
         #fig.colorbar(im, ax=ax2, location="bottom")
 
@@ -257,11 +272,15 @@ class Template:
         #fig.savefig(self.path + "plots.pdf")   
         plt.close(fig)    
         
-    def print_properties(self, outCounts):
+    def counts(self, outCounts, inCounts):
         print(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
+        self.printProperties()
+        print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
+        print(f"Reference's Eye-BERT values OUTSIDE the cable's eye: {inCounts}")
+
+    def printProperties(self):
         print(f"Number of 0s: {self.zeros}")
         print(f"Number of 1s: {self.ones}")
-        print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
     
     #def __sub__(self, other):
         # np.subtract(self.templateData, other.templateData) <--- will subtract regardless of shape
@@ -290,14 +309,23 @@ def main():
         #analysis.writeText()
         
         #writeCSV("AnalysisOutputs/" + "reference_temp.csv", ref540cmd.templateData)
-        ref = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
+        #ref = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
         #print(ref)
+
+        # print("\nREFERENCE - Properties:")
+        # refTemp.printProperties()
+        # print("\n")
 
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
+
+        ref = Reference("540", "CMD", "reference_tempv2.csv")
+        refTemp = ref.createTemplate()
         
         # EDIT: reference needs to be a template object
-        template.plot(ref540cmd) 
+        template.plot(refTemp) 
+        print("\n")
+
 
 if __name__ == "__main__":
     main()
