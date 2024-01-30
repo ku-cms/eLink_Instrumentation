@@ -164,6 +164,8 @@ class Template:
         self.zeros = np.count_nonzero(self.templateData==0)
         self.total = self.templateData.size
 
+        #self.reference = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
+
     def view(self):
         for row in self.templateData:
             print(row)
@@ -199,12 +201,13 @@ class Template:
     def __sub__(self, other):
         # Initialize array of zeros to store difference template values
         diffArr = other.templateData
-        diffCounts = 0
+        outCounts = 0
         for i in range(0, 25):
             for j in range(0, 65):
                 # Update count of points not in the eye of the reference
-                if other.templateData[i][j] == 0 and self.templateData[i][j] != 0:
-                    diffCounts += 1
+                #if other.templateData[i][j] == 0 and self.templateData[i][j] != 0:
+                if self.templateData[i][j] == 0 and other.templateData[i][j] != 0:
+                    outCounts += 1 # update count for elements in eye of current cable, but not in eye of reference 
                 if self.templateData[i][j] == 0:
                     diffArr[i][j] = diffArr[i][j] - 1
                 else:
@@ -221,7 +224,11 @@ class Template:
         #         else:
         #             # If values at position in both templates are the same, set element as that value
         #             diffArr[i][j] = self.templateData[i][j]
-        print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix 
+
+        # Add separate method/class for printing properties?
+        self.print_properties(outCounts)
+
+        #print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix outside of reference's eye 
         # ADDITION: count for elements that are the same
         return diffArr 
     
@@ -250,6 +257,11 @@ class Template:
         #fig.savefig(self.path + "plots.pdf")   
         plt.close(fig)    
         
+    def print_properties(self, outCounts):
+        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
+        print(f"Number of 0s: {self.zeros}")
+        print(f"Number of 1s: {self.ones}")
+        print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
     
     #def __sub__(self, other):
         # np.subtract(self.templateData, other.templateData) <--- will subtract regardless of shape
@@ -285,7 +297,7 @@ def main():
         template = analysis.createTemplate()
         
         # EDIT: reference needs to be a template object
-        #template.plot(ref) 
+        template.plot(ref540cmd) 
 
 if __name__ == "__main__":
     main()
