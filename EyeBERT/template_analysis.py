@@ -281,11 +281,6 @@ class Template:
     def printProperties(self):
         print(f"Number of 0s: {self.zeros}")
         print(f"Number of 1s: {self.ones}")
-    
-    #def __sub__(self, other):
-        # np.subtract(self.templateData, other.templateData) <--- will subtract regardless of shape
-        #difference = self.templateData - other.templateData
-        #return difference 
 
 
 # Creating reference templates to compare to as objects of the Template class
