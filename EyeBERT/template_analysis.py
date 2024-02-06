@@ -3,12 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-# To-Do:
-# Working with Windows & existing code
-# Display properties (counts for 0s & 1s, counts outside reference template when comparing, etc.)
-# Refine comparison templates and construct copy of .csv for comparisons
-# Clean up code/classes (maximize reusability)
-
 # Creates directory if it does not exist
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
@@ -20,7 +14,6 @@ def writeCSV(output_file, data):
         writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for row in data:
             writer.writerow(row)
-
 
 class EyeBERT:
     def __init__(self, cable, channel):
@@ -34,24 +27,25 @@ class EyeBERTFile(EyeBERT):
         self.dataPath = "EyeBERT/EyeBERT_data/" + self.cable # Path to get Eye-BERT data
 
     def getIndices(self, fileList):
-        fileIndices = [] # Initialize list to store 
-        for element in fileList:
-            i = 0
-            underscoreCount = 0
-            index = ""
-            if element.count("_") == 1:
-                index = 0
+        """Returns list of file names as ordered pairs with their indices in descending order."""
+        fileIndices = [] # Initialize list to store the index and file name as an ordered pair 
+        for element in fileList: # Iterate over each file name stored in the list 
+            i = 0 # Initialize i to iterate over each character in the file name string 
+            underscoreCount = 0 # Initialize count for the underscore character in the file name to track the number of its occurrences 
+            index = "" # Initialize chosen index as an empty string 
+            if element.count("_") == 1: # Check if the file name has only 1 underscore (this means this is the earliest data)
+                index = 0 # Set index to 0, as this would be the earliest data 
             else:
-                while element[i] != ".":
-                    if underscoreCount == 2:
-                        index += element[i]
-                    if element[i] == "_":
-                        underscoreCount += 1
-                    i += 1
-            index = int(index)
-            fileIndices.append((index, element))
-        fileIndices.sort(reverse = True)
-        return fileIndices
+                while element[i] != ".": # Iterate over the file name until a period is reached (this means we will reach ".csv")
+                    if underscoreCount == 2: # Check if two underscores have been recorded (this means the correct index will begin in the file name)
+                        index += element[i] # Add the character to the index (string operation, to ensure digit remains in its corresponding place)
+                    if element[i] == "_": # Check if the character is an underscore
+                        underscoreCount += 1 # Update the count for the number of underscore characters iterated if necessary
+                    i += 1 # Increment iterator to iterate over the next character
+            index = int(index) # Convert the index to an integer
+            fileIndices.append((index, element)) # Append the resulting index to the list as an ordered pair with its corresponding original file name
+        fileIndices.sort(reverse = True) # Sort the list in descending order based on the index (therefore, more recent the file (higher index), the closer to the beginning of the list it will be)
+        return fileIndices # Return the completed list with the file names and their corresponding indices as ordered pairs
 
     def getFile(self):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
@@ -64,8 +58,8 @@ class EyeBERTFile(EyeBERT):
         # Sort file names in descending order to ensure latest file will always be at index 0 
         channelFiles = self.getIndices(channelFiles)
         # Return the file name at index 0 (latest file for that channel)
-        index, recent = channelFiles[0]
-        return recent
+        index, recent = channelFiles[0] # Assign variables to each element of the ordered pair (index, file name)
+        return recent # Return the file name at that most recent file name's index 
 
     def getFilename(self):
         """Returns corresponding filename to cable and channel."""
@@ -169,7 +163,7 @@ class Reference:
         self.filename = filename
 
     def getReference(self):
-        data = []
+        data = [] 
         with open(self.filename, "r") as file: 
             search = list(csv.reader(file)) 
             for r in range(0, 25): 
@@ -193,8 +187,6 @@ class Template:
         self.ones = np.count_nonzero(self.templateData==1)
         self.zeros = np.count_nonzero(self.templateData==0)
         self.total = self.templateData.size
-
-        #self.reference = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
 
     def view(self):
         for row in self.templateData:
@@ -220,13 +212,6 @@ class Template:
             return True
         else:
             return False
-        
-        # ALTERNATE: Iteratively 
-        # for i in range(0, 25):
-        #     for j in range(0, 65):
-        #         if self.templateData[i][j] != other.templateData[i][j]:
-        #             return False
-        # return True
     
     def __sub__(self, other):
         # Initialize array of zeros to store difference template values
@@ -290,15 +275,6 @@ class Template:
         print(f"Number of 0s: {self.zeros}")
         print(f"Number of 1s: {self.ones}")
 
-
-# Creating reference templates to compare to as objects of the Template class
-# Current template references: 539 CMD, 540 CMD
-ref539cmd = EyeBERTFile("539", "cmd").analyze()
-ref540cmd = EyeBERTFile("540", "cmd").analyze()
-if ref539cmd.verify() and ref540cmd.verify():
-    ref539cmd = ref539cmd.createTemplate()
-    ref540cmd = ref540cmd.createTemplate()
-
 def main():
     # Obtain cable and channel from user
     cable = str(input("Cable: "))
@@ -308,16 +284,6 @@ def main():
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
     if analysis.verify(): # Only continue if template passes verifcation
-        #analysis.graph() 
-        #analysis.writeText()
-        
-        #writeCSV("AnalysisOutputs/" + "reference_temp.csv", ref540cmd.templateData)
-        #ref = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
-        #print(ref)
-
-        # print("\nREFERENCE - Properties:")
-        # refTemp.printProperties()
-        # print("\n")
 
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
