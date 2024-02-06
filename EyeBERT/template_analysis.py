@@ -21,19 +21,6 @@ def writeCSV(output_file, data):
         for row in data:
             writer.writerow(row)
 
-# Assign to a class --- for later:
-# def getReference():
-#     data = []
-#     with open("reference_temp.csv", "r") as file: 
-#         search = list(csv.reader(file)) 
-#         for r in range(0, 25): 
-#             row = [] 
-#             for c in range(0, 65): 
-#                 value = int(search[r][c])
-#                 row.append(value)
-#             data.append(row)    
-#     return data
-
 
 class EyeBERT:
     def __init__(self, cable, channel):
@@ -46,6 +33,26 @@ class EyeBERTFile(EyeBERT):
         super().__init__(cable, channel)
         self.dataPath = "EyeBERT/EyeBERT_data/" + self.cable # Path to get Eye-BERT data
 
+    def getIndices(self, fileList):
+        fileIndices = [] # Initialize list to store 
+        for element in fileList:
+            i = 0
+            underscoreCount = 0
+            index = ""
+            if element.count("_") == 1:
+                index = 0
+            else:
+                while element[i] != ".":
+                    if underscoreCount == 2:
+                        index += element[i]
+                    if element[i] == "_":
+                        underscoreCount += 1
+                    i += 1
+            index = int(index)
+            fileIndices.append((index, element))
+        fileIndices.sort(reverse = True)
+        return fileIndices
+
     def getFile(self):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
         # Initialize empty list to store file names
@@ -55,9 +62,10 @@ class EyeBERTFile(EyeBERT):
             if self.channel in file and ".csv" in file:
                 channelFiles.append(file)
         # Sort file names in descending order to ensure latest file will always be at index 0 
-        channelFiles.sort(reverse=True)
+        channelFiles = self.getIndices(channelFiles)
         # Return the file name at index 0 (latest file for that channel)
-        return channelFiles[0]
+        index, recent = channelFiles[0]
+        return recent
 
     def getFilename(self):
         """Returns corresponding filename to cable and channel."""
