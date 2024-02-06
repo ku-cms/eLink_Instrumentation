@@ -39,25 +39,39 @@ class EyeBERTFile(EyeBERT):
         super().__init__(cable, channel, basePath)
         self.dataPath = self.basePath + "/" + self.cable # Path to get Eye-BERT data
 
+    def getIndices(self, fileList):
+        fileIndices = [] # Initialize list to store 
+        for element in fileList:
+            i = 0
+            underscoreCount = 0
+            index = ""
+            if element.count("_") == 1:
+                index = 0
+            else:
+                while element[i] != ".":
+                    if underscoreCount == 2:
+                        index += element[i]
+                    if element[i] == "_":
+                        underscoreCount += 1
+                    i += 1
+            index = int(index)
+            fileIndices.append((index, element))
+        fileIndices.sort(reverse = True)
+        return fileIndices
+
     def getFile(self):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
-
-        # FIX:
-        # Account for double digit in index
-
         # Initialize empty list to store file names
         channelFiles = [] 
         # Append all .csv files with the corresponding channel from the directory to the list
         for file in os.listdir(self.dataPath):
-            if self.channel in file and ".csv" in file and "data" not in file and "template" not in file:
+            if self.channel in file and ".csv" in file:
                 channelFiles.append(file)
         # Sort file names in descending order to ensure latest file will always be at index 0 
-        channelFiles.sort(reverse=True)
+        channelFiles = self.getIndices(channelFiles)
         # Return the file name at index 0 (latest file for that channel)
-        print(f"getFile(): channelFiles = {channelFiles}")
-        print(f"getFile(): channelFiles[0] = {channelFiles[0]}")
-
-        return channelFiles[0]
+        index, recent = channelFiles[0]
+        return recent
 
     def getFilename(self):
         """Returns corresponding filename to cable and channel."""
