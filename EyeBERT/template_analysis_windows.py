@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+# To-Do:
+# Working with Windows & existing code
+# Display properties (counts for 0s & 1s, counts outside reference template when comparing, etc.)
+# Refine comparison templates and construct copy of .csv for comparisons
+# Clean up code/classes (maximize reusability)
+
 # Creates directory if it does not exist
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
@@ -16,18 +22,24 @@ def writeCSV(output_file, data):
             writer.writerow(row)
 
 class EyeBERT:
-    def __init__(self, cable, channel):
+    def __init__(self, cable, channel, basePath):
         self.cable = cable
         self.channel = channel 
-        self.path = "AnalysisOutputs/" + self.cable + "/" + self.cable + "_" + self.channel + "_" # Prefix for new outputted files
+        self.basePath = basePath 
+        self.path = self.basePath + "/" + self.cable + "/" + self.cable + "_" + self.channel + "_" # Prefix for new outputted files
+
+    def getPath(self):
+        return self.path
+
+    def setPath(self, path):
+        self.path = path 
 
 class EyeBERTFile(EyeBERT):
-    def __init__(self, cable, channel):
-        super().__init__(cable, channel)
-        self.dataPath = "EyeBERT/EyeBERT_data/" + self.cable # Path to get Eye-BERT data
+    def __init__(self, cable, channel, basePath):
+        super().__init__(cable, channel, basePath)
+        self.dataPath = self.basePath + "/" + self.cable # Path to get Eye-BERT data
 
     def getIndices(self, fileList):
-        """Returns list of file names as ordered pairs with their indices in descending order."""
         fileIndices = [] # Initialize list to store the index and file name as an ordered pair 
         for element in fileList: # Iterate over each file name stored in the list 
             i = 0 # Initialize i to iterate over each character in the file name string 
@@ -49,26 +61,28 @@ class EyeBERTFile(EyeBERT):
 
     def getFile(self):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
-        # Initialize empty list to store file names
-        channelFiles = [] 
-        # Append all .csv files with the corresponding channel from the directory to the list
+        channelFiles = [] # Initialize empty list to store file names for the cable and channel 
         for file in os.listdir(self.dataPath):
             if self.channel in file and ".csv" in file:
-                channelFiles.append(file)
-        # Sort file names in descending order to ensure latest file will always be at index 0 
-        channelFiles = self.getIndices(channelFiles)
-        # Return the file name at index 0 (latest file for that channel)
-        index, recent = channelFiles[0] # Assign variables to each element of the ordered pair (index, file name)
+                if "data" not in file and "template" not in file:
+                    channelFiles.append(file) # Append all file names for the cable and channel to the list
+        channelFiles = self.getIndices(channelFiles) # Call method to obtain list of file names with their corresponding indices in order of most recent file to oldest
+        index, recent = channelFiles[0] # Assign variables to each element of the ordered pair (index, file name) for the element at the beginning of the list (the most recent)
         return recent # Return the file name at that most recent file name's index 
 
     def getFilename(self):
         """Returns corresponding filename to cable and channel."""
         filename = self.dataPath + "/" + self.getFile()
+
         return filename
 
     def readFile(self):
         """Reads data from file to return raw data."""
         filename = self.getFilename()
+        
+        path = filename.replace(".csv", "_")
+        self.setPath(path)
+
         data = []
         with open(filename, "r") as file: 
             search = list(csv.reader(file)) 
@@ -106,11 +120,11 @@ class EyeBERTFile(EyeBERT):
         makeDir("AnalysisOutputs")
         # Make directory for cable if one does not already exist
         makeDir("AnalysisOutputs/" + self.cable)
-        return EyeBERTAnalysis(self.cable, self.channel, self.getData(), self.getTemplate())
+        return EyeBERTAnalysis(self.cable, self.channel, self.getData(), self.getTemplate(), self.basePath)
 
 class EyeBERTAnalysis(EyeBERT):
-    def __init__(self, cable, channel, data, template):
-        super().__init__(cable, channel)
+    def __init__(self, cable, channel, data, template, basePath):
+        super().__init__(cable, channel, basePath)
         self.data = np.array(data)
         self.template = np.array(template)
 
@@ -133,7 +147,7 @@ class EyeBERTAnalysis(EyeBERT):
 
     def createTemplate(self):
         """Returns template as Template class object."""
-        return Template(self.template, self.cable, self.channel)
+        return Template(self.template, self.cable, self.channel, self.path)
 
     # To output to text file:
     def writeText(self):
@@ -151,19 +165,20 @@ class EyeBERTAnalysis(EyeBERT):
             for j in range(0, 65):
                 if self.data[i][j] < 2.0e-7 and self.template[i][j] != 0:
                     return False
-                if self.data[i][j] > 2.0e-7 and self.template[i][j] != 1:
+                if self.data[i][j] >= 2.0e-7 and self.template[i][j] != 1:
                     return False
         return True
     
 # Reference Class
 class Reference:
-    def __init__(self, cable, channel, filename):
+    def __init__(self, cable, channel, filename, path):
         self.cable = cable
         self.channel = channel
         self.filename = filename
+        self.path = path 
 
     def getReference(self):
-        data = [] 
+        data = []
         with open(self.filename, "r") as file: 
             search = list(csv.reader(file)) 
             for r in range(0, 25): 
@@ -175,18 +190,21 @@ class Reference:
         return data    
     
     def createTemplate(self):
-        return Template(np.array(self.getReference()), self.cable, self.channel)
+        return Template(np.array(self.getReference()), self.cable, self.channel, self.path)
 
 
 # Template Class to compare templates
 class Template:
-    def __init__(self, templateData, cable, channel):
+    def __init__(self, templateData, cable, channel, path):
         self.cable = cable
         self.channel = channel 
         self.templateData = templateData.astype(int)
         self.ones = np.count_nonzero(self.templateData==1)
         self.zeros = np.count_nonzero(self.templateData==0)
         self.total = self.templateData.size
+        self.path = path
+
+        print(f"Template class: self.path: {self.path}")
 
     def view(self):
         for row in self.templateData:
@@ -233,6 +251,9 @@ class Template:
                         diffArr[i][j] = diffArr[i][j] - 2
         self.counts(outCounts, inCounts)
 
+        self.outCounts = outCounts
+        self.inCounts = inCounts 
+
         #print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix outside of reference's eye 
         # ADDITION: count for elements that are the same
         return diffArr 
@@ -261,8 +282,11 @@ class Template:
         ax2.set_title("Eye-BERT Difference Template")
         #fig.colorbar(im, ax=ax2, location="bottom")
 
-        plt.show()
-        #fig.savefig(self.path + "plots.pdf")   
+        #plt.show()
+
+        print(f"Template.plot(): path: {self.path}")
+
+        fig.savefig(self.path + "template_plots.pdf")   
         plt.close(fig)    
         
     def counts(self, outCounts, inCounts):
@@ -271,9 +295,24 @@ class Template:
         print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
         print(f"Reference's Eye-BERT values OUTSIDE the cable's eye: {inCounts}")
 
+    def getOutCounts(self):
+        return self.outCounts
+
+    def getInCounts(self):
+        return self.inCounts 
+
     def printProperties(self):
         print(f"Number of 0s: {self.zeros}")
         print(f"Number of 1s: {self.ones}")
+
+
+# Creating reference templates to compare to as objects of the Template class
+# Current template references: 539 CMD, 540 CMD
+# ref539cmd = EyeBERTFile("539", "cmd").analyze()
+# ref540cmd = EyeBERTFile("540", "cmd").analyze()
+# if ref539cmd.verify() and ref540cmd.verify():
+#     ref539cmd = ref539cmd.createTemplate()
+#     ref540cmd = ref540cmd.createTemplate()
 
 def main():
     # Obtain cable and channel from user
@@ -284,16 +323,28 @@ def main():
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
     if analysis.verify(): # Only continue if template passes verifcation
+        #analysis.graph() 
+        #analysis.writeText()
+        
+        #writeCSV("AnalysisOutputs/" + "reference_temp.csv", ref540cmd.templateData)
+        #ref = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
+        #print(ref)
+
+        # print("\nREFERENCE - Properties:")
+        # refTemp.printProperties()
+        # print("\n")
 
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
 
-        ref = Reference("540", "CMD", "reference_tempv2.csv")
+        ref = Reference("540", "CMD", "reference_tempv2.csv", )
         refTemp = ref.createTemplate()
         
         # EDIT: reference needs to be a template object
         template.plot(refTemp) 
         print("\n")
+    else:
+        print(f"Error for cable {cable} and channel {channel.upper()}: Template failed verification step.")
 
 
 if __name__ == "__main__":
