@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+# To-Do:
+# Working with Windows & existing code
+# Display properties (counts for 0s & 1s, counts outside reference template when comparing, etc.)
+# Refine comparison templates and construct copy of .csv for comparisons
+# Clean up code/classes (maximize reusability)
+
 # Creates directory if it does not exist
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
@@ -58,17 +64,15 @@ class EyeBERTFile(EyeBERT):
         channelFiles = [] # Initialize empty list to store file names for the cable and channel 
         for file in os.listdir(self.dataPath):
             if self.channel in file and ".csv" in file:
-                channelFiles.append(file) # Append all file names for the cable and channel to the list
+                if "data" not in file and "template" not in file:
+                    channelFiles.append(file) # Append all file names for the cable and channel to the list
         channelFiles = self.getIndices(channelFiles) # Call method to obtain list of file names with their corresponding indices in order of most recent file to oldest
         index, recent = channelFiles[0] # Assign variables to each element of the ordered pair (index, file name) for the element at the beginning of the list (the most recent)
         return recent # Return the file name at that most recent file name's index 
 
-
     def getFilename(self):
         """Returns corresponding filename to cable and channel."""
         filename = self.dataPath + "/" + self.getFile()
-
-        print(f"getFilename(): filename = {filename}")
 
         return filename
 
@@ -78,9 +82,6 @@ class EyeBERTFile(EyeBERT):
         
         path = filename.replace(".csv", "_")
         self.setPath(path)
-        
-        print(f"readFile(): filename = {filename}")
-        print(f"readFile(): path = {path}")
 
         data = []
         with open(filename, "r") as file: 
@@ -249,6 +250,12 @@ class Template:
                     if self.templateData[i][j] != other.templateData[i][j]:
                         diffArr[i][j] = diffArr[i][j] - 2
         self.counts(outCounts, inCounts)
+
+        self.outCounts = outCounts
+        self.inCounts = inCounts 
+
+        #print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix outside of reference's eye 
+        # ADDITION: count for elements that are the same
         return diffArr 
     
     def plot(self, reference):
@@ -288,9 +295,24 @@ class Template:
         print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
         print(f"Reference's Eye-BERT values OUTSIDE the cable's eye: {inCounts}")
 
+    def getOutCounts(self):
+        return self.outCounts
+
+    def getInCounts(self):
+        return self.inCounts 
+
     def printProperties(self):
         print(f"Number of 0s: {self.zeros}")
         print(f"Number of 1s: {self.ones}")
+
+
+# Creating reference templates to compare to as objects of the Template class
+# Current template references: 539 CMD, 540 CMD
+# ref539cmd = EyeBERTFile("539", "cmd").analyze()
+# ref540cmd = EyeBERTFile("540", "cmd").analyze()
+# if ref539cmd.verify() and ref540cmd.verify():
+#     ref539cmd = ref539cmd.createTemplate()
+#     ref540cmd = ref540cmd.createTemplate()
 
 def main():
     # Obtain cable and channel from user

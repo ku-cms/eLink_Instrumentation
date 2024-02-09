@@ -8,11 +8,10 @@
 #
 # To Do : Add appending to XLS file with various cable info
 #       : Get cable specifics from operator
-#       : control EyeBERT relay board
 #       : repeat tests as needed
 #       : much better error recovery & data validation!
 
-version = 1.07
+version = 1.10
 
 from template_analysis_windows import EyeBERTFile, Reference
 
@@ -36,6 +35,7 @@ import sys
 import ctypes
 from pathvalidate import is_valid_filename
 import eyebertserial
+import dmmserial
 
 #
 # The e-link connection mapping is defined by a dictionary
@@ -84,9 +84,17 @@ pygui.PAUSE = 0.5
 #
 eb = eyebertserial.EyeBERTRelayControl()
 if eb.initialize() == False :
-    print(Fore.RED + "Terminating code 1")
+    print(Fore.RED + "Terminating code 1 eyebert relay init")
     sys.exit(1)
 eb.Blinky(5)
+
+#
+# open dmm
+# 
+dmm = dmmserial.Keithley2000DMMControl()
+if dmm.initialize() == False :
+    print(Fore.Red + "Terminating code 1 DMM init")
+    sys.exit(1)
 
 #
 # get operator name/initials
@@ -149,7 +157,6 @@ right_serialnumber = right_serialnumber.upper()
 #
 operator_notes = input(Fore.RED + "Operator notes: " + Fore.GREEN)
 
-
 #
 # guarantee caps lock is off
 #
@@ -160,6 +167,35 @@ if ctypes.WinDLL("User32.dll").GetKeyState(0x14) :
 # loop starts here
 
 keys = list(cable_mapping.keys())
+# 4wire DC resistance
+#pos_path = +1.05040543 # quick single point cal of cables + relay paths
+#neg_path = +1.01958215 # quick single point cal of cables + relay paths
+pos_path = 1.05 # rounded 2 places
+neg_path = 1.02 # rounded 2 places
+for key in keys :
+    if key == "name" :
+        continue
+    # just reporting to screen for now
+    txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
+    rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
+    eb.connection(txpath+b"\r\n")
+    eb.connection(rxpath+b"\r\n")
+    eb.LED(2,"ON")
+    eb.MODE(b"MODE DMM +\r\n")
+    print(f"path {key}",end="")
+    positive = round(dmm.reading(),2) - pos_path
+    eb.MODE(b"MODE DMM -\r\n")
+    negative = round(dmm.reading(),2) - neg_path
+    print(" DMM + ", end="")
+    print("%.2f" % positive, end="")
+    print(" DMM - ", end="")
+    print("%.2f" % negative)
+
+# exit(99)
+
+
+# eyebert
+eb.MODE(b"MODE KC705\r\n")
 for key in keys :
     if key == "name" :
         continue
@@ -282,11 +318,13 @@ for key in keys :
 
     os.rename(src,dest)
 
+    # Copy data csv file to R drive
     copyfilename = dest.replace(file_path+"/","")
     newdest = r_file_path + "/" + copyfilename
+    print(f"data path (1): {dest}")
+    print(f"data path (2): {newdest}")
     shutil.copyfile(dest, newdest)
     
-
     # EyeBERT Template Analysis
     cable = filename
     channel = str(key)
@@ -297,27 +335,12 @@ for key in keys :
 
     # Warning: .getPath() must be called AFTER .analyze()
     refPath = eyebert.getPath()
-    print(f"EyeBertAutomationDev.py: refPath = {refPath}")
 
     analysis.setPath(refPath)
 
     if analysis.verify(): # Only continue if template passes verifcation
-        #analysis.graph() 
-        #analysis.writeText()
-        
-        #writeCSV("AnalysisOutputs/" + "reference_temp.csv", ref540cmd.templateData)
-        #ref = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
-        #print(ref)
 
-        # print("\nREFERENCE - Properties:")
-        # refTemp.printProperties()
-        # print("\n")
-
-        # In progress testing for comparison analysis:
         template = analysis.createTemplate()
-
-        #refPath = eyebert.getPath()
-        #print(f"EyeBertAutomationDev.py: refPath = {refPath}")
 
         ref = Reference("540", "CMD", "reference_tempv2.csv", refPath)
         refTemp = ref.createTemplate()
@@ -325,12 +348,13 @@ for key in keys :
         # EDIT: reference needs to be a template object
         template.plot(refTemp) 
         print("\n")
+
+        out_points = template.getOutCounts()
+        in_points  = template.getInCounts()
     else:
         print(f"Error for cable {cable} and channel {channel.upper()}: Template failed verification step.")
 
-
-
-    # make the screen capture
+    # Make the screen capture
     print(Fore.GREEN + "Creating screen capture...")
     pygui.moveTo(355,800)
     pygui.click()
@@ -340,10 +364,23 @@ for key in keys :
         screenshot = cable_path + "/" + test_name + "_" + str(counter) + ".png"
         counter = counter + 1
 
+    # Save original screenshot 
     pygui.screenshot(screenshot,(360,190,1300,540))
+
+    # Copy screenshot to the R drive
     copyfilename = screenshot.replace(file_path+"/","")
     newdest = r_file_path + "/" + copyfilename
+    print(f"screenshot path (1): {screenshot}")
+    print(f"screenshot path (2): {newdest}")
     shutil.copyfile(screenshot, newdest)
+
+    # Copy template plot to the R drive
+    oldTemplatePath = refPath + "template_plots.pdf"
+    endPath = oldTemplatePath.split("/automation_results/")[-1]
+    newTemplatePath = r_file_path + "/" + endPath 
+    print(f"template plot path (1): {oldTemplatePath}")
+    print(f"template plot path (2): {newTemplatePath}")
+    shutil.copyfile(oldTemplatePath, newTemplatePath)
     
     # add results to dataset for future write
     now = datetime.datetime.now()
@@ -357,6 +394,8 @@ for key in keys :
           "open_area" : open_area, 
           "top_eye" : top_of_eye, 
           "bottom_eye" : bottom_of_eye,
+          "out_points" : out_points,
+          "in_points" : in_points,
           "operator" : operator,
           "left_SN" : left_serialnumber, 
           "right_SN" : right_serialnumber,
@@ -364,7 +403,6 @@ for key in keys :
         }
     )
 #end keys loop
-
 
 # update XLS file, create new entries as needed
 wb = Workbook()
@@ -387,7 +425,7 @@ if isExist == False :
     print(Fore.LIGHTRED_EX + "\tXLSX summary file does not exist. Creating file.")
     ws = wb.active
     newdata = ["Cable name", "channel", "date", "time", "open_area", "top_eye",
-               "bottom_eye", "operator", "left_SN", "right_SN", "notes"]
+               "bottom_eye", "out_points", "in_points", "operator", "left_SN", "right_SN", "notes"]
     ws.append(newdata)
     col = get_column_letter(1)
     ws.column_dimensions[col].bestFit = True
@@ -409,6 +447,8 @@ for key in keys :
                test_results[key]["open_area"],
                test_results[key]["top_eye"],
                test_results[key]["bottom_eye"],
+               test_results[key]["out_points"],
+               test_results[key]["in_points"],
                test_results[key]["operator"],
                test_results[key]["left_SN"],
                test_results[key]["right_SN"],
@@ -422,6 +462,3 @@ pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
 print(Fore.GREEN + Style.BRIGHT + "Done!" + Fore.RESET + Style.RESET_ALL)
 
 #excel_start_return = os.system('start "excel" ' + path + file_name)
-
-
-    
