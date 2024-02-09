@@ -203,8 +203,9 @@ class Template:
         self.zeros = np.count_nonzero(self.templateData==0)
         self.total = self.templateData.size
         self.path = path
-
-        print(f"Template class: self.path: {self.path}")
+        self.verbose = False
+        if self.verbose:
+            print(f"Template class: self.path: {self.path}")
 
     def view(self):
         for row in self.templateData:
@@ -249,10 +250,12 @@ class Template:
                 else:
                     if self.templateData[i][j] != other.templateData[i][j]:
                         diffArr[i][j] = diffArr[i][j] - 2
-        self.counts(outCounts, inCounts)
-
+        
+        # Save counts
         self.outCounts = outCounts
-        self.inCounts = inCounts 
+        self.inCounts = inCounts
+        # Once the counts are saved, we can print values
+        self.printProperties()
 
         #print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix outside of reference's eye 
         # ADDITION: count for elements that are the same
@@ -282,18 +285,8 @@ class Template:
         ax2.set_title("Eye-BERT Difference Template")
         #fig.colorbar(im, ax=ax2, location="bottom")
 
-        #plt.show()
-
-        print(f"Template.plot(): path: {self.path}")
-
         fig.savefig(self.path + "template_plots.pdf")   
         plt.close(fig)    
-        
-    def counts(self, outCounts, inCounts):
-        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
-        self.printProperties()
-        print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
-        print(f"Reference's Eye-BERT values OUTSIDE the cable's eye: {inCounts}")
 
     def getOutCounts(self):
         return self.outCounts
@@ -302,17 +295,11 @@ class Template:
         return self.inCounts 
 
     def printProperties(self):
-        print(f"Number of 0s: {self.zeros}")
-        print(f"Number of 1s: {self.ones}")
-
-
-# Creating reference templates to compare to as objects of the Template class
-# Current template references: 539 CMD, 540 CMD
-# ref539cmd = EyeBERTFile("539", "cmd").analyze()
-# ref540cmd = EyeBERTFile("540", "cmd").analyze()
-# if ref539cmd.verify() and ref540cmd.verify():
-#     ref539cmd = ref539cmd.createTemplate()
-#     ref540cmd = ref540cmd.createTemplate()
+        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}, eye-diagram analysis:")
+        print(f" - Number of 0s (points in open area): {self.zeros}")
+        print(f" - Number of 1s (points in closed area): {self.ones}")
+        print(f" - Number of 0s outside reference eye: {self.outCounts}")
+        print(f" - Number of 1s inside reference eye: {self.inCounts}")
 
 def main():
     # Obtain cable and channel from user
@@ -323,17 +310,6 @@ def main():
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
     if analysis.verify(): # Only continue if template passes verifcation
-        #analysis.graph() 
-        #analysis.writeText()
-        
-        #writeCSV("AnalysisOutputs/" + "reference_temp.csv", ref540cmd.templateData)
-        #ref = np.loadtxt("reference_temp.csv", delimiter=",", dtype=int)
-        #print(ref)
-
-        # print("\nREFERENCE - Properties:")
-        # refTemp.printProperties()
-        # print("\n")
-
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
 
