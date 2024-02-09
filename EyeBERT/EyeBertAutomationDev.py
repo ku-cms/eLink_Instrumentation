@@ -121,6 +121,9 @@ def main():
         if is_valid == False :
             print(Fore.RED + f"{filename} cannot be used as a directory or filename. Re-enter.")
 
+    # Assume that the filename is the cable number
+    cable = filename
+    
     #
     # get ready to use this as our destination path
     #
@@ -166,17 +169,25 @@ def main():
         print(Fore.RED + "CAPSLOCK is on - turning off." + Fore.RESET)
         pygui.press('capslock')
 
-    # loop starts here
-
     keys = list(cable_mapping.keys())
-    # 4wire DC resistance
+
+    print(f"Taking data for cable {cable}.")
+
+    # 4-point DC resistance
+    print("Beginning 4-point DC resistance measurements:")
+    
     #pos_path = +1.05040543 # quick single point cal of cables + relay paths
     #neg_path = +1.01958215 # quick single point cal of cables + relay paths
     pos_path = 1.05 # rounded 2 places
     neg_path = 1.02 # rounded 2 places
+    
     for key in keys :
+        # skip key if it is "name"
         if key == "name" :
             continue
+        # otherwise, we assume that the key is the channel
+        else:
+            channel = str(key)
         # just reporting to screen for now
         txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
         rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
@@ -184,7 +195,7 @@ def main():
         eb.connection(rxpath+b"\r\n")
         eb.LED(2,"ON")
         eb.MODE(b"MODE DMM +\r\n")
-        print(f"path {key}",end="")
+        print(f" - path {key}",end="")
         positive = round(dmm.reading(),2) - pos_path
         eb.MODE(b"MODE DMM -\r\n")
         negative = round(dmm.reading(),2) - neg_path
@@ -198,8 +209,12 @@ def main():
     # eyebert
     eb.MODE(b"MODE KC705\r\n")
     for key in keys :
+        # skip key if it is "name"
         if key == "name" :
             continue
+        # otherwise, we assume that the key is the channel
+        else:
+            channel = str(key)
         temp_name = filename + "_" + str(key) # change for looping version
         test_name = temp_name.replace(" ", "_")
         txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
@@ -328,8 +343,10 @@ def main():
         shutil.copyfile(dest, newdest)
         
         # EyeBERT Template Analysis
-        cable = filename
-        channel = str(key)
+
+        reference_template_file = "reference_template_v2.csv"
+        print(f"Using this reference template data file: {reference_template_file}")
+        
         # Create EyeBERTFile object, cleaning user input, to read data from file
         eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower(), file_path)
         # Call analyze method to obtain graphs and properties
@@ -344,7 +361,7 @@ def main():
 
             template = analysis.createTemplate()
 
-            ref = Reference("540", "CMD", "reference_tempv2.csv", refPath)
+            ref = Reference("540", "CMD", reference_template_file, refPath)
             refTemp = ref.createTemplate()
             
             # EDIT: reference needs to be a template object
