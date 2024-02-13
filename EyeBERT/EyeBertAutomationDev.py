@@ -1,10 +1,22 @@
 # EyeBertAutomation.py
 #
-# Test script for using pyautogui to control the Vivado EyeBert
-# program for CMS twisted pair BERT testing.
+# Developed by the KU CMS group.
 #
-# Automatically generate eye diagram, save screen shot of diagram
-# and extract the "Open Area" value from the measurement
+# Authors:
+# - Rob Young
+# - Nora Manolescu
+# - Caleb Smith
+#
+# Used for the following measurements for twisted pair electrical links (e-links):
+#
+# 1. Performs 4-point DC resistance measurements of all e-link channels (both positive and negative wires)
+#    using a Keithley, relay boards, SMA cables, and adapter boards.
+#    Saves 4-point DC resistance measurement results.
+#    Includes functionality for calibrating 4-point DC resistance for every e-link channel.
+#
+# 2. Performs "Eye BERT" area measurements (including eye-diagram template analysis) of all e-link channels (each differential pair)
+#    using pyautogui to control the Vivado "Eye BERT" program, where the hardware setup is a KC705, relay boards, SMA cables, and adapter boards.
+#    Saves eye-diagram and template analysis plots and records open area, height, and template analysis results.
 #
 # To Do : Add appending to XLS file with various cable info
 #       : Get cable specifics from operator
@@ -382,9 +394,12 @@ def main():
                 # EDIT: reference needs to be a template object
                 template.plot(refTemp) 
                 print("\n")
-
-                out_points = template.getOutCounts()
-                in_points  = template.getInCounts()
+                
+                # Get template analysis results
+                num_zeros   = template.getZeros()
+                num_ones    = template.getOnes()
+                out_points  = template.getOutCounts()
+                in_points   = template.getInCounts()
             else:
                 print(f"Error for cable {cable} and channel {channel.upper()}: Template failed verification step.")
 
@@ -423,19 +438,21 @@ def main():
             channel_name = key
             test_results.update(
                 {key : 
-                {"test_name" : test_name.replace("_"+channel_name,""),
-                "channel" : channel_name,
-                "date" : now.strftime("%Y-%m-%d"),
-                "time" : now.strftime("%H:%M:%S"),
-                "open_area" : open_area, 
-                "top_eye" : top_of_eye, 
-                "bottom_eye" : bottom_of_eye,
-                "out_points" : out_points,
-                "in_points" : in_points,
-                "operator" : operator,
-                "left_SN" : left_serialnumber, 
-                "right_SN" : right_serialnumber,
-                "notes" : operator_notes}
+                {"test_name"    : test_name.replace("_"+channel_name,""),
+                "channel"       : channel_name,
+                "date"          : now.strftime("%Y-%m-%d"),
+                "time"          : now.strftime("%H:%M:%S"),
+                "open_area"     : open_area, 
+                "top_eye"       : top_of_eye, 
+                "bottom_eye"    : bottom_of_eye,
+                "num_zeros"     : num_zeros,
+                "num_ones"      : num_ones,
+                "out_points"    : out_points,
+                "in_points"     : in_points,
+                "operator"      : operator,
+                "left_SN"       : left_serialnumber, 
+                "right_SN"      : right_serialnumber,
+                "notes"         : operator_notes}
                 }
             )
         #end keys loop
@@ -460,8 +477,9 @@ def main():
             # create file
             print(Fore.LIGHTRED_EX + "\tXLSX summary file does not exist. Creating file.")
             ws = wb.active
-            newdata = ["Cable name", "channel", "date", "time", "open_area", "top_eye",
-                    "bottom_eye", "out_points", "in_points", "operator", "left_SN", "right_SN", "notes"]
+            newdata = ["cable name", "channel", "date", "time", "open_area", "top_eye",
+                       "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
+                       "operator", "left_SN", "right_SN", "notes"]
             ws.append(newdata)
             col = get_column_letter(1)
             ws.column_dimensions[col].bestFit = True
@@ -483,6 +501,8 @@ def main():
                     test_results[key]["open_area"],
                     test_results[key]["top_eye"],
                     test_results[key]["bottom_eye"],
+                    test_results[key]["num_zeros"],
+                    test_results[key]["num_ones"],
                     test_results[key]["out_points"],
                     test_results[key]["in_points"],
                     test_results[key]["operator"],

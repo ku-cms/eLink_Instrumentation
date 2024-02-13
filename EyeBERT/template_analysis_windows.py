@@ -196,14 +196,14 @@ class Reference:
 # Template Class to compare templates
 class Template:
     def __init__(self, templateData, cable, channel, path):
-        self.cable = cable
-        self.channel = channel 
+        self.cable      = cable
+        self.channel    = channel 
         self.templateData = templateData.astype(int)
-        self.ones = np.count_nonzero(self.templateData==1)
-        self.zeros = np.count_nonzero(self.templateData==0)
-        self.total = self.templateData.size
-        self.path = path
-        self.verbose = False
+        self.ones       = np.count_nonzero(self.templateData==1)
+        self.zeros      = np.count_nonzero(self.templateData==0)
+        self.total      = self.templateData.size
+        self.path       = path
+        self.verbose    = False
         if self.verbose:
             print(f"Template class: self.path: {self.path}")
 
@@ -288,6 +288,12 @@ class Template:
         fig.savefig(self.path + "template_plots.pdf")   
         plt.close(fig)    
 
+    def getZeros(self):
+        return self.zeros
+    
+    def getOnes(self):
+        return self.ones
+    
     def getOutCounts(self):
         return self.outCounts
 
