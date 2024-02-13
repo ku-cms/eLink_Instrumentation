@@ -32,7 +32,7 @@ class EyeBERT:
         return self.path
 
     def setPath(self, path):
-        self.path = path 
+        self.path = path
 
 class EyeBERTFile(EyeBERT):
     def __init__(self, cable, channel, basePath):
@@ -175,7 +175,7 @@ class Reference:
         self.cable = cable
         self.channel = channel
         self.filename = filename
-        self.path = path 
+        self.path = path
 
     def getReference(self):
         data = []
@@ -311,15 +311,21 @@ def main():
     # Obtain cable and channel from user
     cable = str(input("Cable: "))
     channel = str(input("Channel: "))
+    base_path = "/Users/caleb/CMS/Tracker/e-links/eLink_Instrumentation/EyeBERT/EyeBERT_data"
     # Create EyeBERTFile object, cleaning user input, to read data from file
-    eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower())
+    eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower(), base_path)
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
-    if analysis.verify(): # Only continue if template passes verifcation
+    # Warning: .getPath() must be called AFTER .analyze()
+    refPath = eyebert.getPath()
+    if analysis.verify(): # Only continue if template passes verification
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
 
-        ref = Reference("540", "CMD", "reference_tempv2.csv", )
+        reference_template_file = "EyeBERT/reference_template_v2.csv"
+        print(f"Using this reference template data file: {reference_template_file}")
+        
+        ref = Reference("540", "CMD", reference_template_file, refPath)
         refTemp = ref.createTemplate()
         
         # EDIT: reference needs to be a template object
