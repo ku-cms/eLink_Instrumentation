@@ -288,7 +288,7 @@ def main():
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
 
-        ref = Reference("540", "CMD", "reference_tempv2.csv")
+        ref = Reference("540", "CMD", "reference_template_v2.csv")
         refTemp = ref.createTemplate()
         
         # EDIT: reference needs to be a template object
