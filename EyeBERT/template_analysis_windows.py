@@ -63,7 +63,9 @@ class EyeBERTFile(EyeBERT):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
         channelFiles = [] # Initialize empty list to store file names for the cable and channel 
         for file in os.listdir(self.dataPath):
+            # require a csv file with channel in the file name
             if self.channel in file and ".csv" in file:
+                # require that data and template are not in the file name
                 if "data" not in file and "template" not in file:
                     channelFiles.append(file) # Append all file names for the cable and channel to the list
         channelFiles = self.getIndices(channelFiles) # Call method to obtain list of file names with their corresponding indices in order of most recent file to oldest
