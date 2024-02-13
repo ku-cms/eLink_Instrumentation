@@ -295,7 +295,7 @@ class Template:
         return self.inCounts 
 
     def printProperties(self):
-        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}, eye-diagram analysis:")
+        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}, eye-diagram template analysis:")
         print(f" - Number of 0s (points in open area): {self.zeros}")
         print(f" - Number of 1s (points in closed area): {self.ones}")
         print(f" - Number of 0s outside reference eye: {self.outCounts}")
