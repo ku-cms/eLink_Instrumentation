@@ -21,6 +21,12 @@ class EyeBERT:
         self.channel = channel 
         self.path = "AnalysisOutputs/" + self.cable + "/" + self.cable + "_" + self.channel + "_" # Prefix for new outputted files
 
+    def getPath(self):
+        return self.path
+    
+    def setPath(self, path):
+        self.path = path
+
 class EyeBERTFile(EyeBERT):
     def __init__(self, cable, channel):
         super().__init__(cable, channel)
@@ -53,8 +59,11 @@ class EyeBERTFile(EyeBERT):
         channelFiles = [] 
         # Append all .csv files with the corresponding channel from the directory to the list
         for file in os.listdir(self.dataPath):
+            # require a csv file with channel in the file name
             if self.channel in file and ".csv" in file:
-                channelFiles.append(file)
+                # require that data and template are not in the file name
+                if "data" not in file and "template" not in file:
+                    channelFiles.append(file)
         # Sort file names in descending order to ensure latest file will always be at index 0 
         channelFiles = self.getIndices(channelFiles)
         # Return the file name at index 0 (latest file for that channel)
@@ -157,10 +166,11 @@ class EyeBERTAnalysis(EyeBERT):
     
 # Reference Class
 class Reference:
-    def __init__(self, cable, channel, filename):
+    def __init__(self, cable, channel, filename, path):
         self.cable = cable
         self.channel = channel
         self.filename = filename
+        self.path = path
 
     def getReference(self):
         data = [] 
@@ -283,12 +293,17 @@ def main():
     eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower())
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
-    if analysis.verify(): # Only continue if template passes verifcation
+    # Warning: .getPath() must be called AFTER .analyze()
+    refPath = eyebert.getPath()
+    if analysis.verify(): # Only continue if template passes verification
 
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
+        
+        reference_template_file = "EyeBERT/reference_template_v2.csv"
+        print(f"Using this reference template data file: {reference_template_file}")
 
-        ref = Reference("540", "CMD", "reference_template_v2.csv")
+        ref = Reference("540", "CMD", reference_template_file, refPath)
         refTemp = ref.createTemplate()
         
         # EDIT: reference needs to be a template object
