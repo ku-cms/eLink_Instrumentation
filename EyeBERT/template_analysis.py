@@ -21,6 +21,12 @@ class EyeBERT:
         self.channel = channel 
         self.path = "AnalysisOutputs/" + self.cable + "/" + self.cable + "_" + self.channel + "_" # Prefix for new outputted files
 
+    def getPath(self):
+        return self.path
+    
+    def setPath(self, path):
+        self.path = path
+
 class EyeBERTFile(EyeBERT):
     def __init__(self, cable, channel):
         super().__init__(cable, channel)
@@ -53,8 +59,11 @@ class EyeBERTFile(EyeBERT):
         channelFiles = [] 
         # Append all .csv files with the corresponding channel from the directory to the list
         for file in os.listdir(self.dataPath):
+            # require a csv file with channel in the file name
             if self.channel in file and ".csv" in file:
-                channelFiles.append(file)
+                # require that data and template are not in the file name
+                if "data" not in file and "template" not in file:
+                    channelFiles.append(file)
         # Sort file names in descending order to ensure latest file will always be at index 0 
         channelFiles = self.getIndices(channelFiles)
         # Return the file name at index 0 (latest file for that channel)
@@ -157,10 +166,11 @@ class EyeBERTAnalysis(EyeBERT):
     
 # Reference Class
 class Reference:
-    def __init__(self, cable, channel, filename):
+    def __init__(self, cable, channel, filename, path):
         self.cable = cable
         self.channel = channel
         self.filename = filename
+        self.path = path
 
     def getReference(self):
         data = [] 
@@ -231,7 +241,12 @@ class Template:
                 else:
                     if self.templateData[i][j] != other.templateData[i][j]:
                         diffArr[i][j] = diffArr[i][j] - 2
-        self.counts(outCounts, inCounts)
+        
+        # Save counts
+        self.outCounts = outCounts
+        self.inCounts  = inCounts
+        # Once the counts are saved, we can print values
+        self.printProperties()
 
         #print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix outside of reference's eye 
         # ADDITION: count for elements that are the same
@@ -265,15 +280,24 @@ class Template:
         #fig.savefig(self.path + "plots.pdf")   
         plt.close(fig)    
         
-    def counts(self, outCounts, inCounts):
-        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
-        self.printProperties()
-        print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
-        print(f"Reference's Eye-BERT values OUTSIDE the cable's eye: {inCounts}")
+    def getZeros(self):
+        return self.zeros
+    
+    def getOnes(self):
+        return self.ones
+    
+    def getOutCounts(self):
+        return self.outCounts
+
+    def getInCounts(self):
+        return self.inCounts
 
     def printProperties(self):
-        print(f"Number of 0s: {self.zeros}")
-        print(f"Number of 1s: {self.ones}")
+        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}, eye-diagram template analysis:")
+        print(f" - Number of 0s (points in open area): {self.zeros}")
+        print(f" - Number of 1s (points in closed area): {self.ones}")
+        print(f" - Number of 0s outside reference eye: {self.outCounts}")
+        print(f" - Number of 1s inside reference eye: {self.inCounts}")
 
 def main():
     # Obtain cable and channel from user
@@ -283,12 +307,17 @@ def main():
     eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower())
     # Call analyze method to obtain graphs and properties
     analysis = eyebert.analyze()
-    if analysis.verify(): # Only continue if template passes verifcation
+    # Warning: .getPath() must be called AFTER .analyze()
+    refPath = eyebert.getPath()
+    if analysis.verify(): # Only continue if template passes verification
 
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
+        
+        reference_template_file = "EyeBERT/reference_template_v2.csv"
+        print(f"Using this reference template data file: {reference_template_file}")
 
-        ref = Reference("540", "CMD", "reference_tempv2.csv")
+        ref = Reference("540", "CMD", reference_template_file, refPath)
         refTemp = ref.createTemplate()
         
         # EDIT: reference needs to be a template object
