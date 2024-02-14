@@ -255,7 +255,7 @@ class Template:
         
         # Save counts
         self.outCounts = outCounts
-        self.inCounts = inCounts
+        self.inCounts  = inCounts
         # Once the counts are saved, we can print values
         self.printProperties()
 
@@ -300,7 +300,7 @@ class Template:
         return self.outCounts
 
     def getInCounts(self):
-        return self.inCounts 
+        return self.inCounts
 
     def printProperties(self):
         print(f"Cable: {self.cable}, Channel: {self.channel.upper()}, eye-diagram template analysis:")

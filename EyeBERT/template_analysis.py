@@ -241,7 +241,12 @@ class Template:
                 else:
                     if self.templateData[i][j] != other.templateData[i][j]:
                         diffArr[i][j] = diffArr[i][j] - 2
-        self.counts(outCounts, inCounts)
+        
+        # Save counts
+        self.outCounts = outCounts
+        self.inCounts  = inCounts
+        # Once the counts are saved, we can print values
+        self.printProperties()
 
         #print(diffCounts) # NEED TO OUTPUT TO .TXT: count for differing elements in matrix outside of reference's eye 
         # ADDITION: count for elements that are the same
@@ -275,15 +280,24 @@ class Template:
         #fig.savefig(self.path + "plots.pdf")   
         plt.close(fig)    
         
-    def counts(self, outCounts, inCounts):
-        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
-        self.printProperties()
-        print(f"Eye-BERT values OUTSIDE the reference's eye: {outCounts}")
-        print(f"Reference's Eye-BERT values OUTSIDE the cable's eye: {inCounts}")
+    def getZeros(self):
+        return self.zeros
+    
+    def getOnes(self):
+        return self.ones
+    
+    def getOutCounts(self):
+        return self.outCounts
+
+    def getInCounts(self):
+        return self.inCounts
 
     def printProperties(self):
-        print(f"Number of 0s: {self.zeros}")
-        print(f"Number of 1s: {self.ones}")
+        print(f"Cable: {self.cable}, Channel: {self.channel.upper()}, eye-diagram template analysis:")
+        print(f" - Number of 0s (points in open area): {self.zeros}")
+        print(f" - Number of 1s (points in closed area): {self.ones}")
+        print(f" - Number of 0s outside reference eye: {self.outCounts}")
+        print(f" - Number of 1s inside reference eye: {self.inCounts}")
 
 def main():
     # Obtain cable and channel from user
