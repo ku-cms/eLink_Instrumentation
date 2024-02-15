@@ -32,8 +32,11 @@ unset xil_newLinks
 # assign link settings
 set_property TXPRE {0.00 dB (00000)} [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
 set_property TXPOST {0.00 dB (00000)} [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
+
 set_property TXDIFFSWING {741 mV (0111)} [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
+
 set_property TX_PATTERN {PRBS 7-bit} [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
 set_property RX_PATTERN {PRBS 7-bit} [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
+
 # the commit_hw_sio command is only required once at the end to apply the link settings
 commit_hw_sio -non_blocking [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203AE483DA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
