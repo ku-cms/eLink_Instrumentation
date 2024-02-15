@@ -54,7 +54,7 @@ def main():
     verbose = False
     RUN_4PT_DC_RES_CALIBRATION  = True
     RUN_4PT_DC_RES              = False
-    RUN_EYE_BERT_AREA           = False 
+    RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
     test_results = {}
 
@@ -188,7 +188,11 @@ def main():
 
     keys = list(cable_mapping.keys())
 
-    if RUN_4PT_DC_RES or RUN_EYE_BERT_AREA:
+    if RUN_4PT_DC_RES_CALIBRATION:
+        print("")
+        print("Running 4-point DC resistance calibration.")
+        print("")
+    elif RUN_4PT_DC_RES or RUN_EYE_BERT_AREA:
         print("")
         print(f"Taking data for cable {cable}.")
         print("")
@@ -204,10 +208,18 @@ def main():
         print("--------------------------------------------")
 
         calibration_data = {}
-
         calibration_file = "4_point_DC_Calibration_v1.json"
 
-        print(f"Calibration data will be saved to {calibration_file}")
+        print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
+        
+        # Confirm that user wants to continue
+        user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
+        if user_accept.lower() == "y":
+            print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
+        else:
+            print("Exiting...")
+            print(Fore.RED + "Terminating code 3: exit based on user input.")
+            sys.exit(3)
         
         for key in keys :
             # skip key if it is "name"
@@ -217,7 +229,8 @@ def main():
             else:
                 channel = str(key)
 
-            connect = input(Fore.RED + f"Please connect P and N lines for channel {key}; press enter when ready." + Fore.GREEN)
+            # Pause for user to connect
+            user_connect = input(Fore.RED + f"Please connect through lines (P to P and N to N) for channel {key}; press enter when ready. " + Fore.GREEN)
 
             # just reporting to screen for now
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
@@ -238,8 +251,14 @@ def main():
             calibration_data[key + "_p"] = positive
             calibration_data[key + "_n"] = negative
 
+        # Save calibration data to json file
+        print(f"Saving calibration data to {calibration_file}.")
         with open(calibration_file, "w") as write_file:
             json.dump(calibration_data, write_file, indent=4)
+        
+        print("The calibration is complete!")
+        print("Exiting...")
+        sys.exit(4)
 
     # 4-point DC resistance measurements
     if RUN_4PT_DC_RES:
@@ -247,12 +266,12 @@ def main():
         print("Beginning 4-point DC resistance measurements.")
         print("---------------------------------------------")
 
+        calibration_data = {}
         calibration_file = "4_point_DC_Calibration_v1.json"
 
-        print(f"Using calibration file: {calibration_file}")
-
-        calibration_data = {}
+        print(f"Using the calibration file {calibration_file}.")
         
+        # Load calibration data from json file
         with open(calibration_file, "r") as read_file:
             calibration_data = json.load(read_file)
 
