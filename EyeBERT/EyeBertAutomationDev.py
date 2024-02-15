@@ -47,13 +47,14 @@ import ctypes
 from pathvalidate import is_valid_filename
 import eyebertserial
 import dmmserial
+import json
 
 def main():
     # parameters
     verbose = False
-    RUN_4PT_DC_RES_CALIBRATION  = False
-    RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = True
+    RUN_4PT_DC_RES_CALIBRATION  = True
+    RUN_4PT_DC_RES              = False
+    RUN_EYE_BERT_AREA           = False 
     pygui.PAUSE = 0.5
     test_results = {}
 
@@ -107,10 +108,12 @@ def main():
     #
     # open dmm
     # 
-    dmm = dmmserial.Keithley2000DMMControl()
-    if dmm.initialize() == False :
-        print(Fore.Red + "Terminating code 1 DMM init")
-        sys.exit(1)
+    dmm = None
+    if RUN_4PT_DC_RES or RUN_4PT_DC_RES_CALIBRATION:
+        dmm = dmmserial.Keithley2000DMMControl()
+        if dmm.initialize() == False :
+            print(Fore.RED + "Terminating code 1 DMM init")
+            sys.exit(1)
 
     #
     # get operator name/initials
@@ -194,16 +197,17 @@ def main():
         print("Nothing to do (based on run flags)...")
         print("")
 
-    # 4-point DC resistance measurements
-    if RUN_4PT_DC_RES:
-        print("---------------------------------------------")
-        print("Beginning 4-point DC resistance measurements.")
-        print("---------------------------------------------")
-        
-        #pos_path = +1.05040543 # quick single point cal of cables + relay paths
-        #neg_path = +1.01958215 # quick single point cal of cables + relay paths
-        pos_path = 1.05 # rounded 2 places
-        neg_path = 1.02 # rounded 2 places
+    # 4-point DC resistance calibration
+    if RUN_4PT_DC_RES_CALIBRATION:
+        print("--------------------------------------------")
+        print("Beginning 4-point DC resistance calibration.")
+        print("--------------------------------------------")
+
+        calibration_data = {}
+
+        calibration_file = "4_point_DC_Calibration_v1.json"
+
+        print(f"Calibration data will be saved to {calibration_file}")
         
         for key in keys :
             # skip key if it is "name"
@@ -212,6 +216,62 @@ def main():
             # otherwise, we assume that the key is the channel
             else:
                 channel = str(key)
+
+            connect = input(Fore.RED + f"Please connect P and N lines for channel {key}; press enter when ready." + Fore.GREEN)
+
+            # just reporting to screen for now
+            txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
+            rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
+            eb.connection(txpath+b"\r\n")
+            eb.connection(rxpath+b"\r\n")
+            eb.LED(2,"ON")
+            eb.MODE(b"MODE DMM +\r\n")
+            print(f" - path {key}",end="")
+            positive = round(dmm.reading(),2)
+            eb.MODE(b"MODE DMM -\r\n")
+            negative = round(dmm.reading(),2) 
+            print(" DMM + ", end="")
+            print("%.2f" % positive, end="")
+            print(" DMM - ", end="")
+            print("%.2f" % negative)
+
+            calibration_data[key + "_p"] = positive
+            calibration_data[key + "_n"] = negative
+
+        with open(calibration_file, "w") as write_file:
+            json.dump(calibration_data, write_file, indent=4)
+
+    # 4-point DC resistance measurements
+    if RUN_4PT_DC_RES:
+        print("---------------------------------------------")
+        print("Beginning 4-point DC resistance measurements.")
+        print("---------------------------------------------")
+
+        calibration_file = "4_point_DC_Calibration_v1.json"
+
+        print(f"Using calibration file: {calibration_file}")
+
+        calibration_data = {}
+        
+        with open(calibration_file, "r") as read_file:
+            calibration_data = json.load(read_file)
+
+        #pos_path = +1.05040543 # quick single point cal of cables + relay paths
+        #neg_path = +1.01958215 # quick single point cal of cables + relay paths
+        #pos_path = 1.05 # rounded 2 places
+        #neg_path = 1.02 # rounded 2 places
+        
+        for key in keys :
+            # skip key if it is "name"
+            if key == "name" :
+                continue
+            # otherwise, we assume that the key is the channel
+            else:
+                channel = str(key)
+
+            pos_path = calibration_data[key + "_p"]
+            neg_path = calibration_data[key + "_n"]
+            
             # just reporting to screen for now
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
