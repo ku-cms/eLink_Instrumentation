@@ -229,12 +229,15 @@ def main():
             else:
                 channel = str(key)
 
-            # Pause for user to connect
-            user_connect = input(Fore.RED + f"Please connect through lines (P to P and N to N) for channel {key}; press enter when ready. " + Fore.GREEN)
-
-            # just reporting to screen for now
+            # get TX and RX paths from cable mapping
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
+
+            # pause for user to connect through lines (P to P and N to N) for channel
+            print(Fore.RED + f"Please connect through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
+            user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
+
+            # take measurements; do not subtract anything
             eb.connection(txpath+b"\r\n")
             eb.connection(rxpath+b"\r\n")
             eb.LED(2,"ON")
@@ -248,6 +251,7 @@ def main():
             print(" DMM - ", end="")
             print("%.2f" % negative)
 
+            # save data
             calibration_data[key + "_p"] = positive
             calibration_data[key + "_n"] = negative
 
@@ -287,13 +291,17 @@ def main():
             # otherwise, we assume that the key is the channel
             else:
                 channel = str(key)
-
+            
+            # get calibration data for channel (for both P and N lines)
             pos_path = calibration_data[key + "_p"]
             neg_path = calibration_data[key + "_n"]
             
-            # just reporting to screen for now
+            # get TX and RX paths from cable mapping
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
+
+            # take measurements and subtract calibration values
+            # just reporting results to screen for now
             eb.connection(txpath+b"\r\n")
             eb.connection(rxpath+b"\r\n")
             eb.LED(2,"ON")
