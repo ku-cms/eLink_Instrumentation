@@ -52,8 +52,8 @@ import json
 def main():
     # parameters
     verbose = False
-    RUN_4PT_DC_RES_CALIBRATION  = True
-    RUN_4PT_DC_RES              = False
+    RUN_4PT_DC_RES_CALIBRATION  = False
+    RUN_4PT_DC_RES              = True
     RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
     test_results = {}
@@ -207,8 +207,9 @@ def main():
         print("Beginning 4-point DC resistance calibration.")
         print("--------------------------------------------")
 
+        # TODO: automatically create new calibration file name
         calibration_data = {}
-        calibration_file = "4_point_DC_Calibration_v1.json"
+        calibration_file = "4_point_DC_Calibration_v2.json"
 
         print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
         
