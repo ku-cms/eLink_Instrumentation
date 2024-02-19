@@ -2,7 +2,7 @@ import serial
 import serial.tools.list_ports
 import time
 from colorama import Fore, init
-#import sys
+import sys
 
 #
 # sample connection dictionaries
@@ -50,6 +50,9 @@ class EyeBERTRelayControl:
         for port, desc, hwid in sorted(ports) :
             #print("{}: {} [{}]".format(port,desc,hwid))
             if hwid == "USB VID:PID=0403:6001 SER=B0026EF9A" :
+                port_to_use = port
+                break
+            if hwid == "USB VID:PID=0403:6001 SER=B0039DXVA" :
                 port_to_use = port
                 break
          
@@ -123,6 +126,10 @@ class EyeBERTRelayControl:
             #print(cmd)
             self.ser.write(cmd)
 
+    def MODE(self, modestr) :
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
+        self.ser.write(modestr.upper());
 
 
 
@@ -133,42 +140,43 @@ class EyeBERTRelayControl:
 
 
 
-
-# #
-# # how to step through entries in connection dictionary
-# #
-# def testV_45_33(obj,type) :
-#     keys = list(type.keys())
-#     print(keys)
-#     for x in keys :
-#         print("Testing {} path".format(x))
-#         txpath = b"tx " + bytes(type[x]['tx'], 'utf-8') + b"\r\n"
-#         rxpath = b"rx " + bytes(type[x]['rx'], 'utf-8') + b"\r\n"
-#         obj.connection(txpath)
-#         time.sleep(0.1)
-#         obj.connection(rxpath)
-#         obj.LED(2,"ON")
-#         time.sleep(5) # actual testing occurs here, time delay is dummy
-#         obj.LED(2,"OFF")
-#     obj.LED(2,"OFF")
-
+#
+# how to step through entries in connection dictionary
+#
+""" def testV_45_33(obj,type) :
+    keys = list(type.keys())
+    print(keys)
+    for x in keys :
+        print("Testing {} path".format(x))
+        txpath = b"tx " + bytes(type[x]['tx'], 'utf-8') + b"\r\n"
+        rxpath = b"rx " + bytes(type[x]['rx'], 'utf-8') + b"\r\n"
+        obj.connection(txpath)
+        time.sleep(0.1)
+        obj.connection(rxpath)
+        obj.LED(2,"ON")
+        time.sleep(5) # actual testing occurs here, time delay is dummy
+        obj.LED(2,"OFF")
+    obj.LED(2,"OFF")
+ """
 
 #
 # test code
 #
 # create instance & continue if relay board found
-# eb = EyeBERTRelayControl()
-# if eb.initialize() == False :
-#     print("Terminating code 1")
-#     sys.exit(1)
+#eb = EyeBERTRelayControl()
+#if eb.initialize() == False :
+#    print("Terminating code 1")
+#    sys.exit(1)
 
 # # blink some LEDs
-# print("Das Blinkin Lights")
-# eb.Blinky(5)
+#print("Das Blinkin Lights")
+#eb.Blinky(5)
 
 # # a sample test could be like this call
-# print("Testing sample paths")
-# testV_45_33(eb, typeV_45_33) # this would also need to handle the running of the EyeBERT TCL files
+# #print("Testing sample paths")
+# #testV_45_33(eb, typeV_45_33) # this would also need to handle the running of the EyeBERT TCL files
 
 # print("Done")
-
+# cmd = b"MODE DMM +\r\n"
+# eb.MODE(cmd)
+# testV_45_33(eb, typeV_45_33)
