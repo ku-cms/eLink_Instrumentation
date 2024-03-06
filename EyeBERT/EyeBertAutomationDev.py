@@ -23,7 +23,7 @@
 #       : repeat tests as needed
 #       : much better error recovery & data validation!
 
-version = 1.11
+version = 1.12
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -49,6 +49,15 @@ import eyebertserial
 import dmmserial
 import json
 
+# Get bad 4-point DC channels
+def GetBadDCChannels(measurement_data):
+    bad_channels = {}
+    for key in measurement_data:
+        value = measurement_data[key]
+        if value > 10.0:
+            bad_channels[key] = value
+    return bad_channels
+
 def main():
     # parameters
     verbose = False
@@ -56,7 +65,8 @@ def main():
     RUN_4PT_DC_RES              = True
     RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
-    test_results = {}
+    eye_bert_results = {}
+    dc_resistance_results = {}
 
     #
     # The e-link connection mapping is defined by a dictionary
@@ -270,7 +280,8 @@ def main():
         print("---------------------------------------------")
         print("Beginning 4-point DC resistance measurements.")
         print("---------------------------------------------")
-
+        
+        measurement_data = {}
         calibration_data = {}
         calibration_file = "4_point_DC_Calibration_v1.json"
 
@@ -307,14 +318,63 @@ def main():
             eb.connection(rxpath+b"\r\n")
             eb.LED(2,"ON")
             eb.MODE(b"MODE DMM +\r\n")
-            print(f" - path {key}",end="")
             positive = round(dmm.reading(),2) - pos_path
             eb.MODE(b"MODE DMM -\r\n")
             negative = round(dmm.reading(),2) - neg_path
-            print(" DMM + ", end="")
-            print("%.2f" % positive, end="")
-            print(" DMM - ", end="")
-            print("%.2f" % negative)
+            #print(f" - path {key}:",end="")
+            #print(" DMM + ", end="")
+            #print("%.2f" % positive, end="")
+            #print(" DMM - ", end="")
+            #print("%.2f" % negative)
+            print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+
+            # save data
+            measurement_data[key + "_p"] = positive
+            measurement_data[key + "_n"] = negative
+
+        # Get bad 4-point DC channels
+        bad_channels = GetBadDCChannels(measurement_data)
+        
+        if bad_channels:
+            print(Fore.RED + "Warning: The following channels have large 4-point DC resistance:" + Fore.GREEN)
+            for key in bad_channels:
+                value = bad_channels[key]
+                print(f" - {key}: {value}")
+            print(Fore.RED + "Possible causes:" + Fore.GREEN)
+            print(" - The e-link is not connected properly.")
+            print(" - The SMA cable mapping is not correct for this type of e-link.")
+            print(" - The e-link has a break or discontinuity for these channels.")
+
+        # add results to dataset for future write
+        # TODO: delete comments after testing:
+        #cable_name = test_name.replace("_"+channel_name,"")
+        #channel_name = key
+        
+        now = datetime.datetime.now()
+        date_now = now.strftime("%Y-%m-%d")
+        time_now = now.strftime("%H:%M:%S")
+
+        dc_resistance_results.update(
+            {key :
+                {
+                "cable"         : cable,
+                "channel"       : channel,
+                "date"          : now.strftime("%Y-%m-%d"),
+                "time"          : now.strftime("%H:%M:%S"),
+                "cmd_p"         : measurement_data["cmd_p"],
+                "cmd_n"         : measurement_data["cmd_n"],
+                "d0_p"          : measurement_data["d0_p"],
+                "d0_n"          : measurement_data["d0_n"],
+                "d1_p"          : measurement_data["d1_p"],
+                "d1_n"          : measurement_data["d1_n"],
+                "d2_p"          : measurement_data["d2_p"],
+                "d2_n"          : measurement_data["d2_n"],
+                "d3_p"          : measurement_data["d3_p"],
+                "d3_n"          : measurement_data["d3_n"],
+                "notes"         : operator_notes
+                }
+            }
+        )
 
     # Eye BERT area measurements
     if RUN_EYE_BERT_AREA:
@@ -522,25 +582,33 @@ def main():
             shutil.copyfile(oldTemplatePath, newTemplatePath)
             
             # add results to dataset for future write
+            # TODO: delete comments after testing:
+            #cable_name = test_name.replace("_"+channel_name,"")
+            #channel_name = key
+            
             now = datetime.datetime.now()
-            channel_name = key
-            test_results.update(
+            date_now = now.strftime("%Y-%m-%d")
+            time_now = now.strftime("%H:%M:%S")
+            
+            eye_bert_results.update(
                 {key : 
-                {"test_name"    : test_name.replace("_"+channel_name,""),
-                "channel"       : channel_name,
-                "date"          : now.strftime("%Y-%m-%d"),
-                "time"          : now.strftime("%H:%M:%S"),
-                "open_area"     : open_area, 
-                "top_eye"       : top_of_eye, 
-                "bottom_eye"    : bottom_of_eye,
-                "num_zeros"     : num_zeros,
-                "num_ones"      : num_ones,
-                "out_points"    : out_points,
-                "in_points"     : in_points,
-                "operator"      : operator,
-                "left_SN"       : left_serialnumber, 
-                "right_SN"      : right_serialnumber,
-                "notes"         : operator_notes}
+                    {
+                    "cable"         : cable,
+                    "channel"       : channel,
+                    "date"          : date_now,
+                    "time"          : time_now,
+                    "open_area"     : open_area, 
+                    "top_eye"       : top_of_eye, 
+                    "bottom_eye"    : bottom_of_eye,
+                    "num_zeros"     : num_zeros,
+                    "num_ones"      : num_ones,
+                    "out_points"    : out_points,
+                    "in_points"     : in_points,
+                    "operator"      : operator,
+                    "left_SN"       : left_serialnumber, 
+                    "right_SN"      : right_serialnumber,
+                    "notes"         : operator_notes
+                    }
                 }
             )
         #end keys loop
@@ -565,7 +633,8 @@ def main():
             # create file
             print(Fore.LIGHTRED_EX + "\tXLSX summary file does not exist. Creating file.")
             ws = wb.active
-            newdata = ["cable name", "channel", "date", "time", "open_area", "top_eye",
+            # table headers
+            newdata = ["cable", "channel", "date", "time", "open_area", "top_eye",
                        "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
                        "operator", "left_SN", "right_SN", "notes"]
             ws.append(newdata)
@@ -579,24 +648,25 @@ def main():
             ws = wb.active
 
         print(Fore.GREEN + "Adding data...")
-        cablename = test_name
-        keys = list(test_results)
+        keys = list(eye_bert_results)
         for key in keys :
-            newdata = [test_results[key]["test_name"],
-                    test_results[key]["channel"],
-                    test_results[key]["date"],
-                    test_results[key]["time"],
-                    test_results[key]["open_area"],
-                    test_results[key]["top_eye"],
-                    test_results[key]["bottom_eye"],
-                    test_results[key]["num_zeros"],
-                    test_results[key]["num_ones"],
-                    test_results[key]["out_points"],
-                    test_results[key]["in_points"],
-                    test_results[key]["operator"],
-                    test_results[key]["left_SN"],
-                    test_results[key]["right_SN"],
-                    test_results[key]["notes"]]
+            newdata = [
+                eye_bert_results[key]["cable"],
+                eye_bert_results[key]["channel"],
+                eye_bert_results[key]["date"],
+                eye_bert_results[key]["time"],
+                eye_bert_results[key]["open_area"],
+                eye_bert_results[key]["top_eye"],
+                eye_bert_results[key]["bottom_eye"],
+                eye_bert_results[key]["num_zeros"],
+                eye_bert_results[key]["num_ones"],
+                eye_bert_results[key]["out_points"],
+                eye_bert_results[key]["in_points"],
+                eye_bert_results[key]["operator"],
+                eye_bert_results[key]["left_SN"],
+                eye_bert_results[key]["right_SN"],
+                eye_bert_results[key]["notes"]
+            ]
             ws.append(newdata)
         col = get_column_letter(1)
         ws.column_dimensions[col].bestFit = True
