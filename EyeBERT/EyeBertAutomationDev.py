@@ -18,18 +18,22 @@
 #    using pyautogui to control the Vivado "Eye BERT" program, where the hardware setup is a KC705, relay boards, SMA cables, and adapter boards.
 #    Saves eye-diagram and template analysis plots and records open area, height, and template analysis results.
 #
-# To Do : Add appending to XLS file with various cable info
-#       : Get cable specifics from operator
-#       : repeat tests as needed
-#       : much better error recovery & data validation!
+# To Do
+#   : Get cable type from operator
+#   : Get parameters (which tests to run) from operator
+#   : For 4-point DC calibration, automatically create new file name (default) or let user overwrite existing file
+#   : For each 4-point DC calibration measurement, allow user to accept value to redo calibration measurement 
+#   : repeat tests as needed
+#   : much better error recovery & data validation!
 
-version = 1.11
+# version
+version = 1.12
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
 
 init(convert=True)
-print(Fore.GREEN + "KU-CMS KC705 EyeBERT Automated Test")
+print(Fore.GREEN + "KU-CMS 4-point DC Resistance and KC705 EyeBERT Automated Test")
 print(f"Version {version:.2f}")
 print(Fore.RESET + "Loading libraries...")
 
@@ -49,14 +53,27 @@ import eyebertserial
 import dmmserial
 import json
 
+# get bad 4-point DC channels
+def GetBadDCChannels(measurement_data):
+    bad_channels = {}
+    for key in measurement_data:
+        value = measurement_data[key]
+        if value > 10.0:
+            bad_channels[key] = value
+    return bad_channels
+
 def main():
     # parameters
+    # TODO: let user specify parameters for what test(s) to run
     verbose = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = False
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
-    test_results = {}
+    
+    # dictionaries to save results
+    dc_resistance_results = {}
+    eye_bert_results = {}
 
     #
     # The e-link connection mapping is defined by a dictionary
@@ -91,6 +108,7 @@ def main():
         "d3"  : {"tx" : "3", "rx" : "3"}
     }
 
+    # TODO: let user specify e-link type, which will determine mapping
     # Choose e-link mapping:
     cable_mapping = mapping_type5
     print(Fore.GREEN + "Mapping Dictionary : " + Fore.RED + 
@@ -189,25 +207,27 @@ def main():
     keys = list(cable_mapping.keys())
 
     if RUN_4PT_DC_RES_CALIBRATION:
-        print("")
+        print(Fore.GREEN + "")
         print("Running 4-point DC resistance calibration.")
         print("")
     elif RUN_4PT_DC_RES or RUN_EYE_BERT_AREA:
-        print("")
+        print(Fore.GREEN + "")
         print(f"Taking data for cable {cable}.")
         print("")
     else:
-        print("")
+        print(Fore.GREEN + "")
         print("Nothing to do (based on run flags)...")
         print("")
 
     # 4-point DC resistance calibration
     if RUN_4PT_DC_RES_CALIBRATION:
+        print(Fore.GREEN + "")
         print("--------------------------------------------")
         print("Beginning 4-point DC resistance calibration.")
         print("--------------------------------------------")
 
         # TODO: automatically create new calibration file name
+        # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
         calibration_file = "4_point_DC_Calibration_v2.json"
 
@@ -222,6 +242,8 @@ def main():
             print(Fore.RED + "Terminating code 3: exit based on user input.")
             sys.exit(3)
         
+        print("Measured calibration values (ohms):")
+
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -243,20 +265,19 @@ def main():
             eb.connection(rxpath+b"\r\n")
             eb.LED(2,"ON")
             eb.MODE(b"MODE DMM +\r\n")
-            print(f" - path {key}",end="")
             positive = round(dmm.reading(),2)
             eb.MODE(b"MODE DMM -\r\n")
-            negative = round(dmm.reading(),2) 
-            print(" DMM + ", end="")
-            print("%.2f" % positive, end="")
-            print(" DMM - ", end="")
-            print("%.2f" % negative)
+            negative = round(dmm.reading(),2)
 
-            # save data
+            # print results
+            print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+
+            # save calibration data
             calibration_data[key + "_p"] = positive
             calibration_data[key + "_n"] = negative
 
         # Save calibration data to json file
+        print("")
         print(f"Saving calibration data to {calibration_file}.")
         with open(calibration_file, "w") as write_file:
             json.dump(calibration_data, write_file, indent=4)
@@ -267,10 +288,12 @@ def main():
 
     # 4-point DC resistance measurements
     if RUN_4PT_DC_RES:
+        print(Fore.GREEN + "")
         print("---------------------------------------------")
         print("Beginning 4-point DC resistance measurements.")
         print("---------------------------------------------")
-
+        
+        measurement_data = {}
         calibration_data = {}
         calibration_file = "4_point_DC_Calibration_v1.json"
 
@@ -279,12 +302,9 @@ def main():
         # Load calibration data from json file
         with open(calibration_file, "r") as read_file:
             calibration_data = json.load(read_file)
-
-        #pos_path = +1.05040543 # quick single point cal of cables + relay paths
-        #neg_path = +1.01958215 # quick single point cal of cables + relay paths
-        #pos_path = 1.05 # rounded 2 places
-        #neg_path = 1.02 # rounded 2 places
         
+        print("Measurements after subtracting calibration values (ohms):")
+
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -302,22 +322,133 @@ def main():
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
 
             # take measurements and subtract calibration values
-            # just reporting results to screen for now
             eb.connection(txpath+b"\r\n")
             eb.connection(rxpath+b"\r\n")
             eb.LED(2,"ON")
             eb.MODE(b"MODE DMM +\r\n")
-            print(f" - path {key}",end="")
             positive = round(dmm.reading(),2) - pos_path
             eb.MODE(b"MODE DMM -\r\n")
             negative = round(dmm.reading(),2) - neg_path
-            print(" DMM + ", end="")
-            print("%.2f" % positive, end="")
-            print(" DMM - ", end="")
-            print("%.2f" % negative)
+
+            # print results
+            print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+
+            # save measurement data
+            measurement_data[key + "_p"] = positive
+            measurement_data[key + "_n"] = negative
+
+        # get bad 4-point DC channels
+        bad_channels = GetBadDCChannels(measurement_data)
+
+        if bad_channels:
+            print(Fore.RED + "Warning: The following channels have large 4-point DC resistance:" + Fore.GREEN)
+            for key in bad_channels:
+                value = bad_channels[key]
+                print(f" - {key}: {value}")
+            print(Fore.RED + "Possible causes:" + Fore.GREEN)
+            print(" - The e-link is not connected properly.")
+            print(" - The SMA cable mapping is not correct for this type of e-link.")
+            print(" - The e-link has a break or discontinuity for these channels.")
+
+        # get date and time
+        now = datetime.datetime.now()
+        date_now = now.strftime("%Y-%m-%d")
+        time_now = now.strftime("%H:%M:%S")
+
+        # add results to dataset for future write
+        # hardcode channels for now to save all values in one row of the excel file; may want to change in the future
+        dc_resistance_results.update(
+            {
+            "cable"         : cable,
+            "date"          : now.strftime("%Y-%m-%d"),
+            "time"          : now.strftime("%H:%M:%S"),
+            "cmd_p"         : measurement_data["cmd_p"],
+            "cmd_n"         : measurement_data["cmd_n"],
+            "d0_p"          : measurement_data["d0_p"],
+            "d0_n"          : measurement_data["d0_n"],
+            "d1_p"          : measurement_data["d1_p"],
+            "d1_n"          : measurement_data["d1_n"],
+            "d2_p"          : measurement_data["d2_p"],
+            "d2_n"          : measurement_data["d2_n"],
+            "d3_p"          : measurement_data["d3_p"],
+            "d3_n"          : measurement_data["d3_n"],
+            "operator"      : operator,
+            "left_SN"       : left_serialnumber, 
+            "right_SN"      : right_serialnumber,
+            "notes"         : operator_notes
+            }
+        )
+
+        # update XLS file, create new entries as needed
+        wb = Workbook()
+        path = "R:/BEAN_GRP/EyeBertAutomation/"
+        file_name = "DCResistanceAutomation.xlsx"
+        full_file_path = path + file_name
+
+        # check if file exists
+        fileExists = os.path.exists(full_file_path)
+
+        # if file exists, check if file is open
+        if fileExists:
+            keep_trying = True
+            while keep_trying:
+                try:
+                    os.rename(full_file_path, full_file_path)
+                    keep_trying = False
+                except OSError:
+                    print(Fore.RED + file_name + " summary file is open. Please close.")
+                    x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
+                    keep_trying = True
+        
+        # if file does not exist, create file with table headers
+        if not fileExists:
+            # create file
+            print(Fore.LIGHTRED_EX + "\t" + file_name + " summary file does not exist. Creating file.")
+            ws = wb.active
+            # table headers
+            headers = ["cable", "date", "time",
+                       "cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n",
+                       "operator", "left_SN", "right_SN", "notes"]
+            ws.append(headers)
+            col = get_column_letter(1)
+            ws.column_dimensions[col].bestFit = True
+            wb.save(full_file_path)
+        else:
+            # load existing copy
+            print(Fore.GREEN + "Opening summary file " + file_name)
+            wb = load_workbook(filename = full_file_path)
+            ws = wb.active
+        
+        print(Fore.GREEN + "Adding data...")
+        newdata = [
+            dc_resistance_results["cable"],
+            dc_resistance_results["date"],
+            dc_resistance_results["time"],
+            dc_resistance_results["cmd_p"],
+            dc_resistance_results["cmd_n"],
+            dc_resistance_results["d0_p"],
+            dc_resistance_results["d0_n"],
+            dc_resistance_results["d1_p"],
+            dc_resistance_results["d1_n"],
+            dc_resistance_results["d2_p"],
+            dc_resistance_results["d2_n"],
+            dc_resistance_results["d3_p"],
+            dc_resistance_results["d3_n"],
+            dc_resistance_results["operator"],
+            dc_resistance_results["left_SN"],
+            dc_resistance_results["right_SN"],
+            dc_resistance_results["notes"]
+        ]
+        ws.append(newdata)
+        col = get_column_letter(1)
+        ws.column_dimensions[col].bestFit = True
+        wb.save(full_file_path)
+
+        print(Fore.GREEN + Style.BRIGHT + "4-point DC resistance measuremsnts are complete!" + Fore.RESET + Style.RESET_ALL)
 
     # Eye BERT area measurements
     if RUN_EYE_BERT_AREA:
+        print(Fore.GREEN + "")
         print("-------------------------------------")
         print("Beginning Eye BERT area measurements.")
         print("-------------------------------------")
@@ -521,91 +652,105 @@ def main():
                 print(f"template plot path (2): {newTemplatePath}")
             shutil.copyfile(oldTemplatePath, newTemplatePath)
             
-            # add results to dataset for future write
+            # get date and time
             now = datetime.datetime.now()
-            channel_name = key
-            test_results.update(
+            date_now = now.strftime("%Y-%m-%d")
+            time_now = now.strftime("%H:%M:%S")
+
+            # add results to dataset for future write
+            eye_bert_results.update(
                 {key : 
-                {"test_name"    : test_name.replace("_"+channel_name,""),
-                "channel"       : channel_name,
-                "date"          : now.strftime("%Y-%m-%d"),
-                "time"          : now.strftime("%H:%M:%S"),
-                "open_area"     : open_area, 
-                "top_eye"       : top_of_eye, 
-                "bottom_eye"    : bottom_of_eye,
-                "num_zeros"     : num_zeros,
-                "num_ones"      : num_ones,
-                "out_points"    : out_points,
-                "in_points"     : in_points,
-                "operator"      : operator,
-                "left_SN"       : left_serialnumber, 
-                "right_SN"      : right_serialnumber,
-                "notes"         : operator_notes}
+                    {
+                    "cable"         : cable,
+                    "channel"       : channel,
+                    "date"          : date_now,
+                    "time"          : time_now,
+                    "open_area"     : open_area, 
+                    "top_eye"       : top_of_eye, 
+                    "bottom_eye"    : bottom_of_eye,
+                    "num_zeros"     : num_zeros,
+                    "num_ones"      : num_ones,
+                    "out_points"    : out_points,
+                    "in_points"     : in_points,
+                    "operator"      : operator,
+                    "left_SN"       : left_serialnumber, 
+                    "right_SN"      : right_serialnumber,
+                    "notes"         : operator_notes
+                    }
                 }
             )
         #end keys loop
 
         # update XLS file, create new entries as needed
         wb = Workbook()
-        file_name = "EyeBERTautomation.xlsx"
         path = "R:/BEAN_GRP/EyeBertAutomation/"
-        keep_trying = True
-        while keep_trying :
-            try :
-                os.rename(path + file_name, path + file_name)
-                keep_trying = False
-            except OSError:
-                pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
-                print(Fore.RED + "EyeBERTautomation.xlxs summary file is open. Please close")
-                x=input(Fore.RED + "Press ENTER when ready to retry" + Fore.GREEN)
-                keep_trying = True
+        file_name = "EyeBERTautomation.xlsx"
+        full_file_path = path + file_name
 
-        isExist = os.path.exists(path + file_name)
-        if isExist == False :
+        # check if file exists
+        fileExists = os.path.exists(full_file_path)
+
+        # if file exists, check if file is open
+        if fileExists:
+            keep_trying = True
+            while keep_trying:
+                try:
+                    os.rename(full_file_path, full_file_path)
+                    keep_trying = False
+                except OSError:
+                    pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
+                    print(Fore.RED + file_name + " summary file is open. Please close.")
+                    x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
+                    keep_trying = True
+        
+        # if file does not exist, create file with table headers
+        if not fileExists:
             # create file
-            print(Fore.LIGHTRED_EX + "\tXLSX summary file does not exist. Creating file.")
+            print(Fore.LIGHTRED_EX + "\t" + file_name + " summary file does not exist. Creating file.")
             ws = wb.active
-            newdata = ["cable name", "channel", "date", "time", "open_area", "top_eye",
-                       "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
+            # table headers
+            headers = ["cable", "channel", "date", "time",
+                       "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
                        "operator", "left_SN", "right_SN", "notes"]
-            ws.append(newdata)
+            ws.append(headers)
             col = get_column_letter(1)
             ws.column_dimensions[col].bestFit = True
-            wb.save(path + file_name)
-        else :
+            wb.save(full_file_path)
+        else:
             # load existing copy
-            print(Fore.GREEN + "Opening XLSX summary file")
-            wb = load_workbook(filename = path + file_name)
+            print(Fore.GREEN + "Opening summary file " + file_name)
+            wb = load_workbook(filename = full_file_path)
             ws = wb.active
 
         print(Fore.GREEN + "Adding data...")
-        cablename = test_name
-        keys = list(test_results)
-        for key in keys :
-            newdata = [test_results[key]["test_name"],
-                    test_results[key]["channel"],
-                    test_results[key]["date"],
-                    test_results[key]["time"],
-                    test_results[key]["open_area"],
-                    test_results[key]["top_eye"],
-                    test_results[key]["bottom_eye"],
-                    test_results[key]["num_zeros"],
-                    test_results[key]["num_ones"],
-                    test_results[key]["out_points"],
-                    test_results[key]["in_points"],
-                    test_results[key]["operator"],
-                    test_results[key]["left_SN"],
-                    test_results[key]["right_SN"],
-                    test_results[key]["notes"]]
+        keys = list(eye_bert_results)
+        for key in keys:
+            newdata = [
+                eye_bert_results[key]["cable"],
+                eye_bert_results[key]["channel"],
+                eye_bert_results[key]["date"],
+                eye_bert_results[key]["time"],
+                eye_bert_results[key]["open_area"],
+                eye_bert_results[key]["top_eye"],
+                eye_bert_results[key]["bottom_eye"],
+                eye_bert_results[key]["num_zeros"],
+                eye_bert_results[key]["num_ones"],
+                eye_bert_results[key]["out_points"],
+                eye_bert_results[key]["in_points"],
+                eye_bert_results[key]["operator"],
+                eye_bert_results[key]["left_SN"],
+                eye_bert_results[key]["right_SN"],
+                eye_bert_results[key]["notes"]
+            ]
             ws.append(newdata)
         col = get_column_letter(1)
         ws.column_dimensions[col].bestFit = True
-        wb.save(path + file_name)
+        wb.save(full_file_path)
 
         pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
-        print(Fore.GREEN + Style.BRIGHT + "Done!" + Fore.RESET + Style.RESET_ALL)
+        print(Fore.GREEN + Style.BRIGHT + "Eye BERT area measuremsnts are complete!" + Fore.RESET + Style.RESET_ALL)
 
-        #excel_start_return = os.system('start "excel" ' + path + file_name)
+        #excel_start_return = os.system('start "excel" ' + full_file_path)
 
 if __name__ == "__main__":
     main()
