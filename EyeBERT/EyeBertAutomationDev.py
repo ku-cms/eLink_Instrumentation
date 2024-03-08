@@ -18,18 +18,23 @@
 #    using pyautogui to control the Vivado "Eye BERT" program, where the hardware setup is a KC705, relay boards, SMA cables, and adapter boards.
 #    Saves eye-diagram and template analysis plots and records open area, height, and template analysis results.
 #
-# To Do : Add appending to XLS file with various cable info
-#       : Get cable specifics from operator
-#       : repeat tests as needed
-#       : much better error recovery & data validation!
+# To Do
+#   : Save 4-point DC values to XLS file
+#   : Get cable type from operator
+#   : Get parameters (which tests to run) from operator
+#   : For 4-point DC calibration, automatically create new file name (default) or let user overwrite existing file
+#   : For each 4-point DC calibration measurement, allow user to accept value to redo calibration measurement 
+#   : repeat tests as needed
+#   : much better error recovery & data validation!
 
+# version
 version = 1.12
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
 
 init(convert=True)
-print(Fore.GREEN + "KU-CMS KC705 EyeBERT Automated Test")
+print(Fore.GREEN + "KU-CMS 4-point DC Resistance and KC705 EyeBERT Automated Test")
 print(f"Version {version:.2f}")
 print(Fore.RESET + "Loading libraries...")
 
@@ -60,13 +65,16 @@ def GetBadDCChannels(measurement_data):
 
 def main():
     # parameters
+    # TODO: let user specify parameters for what test(s) to run
     verbose = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
     RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
-    eye_bert_results = {}
+    
+    # dictionaries to save results
     dc_resistance_results = {}
+    eye_bert_results = {}
 
     #
     # The e-link connection mapping is defined by a dictionary
@@ -101,6 +109,7 @@ def main():
         "d3"  : {"tx" : "3", "rx" : "3"}
     }
 
+    # TODO: let user specify e-link type, which will determine mapping
     # Choose e-link mapping:
     cable_mapping = mapping_type5
     print(Fore.GREEN + "Mapping Dictionary : " + Fore.RED + 
@@ -348,26 +357,93 @@ def main():
         # add results to dataset for future write
         # hardcode channels for now to save all values in one row of the excel file; may want to change in the future
         dc_resistance_results.update(
-            {key :
-                {
-                "cable"         : cable,
-                "channel"       : channel,
-                "date"          : now.strftime("%Y-%m-%d"),
-                "time"          : now.strftime("%H:%M:%S"),
-                "cmd_p"         : measurement_data["cmd_p"],
-                "cmd_n"         : measurement_data["cmd_n"],
-                "d0_p"          : measurement_data["d0_p"],
-                "d0_n"          : measurement_data["d0_n"],
-                "d1_p"          : measurement_data["d1_p"],
-                "d1_n"          : measurement_data["d1_n"],
-                "d2_p"          : measurement_data["d2_p"],
-                "d2_n"          : measurement_data["d2_n"],
-                "d3_p"          : measurement_data["d3_p"],
-                "d3_n"          : measurement_data["d3_n"],
-                "notes"         : operator_notes
-                }
+            {
+            "cable"         : cable,
+            "date"          : now.strftime("%Y-%m-%d"),
+            "time"          : now.strftime("%H:%M:%S"),
+            "cmd_p"         : measurement_data["cmd_p"],
+            "cmd_n"         : measurement_data["cmd_n"],
+            "d0_p"          : measurement_data["d0_p"],
+            "d0_n"          : measurement_data["d0_n"],
+            "d1_p"          : measurement_data["d1_p"],
+            "d1_n"          : measurement_data["d1_n"],
+            "d2_p"          : measurement_data["d2_p"],
+            "d2_n"          : measurement_data["d2_n"],
+            "d3_p"          : measurement_data["d3_p"],
+            "d3_n"          : measurement_data["d3_n"],
+            "operator"      : operator,
+            "left_SN"       : left_serialnumber, 
+            "right_SN"      : right_serialnumber,
+            "notes"         : operator_notes
             }
         )
+
+        # update XLS file, create new entries as needed
+        wb = Workbook()
+        path = "R:/BEAN_GRP/EyeBertAutomation/"
+        file_name = "DCResistanceAutomation.xlsx"
+        full_file_path = path + file_name
+
+        # check if file exists
+        fileExists = os.path.exists(full_file_path)
+
+        # if file exists, check if file is open
+        if fileExists:
+            keep_trying = True
+            while keep_trying:
+                try:
+                    os.rename(full_file_path, full_file_path)
+                    keep_trying = False
+                except OSError:
+                    print(Fore.RED + file_name + " summary file is open. Please close.")
+                    x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
+                    keep_trying = True
+        
+        # if file does not exist, create file with table headers
+        if not fileExists:
+            # create file
+            print(Fore.LIGHTRED_EX + "\t" + file_name + " summary file does not exist. Creating file.")
+            ws = wb.active
+            # table headers
+            headers = ["cable", "date", "time",
+                       "cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n",
+                       "operator", "left_SN", "right_SN", "notes"]
+            ws.append(headers)
+            col = get_column_letter(1)
+            ws.column_dimensions[col].bestFit = True
+            wb.save(full_file_path)
+        else:
+            # load existing copy
+            print(Fore.GREEN + "Opening summary file " + file_name)
+            wb = load_workbook(filename = full_file_path)
+            ws = wb.active
+        
+        print(Fore.GREEN + "Adding data...")
+        newdata = [
+            dc_resistance_results["cable"],
+            dc_resistance_results["date"],
+            dc_resistance_results["time"],
+            dc_resistance_results["cmd_p"],
+            dc_resistance_results["cmd_n"],
+            dc_resistance_results["d0_p"],
+            dc_resistance_results["d0_n"],
+            dc_resistance_results["d1_p"],
+            dc_resistance_results["d1_n"],
+            dc_resistance_results["d2_p"],
+            dc_resistance_results["d2_n"],
+            dc_resistance_results["d3_p"],
+            dc_resistance_results["d3_n"],
+            dc_resistance_results["operator"],
+            dc_resistance_results["left_SN"],
+            dc_resistance_results["right_SN"],
+            dc_resistance_results["notes"]
+        ]
+        ws.append(newdata)
+        col = get_column_letter(1)
+        ws.column_dimensions[col].bestFit = True
+        wb.save(full_file_path)
+
+        print(Fore.GREEN + Style.BRIGHT + "4-point DC resistance measuremsnts are complete!" + Fore.RESET + Style.RESET_ALL)
 
     # Eye BERT area measurements
     if RUN_EYE_BERT_AREA:
@@ -608,38 +684,38 @@ def main():
         file_name = "EyeBERTautomation.xlsx"
         path = "R:/BEAN_GRP/EyeBertAutomation/"
         keep_trying = True
-        while keep_trying :
-            try :
+        while keep_trying:
+            try:
                 os.rename(path + file_name, path + file_name)
                 keep_trying = False
             except OSError:
                 pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
-                print(Fore.RED + "EyeBERTautomation.xlxs summary file is open. Please close")
-                x=input(Fore.RED + "Press ENTER when ready to retry" + Fore.GREEN)
+                print(Fore.RED + file_name + " summary file is open. Please close.")
+                x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
                 keep_trying = True
 
         isExist = os.path.exists(path + file_name)
-        if isExist == False :
+        if isExist == False:
             # create file
-            print(Fore.LIGHTRED_EX + "\tXLSX summary file does not exist. Creating file.")
+            print(Fore.LIGHTRED_EX + "\t" + file_name + " summary file does not exist. Creating file.")
             ws = wb.active
             # table headers
-            newdata = ["cable", "channel", "date", "time", "open_area", "top_eye",
-                       "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
+            headers = ["cable", "channel", "date", "time",
+                       "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
                        "operator", "left_SN", "right_SN", "notes"]
-            ws.append(newdata)
+            ws.append(headers)
             col = get_column_letter(1)
             ws.column_dimensions[col].bestFit = True
             wb.save(path + file_name)
-        else :
+        else:
             # load existing copy
-            print(Fore.GREEN + "Opening XLSX summary file")
+            print(Fore.GREEN + "Opening summary file " + file_name)
             wb = load_workbook(filename = path + file_name)
             ws = wb.active
 
         print(Fore.GREEN + "Adding data...")
         keys = list(eye_bert_results)
-        for key in keys :
+        for key in keys:
             newdata = [
                 eye_bert_results[key]["cable"],
                 eye_bert_results[key]["channel"],
@@ -663,7 +739,7 @@ def main():
         wb.save(path + file_name)
 
         pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
-        print(Fore.GREEN + Style.BRIGHT + "Done!" + Fore.RESET + Style.RESET_ALL)
+        print(Fore.GREEN + Style.BRIGHT + "Eye BERT area measuremsnts are complete!" + Fore.RESET + Style.RESET_ALL)
 
         #excel_start_return = os.system('start "excel" ' + path + file_name)
 
