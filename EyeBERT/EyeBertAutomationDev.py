@@ -69,7 +69,7 @@ def main():
     verbose = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = False
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -208,20 +208,21 @@ def main():
     keys = list(cable_mapping.keys())
 
     if RUN_4PT_DC_RES_CALIBRATION:
-        print("")
+        print(Fore.GREEN + "")
         print("Running 4-point DC resistance calibration.")
         print("")
     elif RUN_4PT_DC_RES or RUN_EYE_BERT_AREA:
-        print("")
+        print(Fore.GREEN + "")
         print(f"Taking data for cable {cable}.")
         print("")
     else:
-        print("")
+        print(Fore.GREEN + "")
         print("Nothing to do (based on run flags)...")
         print("")
 
     # 4-point DC resistance calibration
     if RUN_4PT_DC_RES_CALIBRATION:
+        print(Fore.GREEN + "")
         print("--------------------------------------------")
         print("Beginning 4-point DC resistance calibration.")
         print("--------------------------------------------")
@@ -288,6 +289,7 @@ def main():
 
     # 4-point DC resistance measurements
     if RUN_4PT_DC_RES:
+        print(Fore.GREEN + "")
         print("---------------------------------------------")
         print("Beginning 4-point DC resistance measurements.")
         print("---------------------------------------------")
@@ -447,6 +449,7 @@ def main():
 
     # Eye BERT area measurements
     if RUN_EYE_BERT_AREA:
+        print(Fore.GREEN + "")
         print("-------------------------------------")
         print("Beginning Eye BERT area measurements.")
         print("-------------------------------------")
@@ -681,21 +684,28 @@ def main():
 
         # update XLS file, create new entries as needed
         wb = Workbook()
-        file_name = "EyeBERTautomation.xlsx"
         path = "R:/BEAN_GRP/EyeBertAutomation/"
-        keep_trying = True
-        while keep_trying:
-            try:
-                os.rename(path + file_name, path + file_name)
-                keep_trying = False
-            except OSError:
-                pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
-                print(Fore.RED + file_name + " summary file is open. Please close.")
-                x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
-                keep_trying = True
+        file_name = "EyeBERTautomation.xlsx"
+        full_file_path = path + file_name
 
-        isExist = os.path.exists(path + file_name)
-        if isExist == False:
+        # check if file exists
+        fileExists = os.path.exists(full_file_path)
+
+        # if file exists, check if file is open
+        if fileExists:
+            keep_trying = True
+            while keep_trying:
+                try:
+                    os.rename(full_file_path, full_file_path)
+                    keep_trying = False
+                except OSError:
+                    pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
+                    print(Fore.RED + file_name + " summary file is open. Please close.")
+                    x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
+                    keep_trying = True
+        
+        # if file does not exist, create file with table headers
+        if not fileExists:
             # create file
             print(Fore.LIGHTRED_EX + "\t" + file_name + " summary file does not exist. Creating file.")
             ws = wb.active
@@ -706,11 +716,11 @@ def main():
             ws.append(headers)
             col = get_column_letter(1)
             ws.column_dimensions[col].bestFit = True
-            wb.save(path + file_name)
+            wb.save(full_file_path)
         else:
             # load existing copy
             print(Fore.GREEN + "Opening summary file " + file_name)
-            wb = load_workbook(filename = path + file_name)
+            wb = load_workbook(filename = full_file_path)
             ws = wb.active
 
         print(Fore.GREEN + "Adding data...")
@@ -736,12 +746,12 @@ def main():
             ws.append(newdata)
         col = get_column_letter(1)
         ws.column_dimensions[col].bestFit = True
-        wb.save(path + file_name)
+        wb.save(full_file_path)
 
         pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
         print(Fore.GREEN + Style.BRIGHT + "Eye BERT area measuremsnts are complete!" + Fore.RESET + Style.RESET_ALL)
 
-        #excel_start_return = os.system('start "excel" ' + path + file_name)
+        #excel_start_return = os.system('start "excel" ' + full_file_path)
 
 if __name__ == "__main__":
     main()
