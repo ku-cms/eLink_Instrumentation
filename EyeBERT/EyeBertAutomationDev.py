@@ -19,7 +19,6 @@
 #    Saves eye-diagram and template analysis plots and records open area, height, and template analysis results.
 #
 # To Do
-#   : Save 4-point DC values to XLS file
 #   : Get cable type from operator
 #   : Get parameters (which tests to run) from operator
 #   : For 4-point DC calibration, automatically create new file name (default) or let user overwrite existing file
