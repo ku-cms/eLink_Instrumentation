@@ -49,7 +49,7 @@ import eyebertserial
 import dmmserial
 import json
 
-# Get bad 4-point DC channels
+# get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
     bad_channels = {}
     for key in measurement_data:
@@ -218,6 +218,7 @@ def main():
         print("--------------------------------------------")
 
         # TODO: automatically create new calibration file name
+        # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
         calibration_file = "4_point_DC_Calibration_v2.json"
 
@@ -232,6 +233,8 @@ def main():
             print(Fore.RED + "Terminating code 3: exit based on user input.")
             sys.exit(3)
         
+        print("Measured calibration values (ohms):")
+
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -253,20 +256,19 @@ def main():
             eb.connection(rxpath+b"\r\n")
             eb.LED(2,"ON")
             eb.MODE(b"MODE DMM +\r\n")
-            print(f" - path {key}",end="")
             positive = round(dmm.reading(),2)
             eb.MODE(b"MODE DMM -\r\n")
-            negative = round(dmm.reading(),2) 
-            print(" DMM + ", end="")
-            print("%.2f" % positive, end="")
-            print(" DMM - ", end="")
-            print("%.2f" % negative)
+            negative = round(dmm.reading(),2)
 
-            # save data
+            # print results
+            print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+
+            # save calibration data
             calibration_data[key + "_p"] = positive
             calibration_data[key + "_n"] = negative
 
         # Save calibration data to json file
+        print("")
         print(f"Saving calibration data to {calibration_file}.")
         with open(calibration_file, "w") as write_file:
             json.dump(calibration_data, write_file, indent=4)
@@ -290,12 +292,9 @@ def main():
         # Load calibration data from json file
         with open(calibration_file, "r") as read_file:
             calibration_data = json.load(read_file)
-
-        #pos_path = +1.05040543 # quick single point cal of cables + relay paths
-        #neg_path = +1.01958215 # quick single point cal of cables + relay paths
-        #pos_path = 1.05 # rounded 2 places
-        #neg_path = 1.02 # rounded 2 places
         
+        print("Measurements after subtracting calibration values (ohms):")
+
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -313,7 +312,6 @@ def main():
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
 
             # take measurements and subtract calibration values
-            # just reporting results to screen for now
             eb.connection(txpath+b"\r\n")
             eb.connection(rxpath+b"\r\n")
             eb.LED(2,"ON")
@@ -321,20 +319,17 @@ def main():
             positive = round(dmm.reading(),2) - pos_path
             eb.MODE(b"MODE DMM -\r\n")
             negative = round(dmm.reading(),2) - neg_path
-            #print(f" - path {key}:",end="")
-            #print(" DMM + ", end="")
-            #print("%.2f" % positive, end="")
-            #print(" DMM - ", end="")
-            #print("%.2f" % negative)
+
+            # print results
             print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
 
-            # save data
+            # save measurement data
             measurement_data[key + "_p"] = positive
             measurement_data[key + "_n"] = negative
 
-        # Get bad 4-point DC channels
+        # get bad 4-point DC channels
         bad_channels = GetBadDCChannels(measurement_data)
-        
+
         if bad_channels:
             print(Fore.RED + "Warning: The following channels have large 4-point DC resistance:" + Fore.GREEN)
             for key in bad_channels:
@@ -345,15 +340,13 @@ def main():
             print(" - The SMA cable mapping is not correct for this type of e-link.")
             print(" - The e-link has a break or discontinuity for these channels.")
 
-        # add results to dataset for future write
-        # TODO: delete comments after testing:
-        #cable_name = test_name.replace("_"+channel_name,"")
-        #channel_name = key
-        
+        # get date and time
         now = datetime.datetime.now()
         date_now = now.strftime("%Y-%m-%d")
         time_now = now.strftime("%H:%M:%S")
 
+        # add results to dataset for future write
+        # hardcode channels for now to save all values in one row of the excel file; may want to change in the future
         dc_resistance_results.update(
             {key :
                 {
@@ -581,15 +574,12 @@ def main():
                 print(f"template plot path (2): {newTemplatePath}")
             shutil.copyfile(oldTemplatePath, newTemplatePath)
             
-            # add results to dataset for future write
-            # TODO: delete comments after testing:
-            #cable_name = test_name.replace("_"+channel_name,"")
-            #channel_name = key
-            
+            # get date and time
             now = datetime.datetime.now()
             date_now = now.strftime("%Y-%m-%d")
             time_now = now.strftime("%H:%M:%S")
-            
+
+            # add results to dataset for future write
             eye_bert_results.update(
                 {key : 
                     {
