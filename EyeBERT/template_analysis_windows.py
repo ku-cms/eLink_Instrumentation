@@ -22,11 +22,23 @@ def writeCSV(output_file, data):
             writer.writerow(row)
 
 class EyeBERT:
-    def __init__(self, cable, channel, basePath):
-        self.cable = cable
-        self.channel = channel 
-        self.basePath = basePath 
-        self.path = self.basePath + "/" + self.cable + "/" + self.cable + "_" + self.channel + "_" # Prefix for new outputted files
+    def __init__(self, cable, branch, channel, basePath):
+        self.cable      = cable
+        self.branch     = branch
+        self.channel    = channel
+        self.basePath   = basePath
+        self.debug      = True
+        
+        #self.path = self.basePath + "/" + self.cable + "/" + self.cable + "_" + self.branch + "_" + self.channel + "_"
+        
+        # The path is the prefix for new output files.
+        # The path is dependent on if the cable has branches.
+        if self.branch:
+            self.path = f"{self.basePath}/{self.cable}/{self.cable}_{self.branch}_{self.channel}_"
+        else:
+            self.path = f"{self.basePath}/{self.cable}/{self.cable}_{self.channel}_"
+        if self.debug:
+            print(f"EyeBERT: self.path = {self.path}")
 
     def getPath(self):
         return self.path
@@ -35,31 +47,47 @@ class EyeBERT:
         self.path = path
 
 class EyeBERTFile(EyeBERT):
-    def __init__(self, cable, channel, basePath):
-        super().__init__(cable, channel, basePath)
+    def __init__(self, cable, branch, channel, basePath):
+        super().__init__(cable, branch, channel, basePath)
         self.dataPath = self.basePath + "/" + self.cable # Path to get Eye-BERT data
+        if self.debug:
+            print(f"EyeBERTFile: self.dataPath = {self.dataPath}")
 
-    def getIndices(self, fileList):
-        fileIndices = [] # Initialize list to store the index and file name as an ordered pair 
-        for element in fileList: # Iterate over each file name stored in the list 
+    # Get indexed files sorted by index in decreasing order
+    # TODO: Simplify function! For example, remove ".csv" from the file name and then split by "_".
+    def getIndexedFiles(self, fileList):
+        fileIndices = [] # Initialize list to store the index and file name as an ordered pair
+        if self.debug:
+            print(f"In getIndexedFiles(): fileList = {fileList}")
+        # Assign the maximum number of underscores in the file name based on if the cable has branches
+        if self.branch:
+            max_underscores = 3
+        else:
+            max_underscores = 2
+        
+        for element in fileList: # Iterate over each file name stored in the list
             i = 0 # Initialize i to iterate over each character in the file name string 
             underscoreCount = 0 # Initialize count for the underscore character in the file name to track the number of its occurrences 
             index = "" # Initialize chosen index as an empty string 
-            if element.count("_") == 1: # Check if the file name has only 1 underscore (this means this is the earliest data)
+            if element.count("_") == max_underscores - 1: # Check if the file name has one less underscore than the max (this means this is the earliest data)
                 index = 0 # Set index to 0, as this would be the earliest data 
             else:
                 while element[i] != ".": # Iterate over the file name until a period is reached (this means we will reach ".csv")
-                    if underscoreCount == 2: # Check if two underscores have been recorded (this means the correct index will begin in the file name)
+                    if underscoreCount == max_underscores: # Check if the underscore counter has reached the max (this means the correct index will begin in the file name)
                         index += element[i] # Add the character to the index (string operation, to ensure digit remains in its corresponding place)
                     if element[i] == "_": # Check if the character is an underscore
                         underscoreCount += 1 # Update the count for the number of underscore characters iterated if necessary
                     i += 1 # Increment iterator to iterate over the next character
-            index = int(index) # Convert the index to an integer
+            if self.debug:
+                print(f"In getIndexedFiles(): index = {index}")
+            index = int(index) # Convert the index to an integer... we assume this will work... when it does not, we have to debug...
             fileIndices.append((index, element)) # Append the resulting index to the list as an ordered pair with its corresponding original file name
         fileIndices.sort(reverse = True) # Sort the list in descending order based on the index (therefore, more recent the file (higher index), the closer to the beginning of the list it will be)
         return fileIndices # Return the completed list with the file names and their corresponding indices as ordered pairs
 
-    def getFile(self):
+    # Get latest file for channel
+    # FIXME: get latest file for specific branch and channel, depending on if the e-link has branches
+    def getLatestFile(self):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
         channelFiles = [] # Initialize empty list to store file names for the cable and channel 
         for file in os.listdir(self.dataPath):
@@ -68,13 +96,16 @@ class EyeBERTFile(EyeBERT):
                 # require that data and template are not in the file name
                 if "data" not in file and "template" not in file:
                     channelFiles.append(file) # Append all file names for the cable and channel to the list
-        channelFiles = self.getIndices(channelFiles) # Call method to obtain list of file names with their corresponding indices in order of most recent file to oldest
-        index, recent = channelFiles[0] # Assign variables to each element of the ordered pair (index, file name) for the element at the beginning of the list (the most recent)
-        return recent # Return the file name at that most recent file name's index 
+        channelFiles = self.getIndexedFiles(channelFiles) # Call method to obtain list of file names with their corresponding indices in order of most recent file to oldest
+        index, latest_file = channelFiles[0] # Assign variables to each element of the ordered pair (index, file name) for the element at the beginning of the list (the most recent)
+        if self.debug:
+            print(f"In getLatestFile(): channelFiles = {channelFiles}")
+            print(f"In getLatestFile(): index = {index}, latest_file = {latest_file}")
+        return latest_file # Return the file name at that most recent file name's index 
 
     def getFilename(self):
         """Returns corresponding filename to cable and channel."""
-        filename = self.dataPath + "/" + self.getFile()
+        filename = self.dataPath + "/" + self.getLatestFile()
 
         return filename
 
@@ -122,11 +153,11 @@ class EyeBERTFile(EyeBERT):
         makeDir("AnalysisOutputs")
         # Make directory for cable if one does not already exist
         makeDir("AnalysisOutputs/" + self.cable)
-        return EyeBERTAnalysis(self.cable, self.channel, self.getData(), self.getTemplate(), self.basePath)
+        return EyeBERTAnalysis(self.cable, self.branch, self.channel, self.getData(), self.getTemplate(), self.basePath)
 
 class EyeBERTAnalysis(EyeBERT):
-    def __init__(self, cable, channel, data, template, basePath):
-        super().__init__(cable, channel, basePath)
+    def __init__(self, cable, branch, channel, data, template, basePath):
+        super().__init__(cable, branch, channel, basePath)
         self.data = np.array(data)
         self.template = np.array(template)
 

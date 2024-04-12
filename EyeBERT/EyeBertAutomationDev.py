@@ -80,9 +80,9 @@ def is_valid_branch(branches, branch):
 def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
-    verbose = False
+    verbose = True
     RUN_4PT_DC_RES_CALIBRATION  = False
-    RUN_4PT_DC_RES              = True
+    RUN_4PT_DC_RES              = False
     RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
@@ -282,15 +282,15 @@ def main():
     if RUN_4PT_DC_RES_CALIBRATION:
         print(Fore.GREEN + "")
         print("Running 4-point DC resistance calibration.")
-        print("")
     elif RUN_4PT_DC_RES or RUN_EYE_BERT_AREA:
         print(Fore.GREEN + "")
-        print(f"Taking data for cable {cable}.")
-        print("")
+        if branch:
+            print(f"Taking data for cable {cable}, branch {branch}.")
+        else:
+            print(f"Taking data for cable {cable}.")
     else:
         print(Fore.GREEN + "")
         print("Nothing to do (based on run flags)...")
-        print("")
 
     # 4-point DC resistance calibration
     if RUN_4PT_DC_RES_CALIBRATION:
@@ -577,8 +577,17 @@ def main():
             # otherwise, we assume that the key is the channel
             else:
                 channel = str(key)
-            temp_name = filename + "_" + str(key) # change for looping version
+            
+            # base test name:
+            # - cable has branches: cable_branch_channel    
+            # - cable does not have branches: cable_channel
+            if branch:
+                temp_name = f"{cable}_{branch}_{channel}"
+            else:
+                temp_name = f"{cable}_{channel}"
+            # replace spaces to get final base test name:
             test_name = temp_name.replace(" ", "_")
+
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
             
@@ -710,12 +719,16 @@ def main():
             print(f"Using this reference template data file: {reference_template_file}")
             
             # Create EyeBERTFile object, cleaning user input, to read data from file
-            eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower(), file_path)
+            #eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower(), file_path)
+            eyebert = EyeBERTFile(cable, branch, channel, file_path)
+            
             # Call analyze method to obtain graphs and properties
             analysis = eyebert.analyze()
 
             # Warning: .getPath() must be called AFTER .analyze()
             refPath = eyebert.getPath()
+
+            print(f"refPath = {refPath}")
 
             analysis.setPath(refPath)
 
