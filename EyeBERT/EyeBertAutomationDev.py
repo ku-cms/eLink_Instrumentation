@@ -83,7 +83,7 @@ def main():
     verbose = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = False
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -211,7 +211,7 @@ def main():
         cable_type = input(Fore.RED + f"Enter cable type {cable_types}: " + Fore.GREEN)
         is_valid = is_valid_cable_type(cable_types, cable_type)
         if is_valid == False:
-            print(Fore.RED + f"{cable_type} is not a valid cable type. Re-enter a valid cable type {cable_types}.")
+            print(Fore.RED + f"{cable_type} is not a valid cable type. Re-enter a valid cable type: {cable_types}.")
     
     # assign mapping based on cable type
     cable_mapping = cable_mappings[cable_type]
@@ -222,13 +222,15 @@ def main():
     #
     branches = []
     branch = ""
+    # only get branch for cable type that has branches
     if cable_type in cable_branches:
         branches = cable_branches[cable_type]
         is_valid = False
-        branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
-        is_valid = is_valid_branch(branches, branch)
-        if is_valid == False:
-            print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch {branch}.")
+        while is_valid == False:
+            branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
+            is_valid = is_valid_branch(branches, branch)
+            if is_valid == False:
+                print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch: {branches}.")
 
     #
     # get ready to use this as our destination path
