@@ -19,8 +19,6 @@
 #    Saves eye-diagram and template analysis plots and records open area, height, and template analysis results.
 #
 # To Do
-#   : Get cable type from operator
-#   : Get branch from operator (if applicable)
 #   : Get parameters (which tests to run) from operator
 #   : For 4-point DC calibration, automatically create new file name (default) or let user overwrite existing file
 #   : For each 4-point DC calibration measurement, allow user to accept value to redo calibration measurement 
@@ -82,7 +80,7 @@ def main():
     # TODO: let user specify parameters for what test(s) to run
     verbose = True
     RUN_4PT_DC_RES_CALIBRATION  = False
-    RUN_4PT_DC_RES              = False
+    RUN_4PT_DC_RES              = True
     RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
@@ -149,14 +147,6 @@ def main():
 
     # supported cable types
     cable_types = list(cable_mappings.keys())
-
-    # supported cable types
-    #cable_types = ["1", "5K", "5K2", "3p2"]
-
-    # TODO: let user specify e-link type, which will determine mapping
-    # Choose e-link mapping:
-    #cable_mapping = mapping_type5
-    #cable_mapping = None
 
     #
     # open serial control of relay board
@@ -478,12 +468,8 @@ def main():
         # update XLS file, create new entries as needed
         wb = Workbook()
         path = "R:/BEAN_GRP/EyeBertAutomation/"
-        
-        # Type 5
-        #file_name = "DCResistanceAutomation_Type_5.xlsx"
-        # Type 3.2
-        #file_name = "DCResistanceAutomation_Type_3p2.xlsx"
-
+                
+        # Use different spreasheets for each cable type
         file_name = f"DCResistanceAutomation_Type_{cable_type}.xlsx"
 
         full_file_path = path + file_name
@@ -532,27 +518,7 @@ def main():
             ws = wb.active
         
         print(Fore.GREEN + "Adding data...")
-        
-        #newdata = [
-        #    dc_resistance_results["cable"],
-        #    dc_resistance_results["date"],
-        #    dc_resistance_results["time"],
-        #    dc_resistance_results["cmd_p"],
-        #    dc_resistance_results["cmd_n"],
-        #    dc_resistance_results["d0_p"],
-        #    dc_resistance_results["d0_n"],
-        #    dc_resistance_results["d1_p"],
-        #    dc_resistance_results["d1_n"],
-        #    dc_resistance_results["d2_p"],
-        #    dc_resistance_results["d2_n"],
-        #    dc_resistance_results["d3_p"],
-        #    dc_resistance_results["d3_n"],
-        #    dc_resistance_results["operator"],
-        #    dc_resistance_results["left_SN"],
-        #    dc_resistance_results["right_SN"],
-        #    dc_resistance_results["notes"]
-        #]
-        
+                
         newdata = [dc_resistance_results[x] for x in headers]
 
         ws.append(newdata)
@@ -718,8 +684,7 @@ def main():
             reference_template_file = "reference_template_v2.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
-            # Create EyeBERTFile object, cleaning user input, to read data from file
-            #eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower(), file_path)
+            # Create EyeBERTFile object to read data from file
             eyebert = EyeBERTFile(cable, branch, channel, file_path)
             
             # Call analyze method to obtain graphs and properties
@@ -840,11 +805,7 @@ def main():
         wb = Workbook()
         path = "R:/BEAN_GRP/EyeBertAutomation/"
 
-        # Type 5
-        #file_name = "EyeBERTautomation_Type_5.xlsx"
-        # Type 3.2
-        #file_name = "EyeBERTautomation_Type_3p2.xlsx"
-
+        # Use different spreasheets for each cable type
         file_name = f"EyeBERTautomation_Type_{cable_type}.xlsx"
         
         full_file_path = path + file_name
@@ -896,23 +857,6 @@ def main():
         print(Fore.GREEN + "Adding data...")
         keys = list(eye_bert_results)
         for key in keys:
-            #newdata = [
-            #    eye_bert_results[key]["cable"],
-            #    eye_bert_results[key]["channel"],
-            #    eye_bert_results[key]["date"],
-            #    eye_bert_results[key]["time"],
-            #    eye_bert_results[key]["open_area"],
-            #    eye_bert_results[key]["top_eye"],
-            #    eye_bert_results[key]["bottom_eye"],
-            #    eye_bert_results[key]["num_zeros"],
-            #    eye_bert_results[key]["num_ones"],
-            #    eye_bert_results[key]["out_points"],
-            #    eye_bert_results[key]["in_points"],
-            #    eye_bert_results[key]["operator"],
-            #    eye_bert_results[key]["left_SN"],
-            #    eye_bert_results[key]["right_SN"],
-            #    eye_bert_results[key]["notes"]
-            #]
             newdata = [eye_bert_results[key][x] for x in headers]
             ws.append(newdata)
         col = get_column_letter(1)

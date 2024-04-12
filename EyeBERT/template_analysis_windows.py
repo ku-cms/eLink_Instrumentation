@@ -4,8 +4,6 @@ import numpy as np
 import os
 
 # To-Do:
-# Working with Windows & existing code
-# Display properties (counts for 0s & 1s, counts outside reference template when comparing, etc.)
 # Refine comparison templates and construct copy of .csv for comparisons
 # Clean up code/classes (maximize reusability)
 
@@ -28,9 +26,7 @@ class EyeBERT:
         self.channel    = channel
         self.basePath   = basePath
         self.debug      = True
-        
-        #self.path = self.basePath + "/" + self.cable + "/" + self.cable + "_" + self.branch + "_" + self.channel + "_"
-        
+                
         # The path is the prefix for new output files.
         # The path is dependent on if the cable has branches.
         if self.branch:
