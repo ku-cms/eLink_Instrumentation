@@ -4,6 +4,8 @@ import numpy as np
 import os
 
 # To-Do:
+# Add branch to Template class and to plot title if applicable
+# Simplify the function getIndexedFiles(). Create a simpler version and test before replacing.
 # Refine comparison templates and construct copy of .csv for comparisons
 # Clean up code/classes (maximize reusability)
 
@@ -25,7 +27,7 @@ class EyeBERT:
         self.branch     = branch
         self.channel    = channel
         self.basePath   = basePath
-        self.debug      = True
+        self.debug      = False
                 
         # The path is the prefix for new output files.
         # The path is dependent on if the cable has branches.
@@ -81,23 +83,40 @@ class EyeBERTFile(EyeBERT):
         fileIndices.sort(reverse = True) # Sort the list in descending order based on the index (therefore, more recent the file (higher index), the closer to the beginning of the list it will be)
         return fileIndices # Return the completed list with the file names and their corresponding indices as ordered pairs
 
-    # Get latest file for channel
-    # FIXME: get latest file for specific branch and channel, depending on if the e-link has branches
+    # Get latest file for the cable, branch (if applicable), and channel
     def getLatestFile(self):
         """Returns latest .csv file for the corresponding channel from the cable's directory."""
-        channelFiles = [] # Initialize empty list to store file names for the cable and channel 
+        
+        # Get a list of file names for the cable, branch (if applicable), and channel
+        channelFiles = []
         for file in os.listdir(self.dataPath):
+            # determine if we should include this file
+            include_file = False
             # require a csv file with channel in the file name
             if self.channel in file and ".csv" in file:
                 # require that data and template are not in the file name
                 if "data" not in file and "template" not in file:
-                    channelFiles.append(file) # Append all file names for the cable and channel to the list
-        channelFiles = self.getIndexedFiles(channelFiles) # Call method to obtain list of file names with their corresponding indices in order of most recent file to oldest
-        index, latest_file = channelFiles[0] # Assign variables to each element of the ordered pair (index, file name) for the element at the beginning of the list (the most recent)
+                    # require the branch in the file name if the cable has branches
+                    if self.branch:
+                        if self.branch in file:
+                            include_file = True
+                    else:
+                        include_file = True
+            # If the file meets the requirements, append it to the list
+            if include_file:
+                channelFiles.append(file)
+        
+        # Call method to obtain a sorted list of file names with their corresponding indices in order of most recent file to oldest
+        channelFiles = self.getIndexedFiles(channelFiles)
+
+        # Get the index and file name of the latest file
+        index, latest_file = channelFiles[0]
         if self.debug:
             print(f"In getLatestFile(): channelFiles = {channelFiles}")
             print(f"In getLatestFile(): index = {index}, latest_file = {latest_file}")
-        return latest_file # Return the file name at that most recent file name's index 
+        
+        # Return the latest file
+        return latest_file
 
     def getFilename(self):
         """Returns corresponding filename to cable and channel."""
@@ -223,6 +242,7 @@ class Reference:
 
 
 # Template Class to compare templates
+# TODO: Add branch to Template class and to plot title if applicable
 class Template:
     def __init__(self, templateData, cable, channel, path):
         self.cable      = cable
@@ -232,7 +252,7 @@ class Template:
         self.zeros      = np.count_nonzero(self.templateData==0)
         self.total      = self.templateData.size
         self.path       = path
-        self.verbose    = False
+        self.verbose    = True
         if self.verbose:
             print(f"Template class: self.path: {self.path}")
 
