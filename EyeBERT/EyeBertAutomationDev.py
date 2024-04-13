@@ -19,7 +19,6 @@
 #    Saves eye-diagram and template analysis plots and records open area, height, and template analysis results.
 #
 # To Do
-#   : Get cable type from operator
 #   : Get parameters (which tests to run) from operator
 #   : For 4-point DC calibration, automatically create new file name (default) or let user overwrite existing file
 #   : For each 4-point DC calibration measurement, allow user to accept value to redo calibration measurement 
@@ -27,7 +26,7 @@
 #   : much better error recovery & data validation!
 
 # version
-version = 1.12
+version = 1.13
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -62,10 +61,24 @@ def GetBadDCChannels(measurement_data):
             bad_channels[key] = value
     return bad_channels
 
+# determine if cable type is valid
+def is_valid_cable_type(cable_types, cable_type):
+    if cable_type in cable_types:
+        return True
+    else:
+        return False
+    
+# determine if branch is valid
+def is_valid_branch(branches, branch):
+    if branch in branches:
+        return True
+    else:
+        return False
+
 def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
-    verbose = False
+    verbose = True
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
     RUN_EYE_BERT_AREA           = True
@@ -83,36 +96,57 @@ def main():
 
     # SMA cables: testing in loopback mode
     mapping_SMA_test = {
-        "name" : "example",
-        "cmd" : {"tx" : "0", "rx" : "0"},
-        "d0"  : {"tx" : "3", "rx" : "3"}
+        "name"  : "example",
+        "cmd"   : {"tx" : "0", "rx" : "0"},
+        "d0"    : {"tx" : "3", "rx" : "3"}
     }
+
+    # SMAs need to be connected with the correct channel mapping (based on e-link mapping).
+    # SMAs need to be connected with the correct polarity (based on e-link mapping).
 
     # Type 1 e-links
     mapping_type1 = {
-        "name" : "type 1 tfpix",
-        "cmd" : {"tx" : "7", "rx" : "7"},
-        "d0"  : {"tx" : "0", "rx" : "0"},
-        "d1"  : {"tx" : "1", "rx" : "1"},
-        "d2"  : {"tx" : "2", "rx" : "2"},
-        "d3"  : {"tx" : "3", "rx" : "3"}
+        "name"  : "Type 1",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d0"    : {"tx" : "0", "rx" : "0"},
+        "d1"    : {"tx" : "1", "rx" : "1"},
+        "d2"    : {"tx" : "2", "rx" : "2"},
+        "d3"    : {"tx" : "3", "rx" : "3"}
     }
 
-    # Type 5 e-links
+    # TBPX Type 5 e-links (works for 5K and 5K2)
     mapping_type5 = {
-        "name" : "type 5 tbpix",
-        "cmd" : {"tx" : "7", "rx" : "7"},
-        "d0"  : {"tx" : "0", "rx" : "0"},
-        "d1"  : {"tx" : "1", "rx" : "1"},
-        "d2"  : {"tx" : "2", "rx" : "2"},
-        "d3"  : {"tx" : "3", "rx" : "3"}
+        "name"  : "TBPX Type 5",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d0"    : {"tx" : "0", "rx" : "0"},
+        "d1"    : {"tx" : "1", "rx" : "1"},
+        "d2"    : {"tx" : "2", "rx" : "2"},
+        "d3"    : {"tx" : "3", "rx" : "3"}
     }
 
-    # TODO: let user specify e-link type, which will determine mapping
-    # Choose e-link mapping:
-    cable_mapping = mapping_type5
-    print(Fore.GREEN + "Mapping Dictionary : " + Fore.RED + 
-        cable_mapping["name"] + Fore.GREEN + " selected.")
+    # TFPX Type 3.2 e-links
+    mapping_type3p2 = {
+        "name"  : "TFPX Type 3p2",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d0"    : {"tx" : "0", "rx" : "0"},
+        "d2"    : {"tx" : "2", "rx" : "2"}
+    }
+
+    # cable mappings for supported e-link types
+    cable_mappings = {
+        "1"     : mapping_type1,
+        "5K"    : mapping_type5,
+        "5K2"   : mapping_type5,
+        "3p2"   : mapping_type3p2
+    }
+
+    # cable branches based on cable type
+    cable_branches = {
+        "3p2" : ["A", "B", "C"]
+    }
+
+    # supported cable types
+    cable_types = list(cable_mappings.keys())
 
     #
     # open serial control of relay board
@@ -150,15 +184,44 @@ def main():
     file_path = "C:/Users/Public/Documents/automation_results"
     r_file_path = "R:/BEAN_GRP/EyeBERTAutomation/automation_results"
     is_valid = False
-    while is_valid == False :
-        filename = input(Fore.RED + "Enter cable name: " + Fore.GREEN)
+    while is_valid == False:
+        filename = input(Fore.RED + "Enter cable number: " + Fore.GREEN)
         is_valid = is_valid_filename(filename)
-        if is_valid == False :
+        if is_valid == False:
             print(Fore.RED + f"{filename} cannot be used as a directory or filename. Re-enter.")
 
     # Assume that the filename is the cable number
     cable = filename
+
+    #
+    # get cable type
+    #
+    is_valid = False
+    while is_valid == False:
+        cable_type = input(Fore.RED + f"Enter cable type {cable_types}: " + Fore.GREEN)
+        is_valid = is_valid_cable_type(cable_types, cable_type)
+        if is_valid == False:
+            print(Fore.RED + f"{cable_type} is not a valid cable type. Re-enter a valid cable type: {cable_types}.")
     
+    # assign mapping based on cable type
+    cable_mapping = cable_mappings[cable_type]
+    print(Fore.GREEN + "Mapping Dictionary: " + Fore.RED + cable_mapping["name"] + Fore.GREEN + " selected.")
+
+    #
+    # get cable branch
+    #
+    branches = []
+    branch = ""
+    # only get branch for cable type that has branches
+    if cable_type in cable_branches:
+        branches = cable_branches[cable_type]
+        is_valid = False
+        while is_valid == False:
+            branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
+            is_valid = is_valid_branch(branches, branch)
+            if is_valid == False:
+                print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch: {branches}.")
+
     #
     # get ready to use this as our destination path
     #
@@ -209,15 +272,15 @@ def main():
     if RUN_4PT_DC_RES_CALIBRATION:
         print(Fore.GREEN + "")
         print("Running 4-point DC resistance calibration.")
-        print("")
     elif RUN_4PT_DC_RES or RUN_EYE_BERT_AREA:
         print(Fore.GREEN + "")
-        print(f"Taking data for cable {cable}.")
-        print("")
+        if branch:
+            print(f"Taking data for cable {cable}, branch {branch}.")
+        else:
+            print(f"Taking data for cable {cable}.")
     else:
         print(Fore.GREEN + "")
         print("Nothing to do (based on run flags)...")
-        print("")
 
     # 4-point DC resistance calibration
     if RUN_4PT_DC_RES_CALIBRATION:
@@ -357,32 +420,58 @@ def main():
 
         # add results to dataset for future write
         # hardcode channels for now to save all values in one row of the excel file; may want to change in the future
-        dc_resistance_results.update(
-            {
-            "cable"         : cable,
-            "date"          : now.strftime("%Y-%m-%d"),
-            "time"          : now.strftime("%H:%M:%S"),
-            "cmd_p"         : measurement_data["cmd_p"],
-            "cmd_n"         : measurement_data["cmd_n"],
-            "d0_p"          : measurement_data["d0_p"],
-            "d0_n"          : measurement_data["d0_n"],
-            "d1_p"          : measurement_data["d1_p"],
-            "d1_n"          : measurement_data["d1_n"],
-            "d2_p"          : measurement_data["d2_p"],
-            "d2_n"          : measurement_data["d2_n"],
-            "d3_p"          : measurement_data["d3_p"],
-            "d3_n"          : measurement_data["d3_n"],
-            "operator"      : operator,
-            "left_SN"       : left_serialnumber, 
-            "right_SN"      : right_serialnumber,
-            "notes"         : operator_notes
-            }
-        )
+
+        # Type 3.2
+        if cable_type == "3p2":
+            dc_resistance_results.update(
+                {
+                "cable"         : cable,
+                "branch"        : branch,
+                "date"          : now.strftime("%Y-%m-%d"),
+                "time"          : now.strftime("%H:%M:%S"),
+                "cmd_p"         : measurement_data["cmd_p"],
+                "cmd_n"         : measurement_data["cmd_n"],
+                "d0_p"          : measurement_data["d0_p"],
+                "d0_n"          : measurement_data["d0_n"],
+                "d2_p"          : measurement_data["d2_p"],
+                "d2_n"          : measurement_data["d2_n"],
+                "operator"      : operator,
+                "left_SN"       : left_serialnumber, 
+                "right_SN"      : right_serialnumber,
+                "notes"         : operator_notes
+                }
+            )
+        # all other types
+        else:
+            dc_resistance_results.update(
+                {
+                "cable"         : cable,
+                "date"          : now.strftime("%Y-%m-%d"),
+                "time"          : now.strftime("%H:%M:%S"),
+                "cmd_p"         : measurement_data["cmd_p"],
+                "cmd_n"         : measurement_data["cmd_n"],
+                "d0_p"          : measurement_data["d0_p"],
+                "d0_n"          : measurement_data["d0_n"],
+                "d1_p"          : measurement_data["d1_p"],
+                "d1_n"          : measurement_data["d1_n"],
+                "d2_p"          : measurement_data["d2_p"],
+                "d2_n"          : measurement_data["d2_n"],
+                "d3_p"          : measurement_data["d3_p"],
+                "d3_n"          : measurement_data["d3_n"],
+                "operator"      : operator,
+                "left_SN"       : left_serialnumber, 
+                "right_SN"      : right_serialnumber,
+                "notes"         : operator_notes
+                }
+            )
 
         # update XLS file, create new entries as needed
         wb = Workbook()
         path = "R:/BEAN_GRP/EyeBertAutomation/"
-        file_name = "DCResistanceAutomation.xlsx"
+                
+        # Use different spreasheets for each cable type
+        file_name = f"DCResistanceAutomation_Type_{cable_type}.xlsx"
+
         full_file_path = path + file_name
 
         # check if file exists
@@ -400,15 +489,24 @@ def main():
                     x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
                     keep_trying = True
         
+        # table headers
+
+        # Type 3.2
+        if cable_type == "3p2":
+            headers = ["cable", "branch", "date", "time",
+                    "cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n",
+                    "operator", "left_SN", "right_SN", "notes"]
+        # all other types
+        else:
+            headers = ["cable", "date", "time",
+                    "cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n",
+                    "operator", "left_SN", "right_SN", "notes"]
+        
         # if file does not exist, create file with table headers
         if not fileExists:
             # create file
             print(Fore.LIGHTRED_EX + "\t" + file_name + " summary file does not exist. Creating file.")
-            ws = wb.active
-            # table headers
-            headers = ["cable", "date", "time",
-                       "cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n",
-                       "operator", "left_SN", "right_SN", "notes"]
+            ws = wb.active            
             ws.append(headers)
             col = get_column_letter(1)
             ws.column_dimensions[col].bestFit = True
@@ -420,25 +518,9 @@ def main():
             ws = wb.active
         
         print(Fore.GREEN + "Adding data...")
-        newdata = [
-            dc_resistance_results["cable"],
-            dc_resistance_results["date"],
-            dc_resistance_results["time"],
-            dc_resistance_results["cmd_p"],
-            dc_resistance_results["cmd_n"],
-            dc_resistance_results["d0_p"],
-            dc_resistance_results["d0_n"],
-            dc_resistance_results["d1_p"],
-            dc_resistance_results["d1_n"],
-            dc_resistance_results["d2_p"],
-            dc_resistance_results["d2_n"],
-            dc_resistance_results["d3_p"],
-            dc_resistance_results["d3_n"],
-            dc_resistance_results["operator"],
-            dc_resistance_results["left_SN"],
-            dc_resistance_results["right_SN"],
-            dc_resistance_results["notes"]
-        ]
+                
+        newdata = [dc_resistance_results[x] for x in headers]
+
         ws.append(newdata)
         col = get_column_letter(1)
         ws.column_dimensions[col].bestFit = True
@@ -461,8 +543,17 @@ def main():
             # otherwise, we assume that the key is the channel
             else:
                 channel = str(key)
-            temp_name = filename + "_" + str(key) # change for looping version
+            
+            # base test name:
+            # - cable has branches: cable_branch_channel    
+            # - cable does not have branches: cable_channel
+            if branch:
+                temp_name = f"{cable}_{branch}_{channel}"
+            else:
+                temp_name = f"{cable}_{channel}"
+            # replace spaces to get final base test name:
             test_name = temp_name.replace(" ", "_")
+
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
             
@@ -593,13 +684,16 @@ def main():
             reference_template_file = "reference_template_v2.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
-            # Create EyeBERTFile object, cleaning user input, to read data from file
-            eyebert = EyeBERTFile(cable.replace(" ", ""), channel.replace(" ", "").lower(), file_path)
+            # Create EyeBERTFile object to read data from file
+            eyebert = EyeBERTFile(cable, branch, channel, file_path)
+            
             # Call analyze method to obtain graphs and properties
             analysis = eyebert.analyze()
 
             # Warning: .getPath() must be called AFTER .analyze()
             refPath = eyebert.getPath()
+
+            print(f"refPath = {refPath}")
 
             analysis.setPath(refPath)
 
@@ -658,33 +752,62 @@ def main():
             time_now = now.strftime("%H:%M:%S")
 
             # add results to dataset for future write
-            eye_bert_results.update(
-                {key : 
-                    {
-                    "cable"         : cable,
-                    "channel"       : channel,
-                    "date"          : date_now,
-                    "time"          : time_now,
-                    "open_area"     : open_area, 
-                    "top_eye"       : top_of_eye, 
-                    "bottom_eye"    : bottom_of_eye,
-                    "num_zeros"     : num_zeros,
-                    "num_ones"      : num_ones,
-                    "out_points"    : out_points,
-                    "in_points"     : in_points,
-                    "operator"      : operator,
-                    "left_SN"       : left_serialnumber, 
-                    "right_SN"      : right_serialnumber,
-                    "notes"         : operator_notes
+            # Type 3.2
+            if cable_type == "3p2":
+                eye_bert_results.update(
+                    {key : 
+                        {
+                        "cable"         : cable,
+                        "branch"        : branch,
+                        "channel"       : channel,
+                        "date"          : date_now,
+                        "time"          : time_now,
+                        "open_area"     : open_area, 
+                        "top_eye"       : top_of_eye, 
+                        "bottom_eye"    : bottom_of_eye,
+                        "num_zeros"     : num_zeros,
+                        "num_ones"      : num_ones,
+                        "out_points"    : out_points,
+                        "in_points"     : in_points,
+                        "operator"      : operator,
+                        "left_SN"       : left_serialnumber, 
+                        "right_SN"      : right_serialnumber,
+                        "notes"         : operator_notes
+                        }
                     }
-                }
-            )
+                )
+            # all other types
+            else:
+                eye_bert_results.update(
+                    {key : 
+                        {
+                        "cable"         : cable,
+                        "channel"       : channel,
+                        "date"          : date_now,
+                        "time"          : time_now,
+                        "open_area"     : open_area, 
+                        "top_eye"       : top_of_eye, 
+                        "bottom_eye"    : bottom_of_eye,
+                        "num_zeros"     : num_zeros,
+                        "num_ones"      : num_ones,
+                        "out_points"    : out_points,
+                        "in_points"     : in_points,
+                        "operator"      : operator,
+                        "left_SN"       : left_serialnumber, 
+                        "right_SN"      : right_serialnumber,
+                        "notes"         : operator_notes
+                        }
+                    }
+                )
         #end keys loop
 
         # update XLS file, create new entries as needed
         wb = Workbook()
         path = "R:/BEAN_GRP/EyeBertAutomation/"
-        file_name = "EyeBERTautomation.xlsx"
+
+        # Use different spreasheets for each cable type
+        file_name = f"EyeBERTautomation_Type_{cable_type}.xlsx"
+        
         full_file_path = path + file_name
 
         # check if file exists
@@ -703,15 +826,24 @@ def main():
                     x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
                     keep_trying = True
         
+        # table headers
+
+        # Type 3.2
+        if cable_type == "3p2":
+            headers = ["cable", "branch", "channel", "date", "time",
+                    "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
+                    "operator", "left_SN", "right_SN", "notes"]
+        else:
+            # all other types
+            headers = ["cable", "channel", "date", "time",
+                    "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
+                    "operator", "left_SN", "right_SN", "notes"]
+        
         # if file does not exist, create file with table headers
         if not fileExists:
             # create file
             print(Fore.LIGHTRED_EX + "\t" + file_name + " summary file does not exist. Creating file.")
-            ws = wb.active
-            # table headers
-            headers = ["cable", "channel", "date", "time",
-                       "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
-                       "operator", "left_SN", "right_SN", "notes"]
+            ws = wb.active            
             ws.append(headers)
             col = get_column_letter(1)
             ws.column_dimensions[col].bestFit = True
@@ -725,23 +857,7 @@ def main():
         print(Fore.GREEN + "Adding data...")
         keys = list(eye_bert_results)
         for key in keys:
-            newdata = [
-                eye_bert_results[key]["cable"],
-                eye_bert_results[key]["channel"],
-                eye_bert_results[key]["date"],
-                eye_bert_results[key]["time"],
-                eye_bert_results[key]["open_area"],
-                eye_bert_results[key]["top_eye"],
-                eye_bert_results[key]["bottom_eye"],
-                eye_bert_results[key]["num_zeros"],
-                eye_bert_results[key]["num_ones"],
-                eye_bert_results[key]["out_points"],
-                eye_bert_results[key]["in_points"],
-                eye_bert_results[key]["operator"],
-                eye_bert_results[key]["left_SN"],
-                eye_bert_results[key]["right_SN"],
-                eye_bert_results[key]["notes"]
-            ]
+            newdata = [eye_bert_results[key][x] for x in headers]
             ws.append(newdata)
         col = get_column_letter(1)
         ws.column_dimensions[col].bestFit = True
