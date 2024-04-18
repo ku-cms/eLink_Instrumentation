@@ -140,6 +140,14 @@ def main():
         "3p2"   : mapping_type3p2
     }
 
+    # cable channels for supported e-link types
+    cable_channels = {
+        "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+        "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+        "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+        "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"]
+    }
+
     # cable branches based on cable type
     cable_branches = {
         "3p2" : ["A", "B", "C"]
@@ -203,8 +211,9 @@ def main():
         if is_valid == False:
             print(Fore.RED + f"{cable_type} is not a valid cable type. Re-enter a valid cable type: {cable_types}.")
     
-    # assign mapping based on cable type
-    cable_mapping = cable_mappings[cable_type]
+    # assign mapping and channels based on cable type
+    cable_mapping   = cable_mappings[cable_type]
+    all_channels    = cable_channels[cable_type]
     print(Fore.GREEN + "Mapping Dictionary: " + Fore.RED + cable_mapping["name"] + Fore.GREEN + " selected.")
 
     #
@@ -420,6 +429,8 @@ def main():
 
         # add results to dataset for future write
         # hardcode channels for now to save all values in one row of the excel file; may want to change in the future
+        
+        # FIXME: update to work for all e-link types using all_channels
 
         # Type 3.2
         if cable_type == "3p2":
@@ -488,19 +499,17 @@ def main():
                     print(Fore.RED + file_name + " summary file is open. Please close.")
                     x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
                     keep_trying = True
-        
-        # table headers
+                
+        # table headers: defines order of columns in table
+        headers = ["cable"]
 
-        # Type 3.2
-        if cable_type == "3p2":
-            headers = ["cable", "branch", "date", "time",
-                    "cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n",
-                    "operator", "left_SN", "right_SN", "notes"]
-        # all other types
-        else:
-            headers = ["cable", "date", "time",
-                    "cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n",
-                    "operator", "left_SN", "right_SN", "notes"]
+        # Cable with branch
+        if branch:
+            headers += ["branch"]
+
+        headers += ["date", "time"]
+        headers += all_channels
+        headers += ["operator", "left_SN", "right_SN", "notes"]
         
         # if file does not exist, create file with table headers
         if not fileExists:
