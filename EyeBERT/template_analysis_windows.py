@@ -195,7 +195,7 @@ class EyeBERTAnalysis(EyeBERT):
 
     def createTemplate(self):
         """Returns template as Template class object."""
-        return Template(self.template, self.cable, self.channel, self.path)
+        return Template(self.template, self.cable, self.branch, self.channel, self.path)
 
     # To output to text file:
     def writeText(self):
@@ -219,8 +219,9 @@ class EyeBERTAnalysis(EyeBERT):
     
 # Reference Class
 class Reference:
-    def __init__(self, cable, channel, filename, path):
+    def __init__(self, cable, branch, channel, filename, path):
         self.cable = cable
+        self.branch = branch
         self.channel = channel
         self.filename = filename
         self.path = path
@@ -238,14 +239,15 @@ class Reference:
         return data    
     
     def createTemplate(self):
-        return Template(np.array(self.getReference()), self.cable, self.channel, self.path)
+        return Template(np.array(self.getReference()), self.cable, self.branch, self.channel, self.path)
 
 
 # Template Class to compare templates
 # TODO: Add branch to Template class and to plot title if applicable
 class Template:
-    def __init__(self, templateData, cable, channel, path):
+    def __init__(self, templateData, cable, branch, channel, path):
         self.cable      = cable
+        self.branch     = branch 
         self.channel    = channel 
         self.templateData = templateData.astype(int)
         self.ones       = np.count_nonzero(self.templateData==1)
@@ -314,7 +316,10 @@ class Template:
         # Difference array as Template Object
         #diff = self.__sub__(reference) 
         fig, (ax0, ax1, ax2) = plt.subplots(3, 1)
-        fig.suptitle(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
+        if self.branch:
+            fig.suptitle(f"Cable: {self.cable}, Branch: {self.branch}, Channel: {self.channel.upper()}")
+        else:
+            fig.suptitle(f"Cable: {self.cable}, Channel: {self.channel.upper()}")
         fig.tight_layout(h_pad=3)
         # Original template plot
         #im = ax0.pcolormesh(self.templateData, cmap="binary")
@@ -374,7 +379,7 @@ def main():
         reference_template_file = "EyeBERT/reference_template_v2.csv"
         print(f"Using this reference template data file: {reference_template_file}")
         
-        ref = Reference("540", "CMD", reference_template_file, refPath)
+        ref = Reference("540", eyebert.branch, "CMD", reference_template_file, refPath)
         refTemp = ref.createTemplate()
         
         # EDIT: reference needs to be a template object

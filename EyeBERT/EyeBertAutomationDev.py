@@ -701,7 +701,7 @@ def main():
 
                 template = analysis.createTemplate()
 
-                ref = Reference("540", "CMD", reference_template_file, refPath)
+                ref = Reference("540", branch, "CMD", reference_template_file, refPath)
                 refTemp = ref.createTemplate()
                 
                 # EDIT: reference needs to be a template object
@@ -752,8 +752,8 @@ def main():
             time_now = now.strftime("%H:%M:%S")
 
             # add results to dataset for future write
-            # Type 3.2
-            if cable_type == "3p2":
+            # Cable with branch
+            if branch:
                 eye_bert_results.update(
                     {key : 
                         {
@@ -828,8 +828,8 @@ def main():
         
         # table headers
 
-        # Type 3.2
-        if cable_type == "3p2":
+        # Cable with branch
+        if branch:
             headers = ["cable", "branch", "channel", "date", "time",
                     "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
                     "operator", "left_SN", "right_SN", "notes"]
