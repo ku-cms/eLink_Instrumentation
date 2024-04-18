@@ -714,7 +714,7 @@ def main():
                 out_points  = template.getOutCounts()
                 in_points   = template.getInCounts()
             else:
-                print(f"Error for cable {cable} and channel {channel.upper()}: Template failed verification step.")
+                print(f"Error for cable {cable}, branch {branch}, and channel {channel.upper()}: Template failed verification step.")
 
             # Make the screen capture
             print(Fore.GREEN + "Creating screen capture...")
@@ -776,7 +776,6 @@ def main():
                         }
                     }
                 )
-            # all other types
             else:
                 eye_bert_results.update(
                     {key : 
@@ -825,18 +824,15 @@ def main():
                     print(Fore.RED + file_name + " summary file is open. Please close.")
                     x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
                     keep_trying = True
+                
+        # table headers: defines order of columns in table
+        headers = ["cable"]
         
-        # table headers
-
         # Cable with branch
         if branch:
-            headers = ["cable", "branch", "channel", "date", "time",
-                    "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
-                    "operator", "left_SN", "right_SN", "notes"]
-        else:
-            # all other types
-            headers = ["cable", "channel", "date", "time",
-                    "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
+            headers += ["branch"]
+        
+        headers += ["channel", "date", "time", "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
                     "operator", "left_SN", "right_SN", "notes"]
         
         # if file does not exist, create file with table headers
