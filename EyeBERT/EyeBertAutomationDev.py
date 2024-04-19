@@ -115,6 +115,8 @@ def main():
     }
 
     # TBPX Type 5 e-links (works for 5K and 5K2)
+    # Note: Type 5K2 has inverted polarity for CMD and D2 compared to type 5K.
+    #       For Type 5K2, you need to account for this by swapping P/N SMA cables for CMD and D2.
     mapping_type5 = {
         "name"  : "TBPX Type 5",
         "cmd"   : {"tx" : "7", "rx" : "7"},
@@ -132,12 +134,43 @@ def main():
         "d2"    : {"tx" : "2", "rx" : "2"}
     }
 
+    # TFPX Type 2.2 e-links
+    mapping_type2p2 = {
+        "name"  : "TFPX Type 2p2",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d0"    : {"tx" : "0", "rx" : "0"},
+        "d2"    : {"tx" : "2", "rx" : "2"}
+    }
+
+    # TFPX Type 2.3 e-links
+    # Note: Channel labels are different than types 3.2 and 2.2!
+    mapping_type2p3 = {
+        "name"  : "TFPX Type 2p3",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d2"    : {"tx" : "1", "rx" : "1"},
+        "d1"    : {"tx" : "2", "rx" : "2"},
+        "d0"    : {"tx" : "3", "rx" : "3"}
+    }
+
+    # TFPX Type 1.3 e-links
+    # Note: Channel labels are different than types 3.2 and 2.2!
+    mapping_type1p3 = {
+        "name"  : "TFPX Type 1p3",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d2"    : {"tx" : "1", "rx" : "1"},
+        "d1"    : {"tx" : "2", "rx" : "2"},
+        "d0"    : {"tx" : "3", "rx" : "3"}
+    }
+
     # cable mappings for supported e-link types
     cable_mappings = {
         "1"     : mapping_type1,
         "5K"    : mapping_type5,
         "5K2"   : mapping_type5,
-        "3p2"   : mapping_type3p2
+        "3p2"   : mapping_type3p2,
+        "2p2"   : mapping_type2p2,
+        "2p3"   : mapping_type2p3,
+        "1p3"   : mapping_type1p3
     }
 
     # cable channels for supported e-link types
@@ -145,12 +178,18 @@ def main():
         "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
-        "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"]
+        "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+        "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+        "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
+        "1p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"]
     }
 
     # cable branches based on cable type
     cable_branches = {
-        "3p2" : ["A", "B", "C"]
+        "3p2" : ["A", "B", "C"],
+        "2p2" : ["A", "C"],
+        "2p3" : ["A", "B"],
+        "1p3" : ["A"]
     }
 
     # supported cable types
@@ -678,8 +717,9 @@ def main():
 
             # Warning: .getPath() must be called AFTER .analyze()
             refPath = eyebert.getPath()
-
-            print(f"refPath = {refPath}")
+            
+            if verbose:
+                print(f"refPath = {refPath}")
 
             analysis.setPath(refPath)
 
