@@ -78,7 +78,7 @@ def is_valid_branch(branches, branch):
 def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
-    verbose = True
+    verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
     RUN_EYE_BERT_AREA           = True
@@ -429,54 +429,27 @@ def main():
         date_now = now.strftime("%Y-%m-%d")
         time_now = now.strftime("%H:%M:%S")
 
-        # add results to dataset for future write
-        # hardcode channels for now to save all values in one row of the excel file; may want to change in the future
-        
-        # FIXME: update to work for all e-link types using all_channels
+        # results for this cable (and branch, if applicable)
+        results_for_cable = {
+            "cable"         : cable,
+            "date"          : date_now,
+            "time"          : time_now,
+            "operator"      : operator,
+            "left_SN"       : left_serialnumber, 
+            "right_SN"      : right_serialnumber,
+            "notes"         : operator_notes
+        }
 
-        # Type 3.2
-        if cable_type == "3p2":
-            dc_resistance_results.update(
-                {
-                "cable"         : cable,
-                "branch"        : branch,
-                "date"          : now.strftime("%Y-%m-%d"),
-                "time"          : now.strftime("%H:%M:%S"),
-                "cmd_p"         : measurement_data["cmd_p"],
-                "cmd_n"         : measurement_data["cmd_n"],
-                "d0_p"          : measurement_data["d0_p"],
-                "d0_n"          : measurement_data["d0_n"],
-                "d2_p"          : measurement_data["d2_p"],
-                "d2_n"          : measurement_data["d2_n"],
-                "operator"      : operator,
-                "left_SN"       : left_serialnumber, 
-                "right_SN"      : right_serialnumber,
-                "notes"         : operator_notes
-                }
-            )
-        # all other types
-        else:
-            dc_resistance_results.update(
-                {
-                "cable"         : cable,
-                "date"          : now.strftime("%Y-%m-%d"),
-                "time"          : now.strftime("%H:%M:%S"),
-                "cmd_p"         : measurement_data["cmd_p"],
-                "cmd_n"         : measurement_data["cmd_n"],
-                "d0_p"          : measurement_data["d0_p"],
-                "d0_n"          : measurement_data["d0_n"],
-                "d1_p"          : measurement_data["d1_p"],
-                "d1_n"          : measurement_data["d1_n"],
-                "d2_p"          : measurement_data["d2_p"],
-                "d2_n"          : measurement_data["d2_n"],
-                "d3_p"          : measurement_data["d3_p"],
-                "d3_n"          : measurement_data["d3_n"],
-                "operator"      : operator,
-                "left_SN"       : left_serialnumber, 
-                "right_SN"      : right_serialnumber,
-                "notes"         : operator_notes
-                }
-            )
+        # Cable with branch
+        if branch:
+            results_for_cable["branch"] = branch
+        
+        # save data for all channels (p and n)
+        for x in all_channels:
+            results_for_cable[x] = measurement_data[x]
+        
+        # save results for this cable (and branch, if applicable)
+        dc_resistance_results.update(results_for_cable)
 
         # update XLS file, create new entries as needed
         wb = Workbook()
@@ -765,7 +738,7 @@ def main():
             time_now = now.strftime("%H:%M:%S")
                 
             # results for this channel
-            result_for_channel = {
+            results_for_channel = {
                 key : {
                         "cable"         : cable,
                         "channel"       : channel,
@@ -787,10 +760,10 @@ def main():
             
             # Cable with branch
             if branch:
-                result_for_channel[key]["branch"] = branch
+                results_for_channel[key]["branch"] = branch
             
             # save results for this channel
-            eye_bert_results.update(result_for_channel)
+            eye_bert_results.update(results_for_channel)
 
         #end keys loop
 

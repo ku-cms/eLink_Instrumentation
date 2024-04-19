@@ -254,7 +254,7 @@ class Template:
         self.zeros      = np.count_nonzero(self.templateData==0)
         self.total      = self.templateData.size
         self.path       = path
-        self.verbose    = True
+        self.verbose    = False
         if self.verbose:
             print(f"Template class: self.path: {self.path}")
 
