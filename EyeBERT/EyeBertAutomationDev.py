@@ -316,6 +316,7 @@ def main():
         
         print("Measured calibration values (ohms):")
 
+        # Loop over channels
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -377,6 +378,7 @@ def main():
         
         print("Measurements after subtracting calibration values (ohms):")
 
+        # Loop over channels
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -545,6 +547,8 @@ def main():
         print("-------------------------------------")
 
         eb.MODE(b"MODE KC705\r\n")
+
+        # Loop over channels
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -759,54 +763,35 @@ def main():
             now = datetime.datetime.now()
             date_now = now.strftime("%Y-%m-%d")
             time_now = now.strftime("%H:%M:%S")
-
-            # add results to dataset for future write
+                
+            # results for this channel
+            result_for_channel = {
+                key : {
+                        "cable"         : cable,
+                        "channel"       : channel,
+                        "date"          : date_now,
+                        "time"          : time_now,
+                        "open_area"     : open_area, 
+                        "top_eye"       : top_of_eye, 
+                        "bottom_eye"    : bottom_of_eye,
+                        "num_zeros"     : num_zeros,
+                        "num_ones"      : num_ones,
+                        "out_points"    : out_points,
+                        "in_points"     : in_points,
+                        "operator"      : operator,
+                        "left_SN"       : left_serialnumber, 
+                        "right_SN"      : right_serialnumber,
+                        "notes"         : operator_notes
+                }
+            }
+            
             # Cable with branch
             if branch:
-                eye_bert_results.update(
-                    {key : 
-                        {
-                        "cable"         : cable,
-                        "branch"        : branch,
-                        "channel"       : channel,
-                        "date"          : date_now,
-                        "time"          : time_now,
-                        "open_area"     : open_area, 
-                        "top_eye"       : top_of_eye, 
-                        "bottom_eye"    : bottom_of_eye,
-                        "num_zeros"     : num_zeros,
-                        "num_ones"      : num_ones,
-                        "out_points"    : out_points,
-                        "in_points"     : in_points,
-                        "operator"      : operator,
-                        "left_SN"       : left_serialnumber, 
-                        "right_SN"      : right_serialnumber,
-                        "notes"         : operator_notes
-                        }
-                    }
-                )
-            else:
-                eye_bert_results.update(
-                    {key : 
-                        {
-                        "cable"         : cable,
-                        "channel"       : channel,
-                        "date"          : date_now,
-                        "time"          : time_now,
-                        "open_area"     : open_area, 
-                        "top_eye"       : top_of_eye, 
-                        "bottom_eye"    : bottom_of_eye,
-                        "num_zeros"     : num_zeros,
-                        "num_ones"      : num_ones,
-                        "out_points"    : out_points,
-                        "in_points"     : in_points,
-                        "operator"      : operator,
-                        "left_SN"       : left_serialnumber, 
-                        "right_SN"      : right_serialnumber,
-                        "notes"         : operator_notes
-                        }
-                    }
-                )
+                result_for_channel[key]["branch"] = branch
+            
+            # save results for this channel
+            eye_bert_results.update(result_for_channel)
+
         #end keys loop
 
         # update XLS file, create new entries as needed
