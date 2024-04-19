@@ -78,7 +78,7 @@ def is_valid_branch(branches, branch):
 def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
-    verbose = True
+    verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
     RUN_EYE_BERT_AREA           = True
@@ -115,6 +115,8 @@ def main():
     }
 
     # TBPX Type 5 e-links (works for 5K and 5K2)
+    # Note: Type 5K2 has inverted polarity for CMD and D2 compared to type 5K.
+    #       For Type 5K2, you need to account for this by swapping P/N SMA cables for CMD and D2.
     mapping_type5 = {
         "name"  : "TBPX Type 5",
         "cmd"   : {"tx" : "7", "rx" : "7"},
@@ -132,17 +134,62 @@ def main():
         "d2"    : {"tx" : "2", "rx" : "2"}
     }
 
+    # TFPX Type 2.2 e-links
+    mapping_type2p2 = {
+        "name"  : "TFPX Type 2p2",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d0"    : {"tx" : "0", "rx" : "0"},
+        "d2"    : {"tx" : "2", "rx" : "2"}
+    }
+
+    # TFPX Type 2.3 e-links
+    # Note: Channel labels are different than types 3.2 and 2.2!
+    mapping_type2p3 = {
+        "name"  : "TFPX Type 2p3",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d2"    : {"tx" : "1", "rx" : "1"},
+        "d1"    : {"tx" : "2", "rx" : "2"},
+        "d0"    : {"tx" : "3", "rx" : "3"}
+    }
+
+    # TFPX Type 1.3 e-links
+    # Note: Channel labels are different than types 3.2 and 2.2!
+    mapping_type1p3 = {
+        "name"  : "TFPX Type 1p3",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d2"    : {"tx" : "1", "rx" : "1"},
+        "d1"    : {"tx" : "2", "rx" : "2"},
+        "d0"    : {"tx" : "3", "rx" : "3"}
+    }
+
     # cable mappings for supported e-link types
     cable_mappings = {
         "1"     : mapping_type1,
         "5K"    : mapping_type5,
         "5K2"   : mapping_type5,
-        "3p2"   : mapping_type3p2
+        "3p2"   : mapping_type3p2,
+        "2p2"   : mapping_type2p2,
+        "2p3"   : mapping_type2p3,
+        "1p3"   : mapping_type1p3
+    }
+
+    # cable channels for supported e-link types
+    cable_channels = {
+        "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+        "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+        "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+        "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+        "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+        "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
+        "1p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"]
     }
 
     # cable branches based on cable type
     cable_branches = {
-        "3p2" : ["A", "B", "C"]
+        "3p2" : ["A", "B", "C"],
+        "2p2" : ["A", "C"],
+        "2p3" : ["A", "B"],
+        "1p3" : ["A"]
     }
 
     # supported cable types
@@ -203,8 +250,9 @@ def main():
         if is_valid == False:
             print(Fore.RED + f"{cable_type} is not a valid cable type. Re-enter a valid cable type: {cable_types}.")
     
-    # assign mapping based on cable type
-    cable_mapping = cable_mappings[cable_type]
+    # assign mapping and channels based on cable type
+    cable_mapping   = cable_mappings[cable_type]
+    all_channels    = cable_channels[cable_type]
     print(Fore.GREEN + "Mapping Dictionary: " + Fore.RED + cable_mapping["name"] + Fore.GREEN + " selected.")
 
     #
@@ -307,6 +355,7 @@ def main():
         
         print("Measured calibration values (ohms):")
 
+        # Loop over channels
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -368,6 +417,7 @@ def main():
         
         print("Measurements after subtracting calibration values (ohms):")
 
+        # Loop over channels
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -418,52 +468,27 @@ def main():
         date_now = now.strftime("%Y-%m-%d")
         time_now = now.strftime("%H:%M:%S")
 
-        # add results to dataset for future write
-        # hardcode channels for now to save all values in one row of the excel file; may want to change in the future
+        # results for this cable (and branch, if applicable)
+        results_for_cable = {
+            "cable"         : cable,
+            "date"          : date_now,
+            "time"          : time_now,
+            "operator"      : operator,
+            "left_SN"       : left_serialnumber, 
+            "right_SN"      : right_serialnumber,
+            "notes"         : operator_notes
+        }
 
-        # Type 3.2
-        if cable_type == "3p2":
-            dc_resistance_results.update(
-                {
-                "cable"         : cable,
-                "branch"        : branch,
-                "date"          : now.strftime("%Y-%m-%d"),
-                "time"          : now.strftime("%H:%M:%S"),
-                "cmd_p"         : measurement_data["cmd_p"],
-                "cmd_n"         : measurement_data["cmd_n"],
-                "d0_p"          : measurement_data["d0_p"],
-                "d0_n"          : measurement_data["d0_n"],
-                "d2_p"          : measurement_data["d2_p"],
-                "d2_n"          : measurement_data["d2_n"],
-                "operator"      : operator,
-                "left_SN"       : left_serialnumber, 
-                "right_SN"      : right_serialnumber,
-                "notes"         : operator_notes
-                }
-            )
-        # all other types
-        else:
-            dc_resistance_results.update(
-                {
-                "cable"         : cable,
-                "date"          : now.strftime("%Y-%m-%d"),
-                "time"          : now.strftime("%H:%M:%S"),
-                "cmd_p"         : measurement_data["cmd_p"],
-                "cmd_n"         : measurement_data["cmd_n"],
-                "d0_p"          : measurement_data["d0_p"],
-                "d0_n"          : measurement_data["d0_n"],
-                "d1_p"          : measurement_data["d1_p"],
-                "d1_n"          : measurement_data["d1_n"],
-                "d2_p"          : measurement_data["d2_p"],
-                "d2_n"          : measurement_data["d2_n"],
-                "d3_p"          : measurement_data["d3_p"],
-                "d3_n"          : measurement_data["d3_n"],
-                "operator"      : operator,
-                "left_SN"       : left_serialnumber, 
-                "right_SN"      : right_serialnumber,
-                "notes"         : operator_notes
-                }
-            )
+        # Cable with branch
+        if branch:
+            results_for_cable["branch"] = branch
+        
+        # save data for all channels (p and n)
+        for x in all_channels:
+            results_for_cable[x] = measurement_data[x]
+        
+        # save results for this cable (and branch, if applicable)
+        dc_resistance_results.update(results_for_cable)
 
         # update XLS file, create new entries as needed
         wb = Workbook()
@@ -488,19 +513,17 @@ def main():
                     print(Fore.RED + file_name + " summary file is open. Please close.")
                     x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
                     keep_trying = True
-        
-        # table headers
+                
+        # table headers: defines order of columns in table
+        headers = ["cable"]
 
-        # Type 3.2
-        if cable_type == "3p2":
-            headers = ["cable", "branch", "date", "time",
-                    "cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n",
-                    "operator", "left_SN", "right_SN", "notes"]
-        # all other types
-        else:
-            headers = ["cable", "date", "time",
-                    "cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n",
-                    "operator", "left_SN", "right_SN", "notes"]
+        # Cable with branch
+        if branch:
+            headers += ["branch"]
+
+        headers += ["date", "time"]
+        headers += all_channels
+        headers += ["operator", "left_SN", "right_SN", "notes"]
         
         # if file does not exist, create file with table headers
         if not fileExists:
@@ -536,6 +559,8 @@ def main():
         print("-------------------------------------")
 
         eb.MODE(b"MODE KC705\r\n")
+
+        # Loop over channels
         for key in keys :
             # skip key if it is "name"
             if key == "name" :
@@ -692,8 +717,9 @@ def main():
 
             # Warning: .getPath() must be called AFTER .analyze()
             refPath = eyebert.getPath()
-
-            print(f"refPath = {refPath}")
+            
+            if verbose:
+                print(f"refPath = {refPath}")
 
             analysis.setPath(refPath)
 
@@ -701,7 +727,7 @@ def main():
 
                 template = analysis.createTemplate()
 
-                ref = Reference("540", "CMD", reference_template_file, refPath)
+                ref = Reference("540", branch, "CMD", reference_template_file, refPath)
                 refTemp = ref.createTemplate()
                 
                 # EDIT: reference needs to be a template object
@@ -714,7 +740,7 @@ def main():
                 out_points  = template.getOutCounts()
                 in_points   = template.getInCounts()
             else:
-                print(f"Error for cable {cable} and channel {channel.upper()}: Template failed verification step.")
+                print(f"Error for cable {cable}, branch {branch}, and channel {channel.upper()}: Template failed verification step.")
 
             # Make the screen capture
             print(Fore.GREEN + "Creating screen capture...")
@@ -750,55 +776,35 @@ def main():
             now = datetime.datetime.now()
             date_now = now.strftime("%Y-%m-%d")
             time_now = now.strftime("%H:%M:%S")
+                
+            # results for this channel
+            results_for_channel = {
+                key : {
+                        "cable"         : cable,
+                        "channel"       : channel,
+                        "date"          : date_now,
+                        "time"          : time_now,
+                        "open_area"     : open_area, 
+                        "top_eye"       : top_of_eye, 
+                        "bottom_eye"    : bottom_of_eye,
+                        "num_zeros"     : num_zeros,
+                        "num_ones"      : num_ones,
+                        "out_points"    : out_points,
+                        "in_points"     : in_points,
+                        "operator"      : operator,
+                        "left_SN"       : left_serialnumber, 
+                        "right_SN"      : right_serialnumber,
+                        "notes"         : operator_notes
+                }
+            }
+            
+            # Cable with branch
+            if branch:
+                results_for_channel[key]["branch"] = branch
+            
+            # save results for this channel
+            eye_bert_results.update(results_for_channel)
 
-            # add results to dataset for future write
-            # Type 3.2
-            if cable_type == "3p2":
-                eye_bert_results.update(
-                    {key : 
-                        {
-                        "cable"         : cable,
-                        "branch"        : branch,
-                        "channel"       : channel,
-                        "date"          : date_now,
-                        "time"          : time_now,
-                        "open_area"     : open_area, 
-                        "top_eye"       : top_of_eye, 
-                        "bottom_eye"    : bottom_of_eye,
-                        "num_zeros"     : num_zeros,
-                        "num_ones"      : num_ones,
-                        "out_points"    : out_points,
-                        "in_points"     : in_points,
-                        "operator"      : operator,
-                        "left_SN"       : left_serialnumber, 
-                        "right_SN"      : right_serialnumber,
-                        "notes"         : operator_notes
-                        }
-                    }
-                )
-            # all other types
-            else:
-                eye_bert_results.update(
-                    {key : 
-                        {
-                        "cable"         : cable,
-                        "channel"       : channel,
-                        "date"          : date_now,
-                        "time"          : time_now,
-                        "open_area"     : open_area, 
-                        "top_eye"       : top_of_eye, 
-                        "bottom_eye"    : bottom_of_eye,
-                        "num_zeros"     : num_zeros,
-                        "num_ones"      : num_ones,
-                        "out_points"    : out_points,
-                        "in_points"     : in_points,
-                        "operator"      : operator,
-                        "left_SN"       : left_serialnumber, 
-                        "right_SN"      : right_serialnumber,
-                        "notes"         : operator_notes
-                        }
-                    }
-                )
         #end keys loop
 
         # update XLS file, create new entries as needed
@@ -825,18 +831,15 @@ def main():
                     print(Fore.RED + file_name + " summary file is open. Please close.")
                     x = input(Fore.RED + "Press ENTER when ready to retry. " + Fore.GREEN)
                     keep_trying = True
+                
+        # table headers: defines order of columns in table
+        headers = ["cable"]
         
-        # table headers
-
-        # Type 3.2
-        if cable_type == "3p2":
-            headers = ["cable", "branch", "channel", "date", "time",
-                    "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
-                    "operator", "left_SN", "right_SN", "notes"]
-        else:
-            # all other types
-            headers = ["cable", "channel", "date", "time",
-                    "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
+        # Cable with branch
+        if branch:
+            headers += ["branch"]
+        
+        headers += ["channel", "date", "time", "open_area", "top_eye", "bottom_eye", "num_zeros", "num_ones", "out_points", "in_points",
                     "operator", "left_SN", "right_SN", "notes"]
         
         # if file does not exist, create file with table headers
