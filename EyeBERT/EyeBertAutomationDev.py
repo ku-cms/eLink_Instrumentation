@@ -706,7 +706,7 @@ def main():
             
             # EyeBERT Template Analysis
 
-            reference_template_file = "reference_template_v2.csv"
+            reference_template_file = "reference_template_v3.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
             # Create EyeBERTFile object to read data from file
