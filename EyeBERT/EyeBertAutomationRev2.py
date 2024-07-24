@@ -80,8 +80,8 @@ def main():
     # TODO: let user specify parameters for what test(s) to run
     verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
-    RUN_4PT_DC_RES              = False
-    RUN_EYE_BERT_AREA           = True
+    RUN_4PT_DC_RES              = True
+    RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -234,15 +234,28 @@ def main():
     }
     # FIXME: Update for Rev B relay board: entries should include both branch and channel (e.g. A_cmd_p)
 
+    # channels for Rev A relay board
     # cable channels for supported e-link types
+    # cable_channels = {
+    #     "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+    #     "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+    #     "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+    #     "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+    #     "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+    #     "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
+    #     "1p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"]
+    # }
+
+    # channels for Rev B relay board
+    # entries should include both branch and channel (e.g. A_cmd_p)
     cable_channels = {
         "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
-        "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
-        "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
-        "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
-        "1p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"]
+        "3p2"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d2_p", "A_d2_n", "B_cmd_p", "B_cmd_n", "B_d0_p", "B_d0_n", "B_d2_p", "B_d2_n", "C_cmd_p", "C_cmd_n", "C_d0_p", "C_d0_n", "C_d2_p", "C_d2_n"],
+        "2p2"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d2_p", "A_d2_n", "C_cmd_p", "C_cmd_n", "C_d0_p", "C_d0_n", "C_d2_p", "C_d2_n"],
+        "2p3"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d1_p", "A_d1_n", "A_d2_p", "A_d2_n", "B_cmd_p", "B_cmd_n", "B_d0_p", "B_d0_n", "B_d1_p", "B_d1_n", "B_d2_p", "B_d2_n"],
+        "1p3"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d1_p", "A_d1_n", "A_d2_p", "A_d2_n"]
     }
 
     # cable branches based on cable type
@@ -404,7 +417,7 @@ def main():
         # TODO: automatically create new calibration file name
         # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
-        calibration_file = "4_point_DC_CalibrationRev2_v0.json"
+        calibration_file = "4_point_DC_CalibrationRev2_v1.json"
 
         print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
         
@@ -473,7 +486,7 @@ def main():
         # FIXME: Create new Rev 2 DC calibration file for Rev B relay board
         measurement_data = {}
         calibration_data = {}
-        calibration_file = "4_point_DC_Calibration_v1.json"
+        calibration_file = "4_point_DC_CalibrationRev2_v0.json"
 
         print(f"Using the calibration file {calibration_file}.")
         
