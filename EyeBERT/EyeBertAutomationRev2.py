@@ -1,4 +1,4 @@
-# EyeBertAutomation.py
+# EyeBertAutomationRev2.py
 #
 # Developed by the KU CMS group.
 #
@@ -21,12 +21,12 @@
 # To Do
 #   : Get parameters (which tests to run) from operator
 #   : For 4-point DC calibration, automatically create new file name (default) or let user overwrite existing file
-#   : For each 4-point DC calibration measurement, allow user to accept value to redo calibration measurement 
+#   : For each 4-point DC calibration measurement, allow user to accept value or redo calibration measurement 
 #   : repeat tests as needed
 #   : much better error recovery & data validation!
 
 # version
-version = 1.13
+version = 2.0
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -127,52 +127,100 @@ def main():
     }
 
     # -------------------------------------------- #
-    # New e-link mappings for Rev A relay board
-    # Use channel in key
+    # e-link mappings v1 for Rev A relay board
+    # use channel in key
     # -------------------------------------------- #
+
+    # # TFPX Type 3.2 e-links
+    # mapping_type3p2 = {
+    #     "name"  : "TFPX Type 3p2",
+    #     "cmd"   : {"tx" : "7", "rx" : "7"},
+    #     "d0"    : {"tx" : "0", "rx" : "0"},
+    #     "d2"    : {"tx" : "2", "rx" : "2"}
+    # }
+
+    # # TFPX Type 2.2 e-links
+    # mapping_type2p2 = {
+    #     "name"  : "TFPX Type 2p2",
+    #     "cmd"   : {"tx" : "7", "rx" : "7"},
+    #     "d0"    : {"tx" : "0", "rx" : "0"},
+    #     "d2"    : {"tx" : "2", "rx" : "2"}
+    # }
+
+    # # TFPX Type 2.3 e-links
+    # # Note: Channel labels are different than types 3.2 and 2.2!
+    # mapping_type2p3 = {
+    #     "name"  : "TFPX Type 2p3",
+    #     "cmd"   : {"tx" : "7", "rx" : "7"},
+    #     "d2"    : {"tx" : "1", "rx" : "1"},
+    #     "d1"    : {"tx" : "2", "rx" : "2"},
+    #     "d0"    : {"tx" : "3", "rx" : "3"}
+    # }
+
+    # # TFPX Type 1.3 e-links
+    # # Note: Channel labels are different than types 3.2 and 2.2!
+    # mapping_type1p3 = {
+    #     "name"  : "TFPX Type 1p3",
+    #     "cmd"   : {"tx" : "7", "rx" : "7"},
+    #     "d2"    : {"tx" : "1", "rx" : "1"},
+    #     "d1"    : {"tx" : "2", "rx" : "2"},
+    #     "d0"    : {"tx" : "3", "rx" : "3"}
+    # }
+
+    # -------------------------------------------- #
+    # e-link mappings v2 for Rev B relay board
+    # use branch and channel in key
+    # -------------------------------------------- #    
+    # FIXME: We need to account for polarity (standard or inverted) for each channel!
 
     # TFPX Type 3.2 e-links
     mapping_type3p2 = {
         "name"  : "TFPX Type 3p2",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d0"    : {"tx" : "0", "rx" : "0"},
-        "d2"    : {"tx" : "2", "rx" : "2"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "3"},
+        "A_d0"    : {"tx" : "1",    "rx" : "4"},
+        "A_d2"    : {"tx" : "3",    "rx" : "2"},
+        "B_cmd"   : {"tx" : "10",   "rx" : "7"},
+        "B_d0"    : {"tx" : "6",    "rx" : "8"},
+        "B_d2"    : {"tx" : "8",    "rx" : "6"},
+        "C_cmd"   : {"tx" : "15",   "rx" : "9"},
+        "C_d0"    : {"tx" : "11",   "rx" : "11"},
+        "C_d2"    : {"tx" : "13",   "rx" : "10"}
     }
 
     # TFPX Type 2.2 e-links
     mapping_type2p2 = {
         "name"  : "TFPX Type 2p2",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d0"    : {"tx" : "0", "rx" : "0"},
-        "d2"    : {"tx" : "2", "rx" : "2"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "3"},
+        "A_d0"    : {"tx" : "1",    "rx" : "4"},
+        "A_d2"    : {"tx" : "3",    "rx" : "2"},
+        "C_cmd"   : {"tx" : "15",   "rx" : "9"},
+        "C_d0"    : {"tx" : "11",   "rx" : "11"},
+        "C_d2"    : {"tx" : "13",   "rx" : "10"}
     }
 
     # TFPX Type 2.3 e-links
     # Note: Channel labels are different than types 3.2 and 2.2!
     mapping_type2p3 = {
         "name"  : "TFPX Type 2p3",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d2"    : {"tx" : "1", "rx" : "1"},
-        "d1"    : {"tx" : "2", "rx" : "2"},
-        "d0"    : {"tx" : "3", "rx" : "3"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "1"},
+        "A_d2"    : {"tx" : "2",    "rx" : "6"},
+        "A_d1"    : {"tx" : "3",    "rx" : "4"},
+        "A_d0"    : {"tx" : "4",    "rx" : "2"},
+        "B_cmd"   : {"tx" : "10",   "rx" : "9"},
+        "B_d2"    : {"tx" : "7",    "rx" : "11"},
+        "B_d1"    : {"tx" : "8",    "rx" : "10"},
+        "B_d0"    : {"tx" : "9",    "rx" : "8"}
     }
 
     # TFPX Type 1.3 e-links
     # Note: Channel labels are different than types 3.2 and 2.2!
     mapping_type1p3 = {
         "name"  : "TFPX Type 1p3",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d2"    : {"tx" : "1", "rx" : "1"},
-        "d1"    : {"tx" : "2", "rx" : "2"},
-        "d0"    : {"tx" : "3", "rx" : "3"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "1"},
+        "A_d2"    : {"tx" : "2",    "rx" : "6"},
+        "A_d1"    : {"tx" : "3",    "rx" : "4"},
+        "A_d0"    : {"tx" : "4",    "rx" : "2"}
     }
-
-    # -------------------------------------------- #
-    # New e-link mappings for Rev B relay board
-    # Use branch and channel in key
-    # -------------------------------------------- #
-    # FIXME: We need to account for polarity (P and N)
-
 
     # cable mappings for supported e-link types
     cable_mappings = {

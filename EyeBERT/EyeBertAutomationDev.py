@@ -1,4 +1,4 @@
-# EyeBertAutomation.py
+# EyeBertAutomationDev.py
 #
 # Developed by the KU CMS group.
 #
