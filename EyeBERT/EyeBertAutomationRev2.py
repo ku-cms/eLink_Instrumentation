@@ -28,7 +28,7 @@
 # version
 version = 2.0
 
-from template_analysis_windows import EyeBERTFile, Reference
+from template_analysis_windows_Rev2 import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
 
 init(convert=True)
@@ -80,7 +80,7 @@ def main():
     # TODO: let user specify parameters for what test(s) to run
     verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
-    RUN_4PT_DC_RES              = True
+    RUN_4PT_DC_RES              = False
     RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
@@ -232,6 +232,7 @@ def main():
         "2p3"   : mapping_type2p3,
         "1p3"   : mapping_type1p3
     }
+    # FIXME: Update for Rev B relay board: entries should include both branch and channel (e.g. A_cmd_p)
 
     # cable channels for supported e-link types
     cable_channels = {
@@ -320,15 +321,18 @@ def main():
     #
     branches = []
     branch = ""
-    # only get branch for cable type that has branches
-    if cable_type in cable_branches:
-        branches = cable_branches[cable_type]
-        is_valid = False
-        while is_valid == False:
-            branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
-            is_valid = is_valid_branch(branches, branch)
-            if is_valid == False:
-                print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch: {branches}.")
+
+    # For the Rev B relay board, the user does not need to enter a branch.
+
+    # # only get branch for cable type that has branches
+    # if cable_type in cable_branches:
+    #     branches = cable_branches[cable_type]
+    #     is_valid = False
+    #     while is_valid == False:
+    #         branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
+    #         is_valid = is_valid_branch(branches, branch)
+    #         if is_valid == False:
+    #             print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch: {branches}.")
 
     #
     # get ready to use this as our destination path
@@ -400,7 +404,7 @@ def main():
         # TODO: automatically create new calibration file name
         # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
-        calibration_file = "4_point_DC_Calibration_v2.json"
+        calibration_file = "4_point_DC_CalibrationRev2_v0.json"
 
         print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
         
@@ -465,6 +469,8 @@ def main():
         print("Beginning 4-point DC resistance measurements.")
         print("---------------------------------------------")
         
+
+        # FIXME: Create new Rev 2 DC calibration file for Rev B relay board
         measurement_data = {}
         calibration_data = {}
         calibration_file = "4_point_DC_Calibration_v1.json"
@@ -555,7 +561,7 @@ def main():
         path = "R:/BEAN_GRP/EyeBertAutomation/"
                 
         # Use different spreasheets for each cable type
-        file_name = f"DCResistanceAutomation_Type_{cable_type}.xlsx"
+        file_name = f"DCResistanceAutomationRev2_Type_{cable_type}.xlsx"
 
         full_file_path = path + file_name
 
@@ -872,7 +878,7 @@ def main():
         path = "R:/BEAN_GRP/EyeBertAutomation/"
 
         # Use different spreasheets for each cable type
-        file_name = f"EyeBERTautomation_Type_{cable_type}.xlsx"
+        file_name = f"EyeBERTautomationRev2_Type_{cable_type}.xlsx"
         
         full_file_path = path + file_name
 
