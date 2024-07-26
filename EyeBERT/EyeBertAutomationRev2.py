@@ -54,10 +54,12 @@ import json
 
 # get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
+    cutoff = 10.0
     bad_channels = {}
     for key in measurement_data:
         value = measurement_data[key]
-        if value > 10.0:
+        # resistance threshold for bad channels
+        if value >= cutoff:
             bad_channels[key] = value
     return bad_channels
 
@@ -81,7 +83,7 @@ def main():
     verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = False
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -521,26 +523,47 @@ def main():
             positive = round(dmm.reading(),2) - pos_path
             eb.MODE(b"MODE DMM -\r\n")
             negative = round(dmm.reading(),2) - neg_path
-
+            
+            # key with p and n
+            key_p = key + "_p"
+            key_n = key + "_n"
+            
+            # for values greater than or equal to this cufoff, print INF (consider these values as infinite resistance)
+            cutoff = 1e6
+            val_to_print_positive = ""
+            val_to_print_negative = ""
+            if positive < cutoff:
+                val_to_print_positive = "{:.2f}".format(positive)
+            else:
+                val_to_print_positive = "INF"
+            if negative < cutoff:
+                val_to_print_negative = "{:.2f}".format(negative)
+            else:
+                val_to_print_negative = "INF"
+            
             # print results
-            print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+            print(" - channel {0:6}: {1:8} = {2:4}, {3:8} = {4:4}".format(key, key_p, val_to_print_positive, key_n, val_to_print_negative))
 
             # save measurement data
-            measurement_data[key + "_p"] = positive
-            measurement_data[key + "_n"] = negative
+            measurement_data[key_p] = positive
+            measurement_data[key_n] = negative
 
         # get bad 4-point DC channels
         bad_channels = GetBadDCChannels(measurement_data)
 
+        # print bad 4-point DC channels
         if bad_channels:
-            print(Fore.RED + "Warning: The following channels have large 4-point DC resistance:" + Fore.GREEN)
+            print(Fore.RED + "Warning: The following channels have large 4-point DC resistance (ohms):" + Fore.GREEN)
             for key in bad_channels:
                 value = bad_channels[key]
-                print(f" - {key}: {value}")
+                print(f" - {key:8}: {value}")
             print(Fore.RED + "Possible causes:" + Fore.GREEN)
             print(" - The e-link is not connected properly.")
-            print(" - The SMA cable mapping is not correct for this type of e-link.")
+            print(" - The SMA cable mapping (connections to the relay board) is not correct for this type of e-link.")
             print(" - The e-link has a break or discontinuity for these channels.")
+            print(" - The SMA cable or adapter board has a break or discontinuity for these channels.")
+            print(" - There is a software and/or firmware bug causing a mapping problem.")
+            print(" - There is some new and unknown problem... good luck debugging! Be systematic and eliminate one possible cause at a time.")
 
         # get date and time
         now = datetime.datetime.now()
@@ -714,6 +737,14 @@ def main():
 
             # launch the test via TCL script
             pygui.write("source eye_and_save.tcl\n", interval = 0.01)
+
+            # From Rob:
+            # caleb, look here!
+            # here's where the polarity stuff goes
+            # I think...
+            #pygui.write("source example_file.tcl\n", interval = 0.01)
+            # From Caleb:
+            # I think the polarity command needs to be after "create scan" but before we take data.
 
             # wait a bit
             print(Fore.GREEN + "Pausing to allow EyeBERT to complete...")
