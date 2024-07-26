@@ -2,7 +2,7 @@
  * Project Name : KU-CMS REV B EyeBERT Relay Mux Board Controller
  * Description  : Set various RF relays to route test signals for
  *                KU-CMS EyeBERT test of cables
- * Sponsor      : A. Bean
+ * Sponsor      : A. Bean 
  * Device       : Arduino Pro-Mini 5V
  * Compiler     : platformIO Core 6.1.15
  *              : Visual Studio Code 1.91.1
@@ -77,7 +77,7 @@ void setup()
   digitalWrite(RESET, LOW);
   digitalWrite(RESET, HIGH);
 
-  // configure SPI
+  // configure SPI for bit-bang use
   pinMode(MOSI, OUTPUT);
   pinMode(SCK, OUTPUT);
   pinMode(CSbar, OUTPUT);
@@ -88,7 +88,7 @@ void setup()
   pinMode(HEARTBEAT, OUTPUT);
   pinMode(ERROR, OUTPUT);
   pinMode(RELAY, OUTPUT);
-  digitalWrite(DMM_4RLY, 0);
+  digitalWrite(DMM_4RLY, LOW);
   digitalWrite(HEARTBEAT, LOW);
   digitalWrite(ERROR, LOW);
   digitalWrite(RELAY, LOW);
@@ -100,19 +100,24 @@ void setup()
   cmdCallBack.addCmd("RX", &cmdRX);
   cmdCallBack.addCmd("MODE", &cmdMODE);
 
+  // configure MAX4822 relay control chips for
+  // setback voltage
   ConfigureMax4822();
 
-  // configure blinkable relays
+  // configure blinkable LEDs
   HeartbeatLEDState = 0;
   HeartbeatLEDCounter = 0;
   ErrorLEDCounter = 0;
   RelayLEDState = 0;
   RelayLEDCounter = 0;
   ErrorLEDState = 0;
+
+  // zero shadow regisers for relays
   for (uint8_t i = 0; i < 4; i++)
     Max8422Data[i] = 0;
 
-  Timer1.initialize(10000); // 10ms
+  // LED timer init
+  Timer1.initialize(TenMilliseconds); // 10ms
   Timer1.attachInterrupt(blink);
 }
 
@@ -127,7 +132,7 @@ void setup()
  *********************************************************************/
 void loop()
 {
-  // respond only to pending events on SERIAL
+  // respond only to pending events on SERIAL stream input
   cmdCallBack.updateCmdProcessing(&myParser, &myBuffer, &Serial);
 }
 
@@ -146,14 +151,14 @@ void cmdID(CmdParser *myParser)
 {
   char s[80];
   // return the ID string via serial
-  sprintf(s, "%s %s %s %s", NAME, SN, FW, HW);
+  sprintf(s, "%s %s %s %s\r\n", NAME, SN, FW, HW);
   Serial.print(s);
-  Serial.println(F(" OK"));
+  //Serial.println(F(" OK"));
 }
 
 /**********************************************************************
    void cmdRST(CmdParser *myParser)
-   Purpose   : Force all relays to there default state. Also turns off
+   Purpose   : Force all relays to their default state. Also turns off
                ERROR and RELAY leds
    Arguments : none
    Modifies  :
@@ -174,11 +179,11 @@ void cmdRST(CmdParser *myParser)
   digitalWrite(RESET, LOW);
   digitalWrite(RESET, HIGH);
 
-  digitalWrite(DMM_4RLY, 0);
+  digitalWrite(DMM_4RLY, LOW);
   digitalWrite(ERROR, LOW);
   digitalWrite(RELAY, LOW);
 
-  // clear phantom copy
+  // clear shadow registers
   for (uint8_t i = 0; i < 4; i++)
     Max8422Data[i] = 0;
 
@@ -205,7 +210,7 @@ void cmdTX(CmdParser *myParser)
   uint8_t rly, state, idx;
 
   pcount = myParser->getParamCount();
-  if (pcount == 2)
+  if (pcount == 2) // too many or too few is error
   {
     s = myParser->getCmdParam(1);
     rlypath = s.toInt();
@@ -221,9 +226,9 @@ void cmdTX(CmdParser *myParser)
           // get state (0 or 1)
           idx = 31 - i;
           state = CHECK_BIT(magic, idx);
-          WriteMax4822(rly, state, false);
+          WriteMax4822(rly, state, false); // update shadow registers
         }
-        WriteMax4822(-1, -1, true);
+        WriteMax4822(-1, -1, true); // update the relays
       }
     }
     else
@@ -253,7 +258,7 @@ void cmdRX(CmdParser *myParser)
   uint8_t rly, state, idx;
 
   pcount = myParser->getParamCount();
-  if (pcount == 2)
+  if (pcount == 2) // too many or too few is error
   {
     s = myParser->getCmdParam(1);
     rlypath = s.toInt();
@@ -269,9 +274,9 @@ void cmdRX(CmdParser *myParser)
           // get state (0 or 1)
           idx = 31 - i;
           state = CHECK_BIT(magic, idx);
-          WriteMax4822(rly, state, false);
+          WriteMax4822(rly, state, false); // update just shadow registers
         }
-        WriteMax4822(-1, -1, true);
+        WriteMax4822(-1, -1, true); // update relays
       }
     }
     else
@@ -364,10 +369,11 @@ void cmdMODE(CmdParser *myParser)
 void blink(void)
 {
 
+  // manage ERROR LED
   if (ErrorLEDState == 1)
   {
     digitalWrite(ERROR, HIGH);
-    if (++ErrorLEDCounter == 1000) // 10 seconds
+    if (++ErrorLEDCounter == TenSecond) // 10 seconds
     {
       ErrorLEDState = 0; // turn off next pass
       ErrorLEDCounter = 0;
@@ -376,10 +382,11 @@ void blink(void)
   else
     digitalWrite(ERROR, LOW);
 
+  // mange RELAY STATE change LED
   if (RelayLEDState == 1)
   {
     digitalWrite(RELAY, HIGH);
-    if (++RelayLEDCounter == 200) // 2 seconds
+    if (++RelayLEDCounter == TwoSecond) // 2 seconds
     {
       RelayLEDState = 0; // turn off next pass
       RelayLEDCounter = 0;
@@ -388,8 +395,8 @@ void blink(void)
   else
     digitalWrite(RELAY, LOW);
 
-  // heartbeat LED
-  if (++HeartbeatLEDCounter == 100) // 1 second
+  // manage heartbeat LED
+  if (++HeartbeatLEDCounter == OneSecond) // 1 second
   {
     digitalWrite(HEARTBEAT, HeartbeatLEDState);
     HeartbeatLEDState ^= 1;
@@ -495,6 +502,7 @@ void ConfigureMax4822(void)
   //
   // 7/2024 determined that some RF relays won't hold at 70% so all
   // must operate at 100%
+  // configure FT232 chip to supply sufficient current via FTProg
   address = 0x01;
   data = 0x00; // power save off
   digitalWrite(CSbar, LOW);

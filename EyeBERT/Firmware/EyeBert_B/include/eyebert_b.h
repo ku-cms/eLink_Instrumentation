@@ -86,6 +86,13 @@
 // check if bit at pos in val is set
 #define CHECK_BIT(var,pos) (((var)>>(pos)) & 1)
 
+// magic numbers for LED illumination
+#define OneSecond 100           /* in 10s of ms */
+#define TwoSecond 200           /* in 10s of ms */
+#define TenSecond 1000          /* in 10s of ms */
+#define TenMilliseconds 10000   /* in usec */
+
+
 /*
  * who are you?
  */
