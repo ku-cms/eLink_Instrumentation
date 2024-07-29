@@ -25,8 +25,10 @@
 #   : repeat tests as needed
 #   : much better error recovery & data validation!
 
+# Updated for the Rev B relay board
+
 # version
-version = 2.0
+version = 2.1
 
 from template_analysis_windows_Rev2 import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -83,7 +85,7 @@ def main():
     verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = True
+    RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -127,47 +129,6 @@ def main():
         "d2"    : {"tx" : "2", "rx" : "2"},
         "d3"    : {"tx" : "3", "rx" : "3"}
     }
-
-    # -------------------------------------------- #
-    # e-link mappings v1 for Rev A relay board
-    # use channel in key
-    # -------------------------------------------- #
-
-    # # TFPX Type 3.2 e-links
-    # mapping_type3p2 = {
-    #     "name"  : "TFPX Type 3p2",
-    #     "cmd"   : {"tx" : "7", "rx" : "7"},
-    #     "d0"    : {"tx" : "0", "rx" : "0"},
-    #     "d2"    : {"tx" : "2", "rx" : "2"}
-    # }
-
-    # # TFPX Type 2.2 e-links
-    # mapping_type2p2 = {
-    #     "name"  : "TFPX Type 2p2",
-    #     "cmd"   : {"tx" : "7", "rx" : "7"},
-    #     "d0"    : {"tx" : "0", "rx" : "0"},
-    #     "d2"    : {"tx" : "2", "rx" : "2"}
-    # }
-
-    # # TFPX Type 2.3 e-links
-    # # Note: Channel labels are different than types 3.2 and 2.2!
-    # mapping_type2p3 = {
-    #     "name"  : "TFPX Type 2p3",
-    #     "cmd"   : {"tx" : "7", "rx" : "7"},
-    #     "d2"    : {"tx" : "1", "rx" : "1"},
-    #     "d1"    : {"tx" : "2", "rx" : "2"},
-    #     "d0"    : {"tx" : "3", "rx" : "3"}
-    # }
-
-    # # TFPX Type 1.3 e-links
-    # # Note: Channel labels are different than types 3.2 and 2.2!
-    # mapping_type1p3 = {
-    #     "name"  : "TFPX Type 1p3",
-    #     "cmd"   : {"tx" : "7", "rx" : "7"},
-    #     "d2"    : {"tx" : "1", "rx" : "1"},
-    #     "d1"    : {"tx" : "2", "rx" : "2"},
-    #     "d0"    : {"tx" : "3", "rx" : "3"}
-    # }
 
     # -------------------------------------------- #
     # e-link mappings v2 for Rev B relay board
@@ -334,20 +295,9 @@ def main():
     #
     # get cable branch
     #
+    # For the Rev B relay board, the user does not need to enter a branch!
     branches = []
     branch = ""
-
-    # For the Rev B relay board, the user does not need to enter a branch.
-
-    # # only get branch for cable type that has branches
-    # if cable_type in cable_branches:
-    #     branches = cable_branches[cable_type]
-    #     is_valid = False
-    #     while is_valid == False:
-    #         branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
-    #         is_valid = is_valid_branch(branches, branch)
-    #         if is_valid == False:
-    #             print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch: {branches}.")
 
     #
     # get ready to use this as our destination path
@@ -719,32 +669,15 @@ def main():
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write('write_hw_sio_scan -force "C:/Users/Public/Documents/automation_results/temp.csv" [get_hw_sio_scans {SCAN_0}]\r\n')
-
-            # send tcl "source eye_and_save.tcl"
-            result = pygui.locateCenterOnScreen('tcl_console.png', grayscale=True)
-            if result == None :
-                result = pygui.locateCenterOnScreen('light_tcl_console.png', grayscale=True)
-
-            if result == None :
-                # handle error
-                print(Fore.RED + "Unable to locate TCL Console tab.")
-                sys.exit(9)
-
-            pygui.click(result) # bring tab to focus
-            time.sleep(0.25)
-            pygui.press('tab') # move focus to text entry box of tab
+            
+            # pygui hotkeys: https://pyautogui.readthedocs.io/en/latest/keyboard.html
+            # Hotkey to select Tcl Console and put the cursor in the command box
+            pygui.hotkey('ctrl', 'shift', 't')
             time.sleep(0.25)
 
             # launch the test via TCL script
+            #rwy polarity TCL goes here before the scan: it is a link setting, not a scan setting
             pygui.write("source eye_and_save.tcl\n", interval = 0.01)
-
-            # From Rob:
-            # caleb, look here!
-            # here's where the polarity stuff goes
-            # I think...
-            #pygui.write("source example_file.tcl\n", interval = 0.01)
-            # From Caleb:
-            # I think the polarity command needs to be after "create scan" but before we take data.
 
             # wait a bit
             print(Fore.GREEN + "Pausing to allow EyeBERT to complete...")

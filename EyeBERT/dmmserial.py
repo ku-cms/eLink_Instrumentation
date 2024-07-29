@@ -25,12 +25,13 @@ class Keithley2000DMMControl:
         ports = serial.tools.list_ports.comports()
         for port, desc, hwid in sorted(ports) :
             #print("{}: {} [{}]".format(port,desc,hwid))
+            # change hwid string to match that of the USB to
+            # serial adapter in use on the Keithley dmm
             if hwid == "USB VID:PID=0403:6001 SER=FTAJPEZEA" :
                 port_to_use = port
                 break
          
         return port_to_use
-
 
     def initialize(self) :
         # try and find instand of serial
@@ -80,6 +81,10 @@ class Keithley2000DMMControl:
 
 
     def reading(self) :
+        # Important:
+        # You must sleep (say 100 ms) before reading a value to wait for the relays to stop bouncing!
+        # If you do not sleep, you may read infinite resistance!
+        time.sleep(.1)
         bytes = b"read?\r\n"
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
@@ -87,11 +92,6 @@ class Keithley2000DMMControl:
         read_string = self.ser.readline().decode()
         read_float = float(read_string)
         return read_float
-
-
-
-
-
 
 #
 # test code
