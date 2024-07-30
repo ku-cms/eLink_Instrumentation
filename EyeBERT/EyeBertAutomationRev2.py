@@ -85,7 +85,7 @@ def main():
     verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = False
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -672,6 +672,8 @@ def main():
             
             # pygui hotkeys: https://pyautogui.readthedocs.io/en/latest/keyboard.html
             # Hotkey to select Tcl Console and put the cursor in the command box
+            print(Fore.GREEN + "Pressing hotkey for Tcl Console!")
+            time.sleep(0.25)
             pygui.hotkey('ctrl', 'shift', 't')
             time.sleep(0.25)
 
