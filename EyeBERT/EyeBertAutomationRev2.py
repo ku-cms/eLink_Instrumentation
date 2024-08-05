@@ -98,7 +98,7 @@ def main():
     verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = False
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -136,18 +136,17 @@ def main():
     #       For Type 5K2, you need to account for this by swapping P/N SMA cables for CMD and D2.
     mapping_type5 = {
         "name"  : "TBPX Type 5",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d0"    : {"tx" : "0", "rx" : "0"},
-        "d1"    : {"tx" : "1", "rx" : "1"},
-        "d2"    : {"tx" : "2", "rx" : "2"},
-        "d3"    : {"tx" : "3", "rx" : "3"}
+        "cmd"   : {"tx" : "5", "rx" : "9"},
+        "d0"    : {"tx" : "1", "rx" : "11"},
+        "d1"    : {"tx" : "2", "rx" : "10"},
+        "d2"    : {"tx" : "3", "rx" : "4"},
+        "d3"    : {"tx" : "4", "rx" : "6"}
     }
 
     # -------------------------------------------- #
     # e-link mappings v2 for Rev B relay board
     # use branch and channel in key
-    # -------------------------------------------- #    
-    # FIXME: We need to account for polarity (standard or inverted) for each channel!
+    # -------------------------------------------- #
 
     # TFPX Type 3.2 e-links
     mapping_type3p2 = {
@@ -762,7 +761,7 @@ def main():
             
             # EyeBERT Template Analysis
 
-            reference_template_file = "reference_template_v3.csv"
+            reference_template_file = "reference_template_Rev2_v3.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
             # Create EyeBERTFile object to read data from file

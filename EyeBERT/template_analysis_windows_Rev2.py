@@ -58,11 +58,17 @@ class EyeBERTFile(EyeBERT):
         if self.debug:
             print(f"In getIndexedFiles(): fileList = {fileList}")
         # Assign the maximum number of underscores in the file name based on if the cable has branches
-        # Hack for Rev B relay board
+        # Hack for Rev B relay board types 3.2, 2.2, 2.3, and 1.3
+        # if self.branch:
+        #     max_underscores = 4
+        # else:
+        #     max_underscores = 3
+
+        # Hack for Rev B relay board types 5K and 5K2
         if self.branch:
-            max_underscores = 4
-        else:
             max_underscores = 3
+        else:
+            max_underscores = 2         
         
         for element in fileList: # Iterate over each file name stored in the list
             i = 0 # Initialize i to iterate over each character in the file name string 
@@ -377,7 +383,7 @@ def main():
         # In progress testing for comparison analysis:
         template = analysis.createTemplate()
 
-        reference_template_file = "EyeBERT/reference_template_v2.csv"
+        reference_template_file = "EyeBERT/reference_template_Rev2_v3.csv"
         print(f"Using this reference template data file: {reference_template_file}")
         
         ref = Reference("540", eyebert.branch, "CMD", reference_template_file, refPath)
