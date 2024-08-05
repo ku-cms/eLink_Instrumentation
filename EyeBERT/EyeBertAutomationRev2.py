@@ -96,9 +96,9 @@ def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
     verbose                     = False
-    RUN_4PT_DC_RES_CALIBRATION  = False
-    RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = True
+    RUN_4PT_DC_RES_CALIBRATION  = True
+    RUN_4PT_DC_RES              = False
+    RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -378,21 +378,31 @@ def main():
         print("Beginning 4-point DC resistance calibration.")
         print("--------------------------------------------")
 
-        # TODO: prompt user to input the calibration file name; warn about overwriting file... ask confirmation to proceed.
         # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
-        calibration_file = "4_point_DC_CalibrationRev2_v1.json"
-
+        calibration_file = input(Fore.RED + f"Please enter a new calibration json file, including e-link type (4_point_DC_CalibrationRev2_Type3p2_v1.json): " + Fore.GREEN)
         print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
         
         # Confirm that user wants to continue
-        user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
-        if user_accept.lower() == "y":
+        valid_inputs = ["y", "n"]
+        accept = input(Fore.RED + f"Do you want to proceed? (y/n): " + Fore.GREEN).lower()
+        while accept not in valid_inputs:
+            accept = input(f"The input '{accept}' is not vaild. Do you want to proceed (y/n): ").lower()
+        if accept == "y":
             print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
-        else:
+        if accept == "n":
             print("Exiting...")
             print(Fore.RED + "Terminating code 3: exit based on user input.")
             sys.exit(3)
+        
+        # Confirm that user wants to continue
+        # user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
+        # if user_accept.lower() == "y":
+        #     print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
+        # else:
+        #     print("Exiting...")
+        #     print(Fore.RED + "Terminating code 3: exit based on user input.")
+        #     sys.exit(3)
         
         print("Measured calibration values (ohms):")
 
@@ -409,8 +419,10 @@ def main():
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
 
-            # pause for user to connect through lines (P to P and N to N) for channel
-            print(Fore.RED + f"Please connect through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
+            # FIXME: verify if we should use P and N according to e-link mapping, or always "P to P" and "N to N" according to relay board labels
+            # pause for user to connect through lines (P and N according to e-link mapping) for channel
+            print(Fore.RED + f"Please connect through lines (P and N according to e-link mapping) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
+            
             user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
 
             # take measurements; do not subtract anything
@@ -425,6 +437,36 @@ def main():
             # print results
             print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
 
+            # Ask user to accept or redo measurement
+            valid_inputs = ["y", "n"]
+            accept = input(Fore.RED + f"Please review and accept (y) or redo (n) this measurement: " + Fore.GREEN).lower()
+            while accept not in valid_inputs:
+                accept = input(f"The input '{accept}' is not vaild. Please accept (y) or redo (n) this measurement: ").lower()
+            
+            while accept == "n":            
+                user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
+
+                # take measurements; do not subtract anything
+                eb.connection(txpath+b"\r\n")
+                eb.connection(rxpath+b"\r\n")
+                eb.LED(2,"ON")
+                eb.MODE(b"MODE DMM +\r\n")
+                positive = round(dmm.reading(),2)
+                eb.MODE(b"MODE DMM -\r\n")
+                negative = round(dmm.reading(),2)
+
+                # print results
+                print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+
+                # Ask user to accept or redo measurement
+                valid_inputs = ["y", "n"]
+                accept = input(Fore.RED + f"Please review and accept (y) or redo (n) this measurement: " + Fore.GREEN).lower()
+                while accept not in valid_inputs:
+                    accept = input(f"The input '{accept}' is not vaild. Please accept (y) or redo (n) this measurement: ").lower()
+
+            if accept == "y":
+                print("Proceeding with calibration.")
+            
             # save calibration data
             calibration_data[key + "_p"] = positive
             calibration_data[key + "_n"] = negative
