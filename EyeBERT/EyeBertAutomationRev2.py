@@ -28,7 +28,7 @@
 # Updated for the Rev B relay board
 
 # version
-version = 2.1
+version = 2.2
 
 from template_analysis_windows_Rev2 import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -53,6 +53,19 @@ from pathvalidate import is_valid_filename
 import eyebertserial
 import dmmserial
 import json
+
+# FIXME: Create new Rev 2 DC calibration files for Rev B relay board
+# get 4-point DC cabliration file based on cable type
+def GetDCCalibrationFile(cable_type):
+    if cable_type in ["1", "5K", "5K2"]:
+        return "4_point_DC_Calibration_v1.json"
+    elif cable_type in ["3p2", "2p2"]:
+        return "4_point_DC_CalibrationRev2_Type3p2_v0.json"
+    elif cable_type in ["2p3", "1p3"]:
+        return "4_point_DC_CalibrationRev2_Type2p3_v0.json"
+    else:
+        print(Fore.RED + f"ERROR: There is no calibration file available for cable type {cable_type}." + Fore.GREEN)
+        return ""
 
 # get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
@@ -85,7 +98,7 @@ def main():
     verbose                     = False
     RUN_4PT_DC_RES_CALIBRATION  = False
     RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = True
+    RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -366,7 +379,7 @@ def main():
         print("Beginning 4-point DC resistance calibration.")
         print("--------------------------------------------")
 
-        # TODO: automatically create new calibration file name
+        # TODO: prompt user to input the calibration file name; warn about overwriting file... ask confirmation to proceed.
         # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
         calibration_file = "4_point_DC_CalibrationRev2_v1.json"
@@ -434,11 +447,9 @@ def main():
         print("Beginning 4-point DC resistance measurements.")
         print("---------------------------------------------")
         
-
-        # FIXME: Create new Rev 2 DC calibration file for Rev B relay board
         measurement_data = {}
         calibration_data = {}
-        calibration_file = "4_point_DC_CalibrationRev2_v0.json"
+        calibration_file = GetDCCalibrationFile(cable_type)
 
         print(f"Using the calibration file {calibration_file}.")
         
