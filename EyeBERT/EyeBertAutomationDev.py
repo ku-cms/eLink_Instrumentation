@@ -25,6 +25,19 @@
 #   : repeat tests as needed
 #   : much better error recovery & data validation!
 
+# Hardware requirements:
+# - KC705
+# - Digital Multimeter (DMM)
+# - Relay board (Rev A)
+# - SMA adapter boards: one 45-pin Kyocera board and one 15-pin Molex board 
+# - SMA cables
+
+# Software requirements:
+# - Computer: Windows 10 PC 
+# - Languages: Python 3, TCL, Windows Batch Script 
+# - Applications: Vivado 2020.2 
+# - Code Repository: https://github.com/ku-cms/eLink_Instrumentation 
+
 # version
 version = 1.14
 
@@ -360,7 +373,7 @@ def main():
         # Confirm that user wants to continue
         user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
         if user_accept.lower() == "y":
-            print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
+            print("Proceeding with calibration. Please connect SMA through lines for each channel as instructed.")
         else:
             print("Exiting...")
             print(Fore.RED + "Terminating code 3: exit based on user input.")
@@ -381,8 +394,8 @@ def main():
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
 
-            # pause for user to connect through lines (P to P and N to N) for channel
-            print(Fore.RED + f"Please connect through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
+            # pause for user to connect SMA through lines (P to P and N to N) for channel
+            print(Fore.RED + f"Please connect SMA through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
             user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
 
             # take measurements; do not subtract anything
