@@ -1,4 +1,4 @@
-# EyeBertAutomationDev.py
+# EyeBertAutomationRev2.py
 #
 # Developed by the KU CMS group.
 #
@@ -21,14 +21,16 @@
 # To Do
 #   : Get parameters (which tests to run) from operator
 #   : For 4-point DC calibration, automatically create new file name (default) or let user overwrite existing file
-#   : For each 4-point DC calibration measurement, allow user to accept value to redo calibration measurement 
+#   : For each 4-point DC calibration measurement, allow user to accept value or redo calibration measurement 
 #   : repeat tests as needed
 #   : much better error recovery & data validation!
 
-# version
-version = 1.13
+# Updated for the Rev B relay board
 
-from template_analysis_windows import EyeBERTFile, Reference
+# version
+version = 2.2
+
+from template_analysis_windows_Rev2 import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
 
 init(convert=True)
@@ -52,12 +54,27 @@ import eyebertserial
 import dmmserial
 import json
 
+# FIXME: Create new Rev 2 DC calibration files for Rev B relay board
+# get 4-point DC cabliration file based on cable type
+def GetDCCalibrationFile(cable_type):
+    if cable_type in ["1", "5K", "5K2"]:
+        return "4_point_DC_Calibration_v1.json"
+    elif cable_type in ["3p2", "2p2"]:
+        return "4_point_DC_CalibrationRev2_Type3p2_v0.json"
+    elif cable_type in ["2p3", "1p3"]:
+        return "4_point_DC_CalibrationRev2_Type2p3_v0.json"
+    else:
+        print(Fore.RED + f"ERROR: There is no calibration file available for cable type {cable_type}." + Fore.GREEN)
+        return ""
+
 # get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
+    cutoff = 10.0
     bad_channels = {}
     for key in measurement_data:
         value = measurement_data[key]
-        if value > 10.0:
+        # resistance threshold for bad channels
+        if value >= cutoff:
             bad_channels[key] = value
     return bad_channels
 
@@ -79,9 +96,9 @@ def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
     verbose                     = False
-    RUN_4PT_DC_RES_CALIBRATION  = False
-    RUN_4PT_DC_RES              = True
-    RUN_EYE_BERT_AREA           = True
+    RUN_4PT_DC_RES_CALIBRATION  = True
+    RUN_4PT_DC_RES              = False
+    RUN_EYE_BERT_AREA           = False
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -119,47 +136,65 @@ def main():
     #       For Type 5K2, you need to account for this by swapping P/N SMA cables for CMD and D2.
     mapping_type5 = {
         "name"  : "TBPX Type 5",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d0"    : {"tx" : "0", "rx" : "0"},
-        "d1"    : {"tx" : "1", "rx" : "1"},
-        "d2"    : {"tx" : "2", "rx" : "2"},
-        "d3"    : {"tx" : "3", "rx" : "3"}
+        "cmd"   : {"tx" : "5", "rx" : "9"},
+        "d0"    : {"tx" : "1", "rx" : "11"},
+        "d1"    : {"tx" : "2", "rx" : "10"},
+        "d2"    : {"tx" : "3", "rx" : "4"},
+        "d3"    : {"tx" : "4", "rx" : "6"}
     }
+
+    # -------------------------------------------- #
+    # e-link mappings v2 for Rev B relay board
+    # use branch and channel in key
+    # -------------------------------------------- #
 
     # TFPX Type 3.2 e-links
     mapping_type3p2 = {
         "name"  : "TFPX Type 3p2",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d0"    : {"tx" : "0", "rx" : "0"},
-        "d2"    : {"tx" : "2", "rx" : "2"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "3"},
+        "A_d0"    : {"tx" : "1",    "rx" : "4"},
+        "A_d2"    : {"tx" : "3",    "rx" : "2"},
+        "B_cmd"   : {"tx" : "10",   "rx" : "7"},
+        "B_d0"    : {"tx" : "6",    "rx" : "8"},
+        "B_d2"    : {"tx" : "8",    "rx" : "6"},
+        "C_cmd"   : {"tx" : "15",   "rx" : "9"},
+        "C_d0"    : {"tx" : "11",   "rx" : "11"},
+        "C_d2"    : {"tx" : "13",   "rx" : "10"}
     }
 
     # TFPX Type 2.2 e-links
     mapping_type2p2 = {
         "name"  : "TFPX Type 2p2",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d0"    : {"tx" : "0", "rx" : "0"},
-        "d2"    : {"tx" : "2", "rx" : "2"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "3"},
+        "A_d0"    : {"tx" : "1",    "rx" : "4"},
+        "A_d2"    : {"tx" : "3",    "rx" : "2"},
+        "C_cmd"   : {"tx" : "15",   "rx" : "9"},
+        "C_d0"    : {"tx" : "11",   "rx" : "11"},
+        "C_d2"    : {"tx" : "13",   "rx" : "10"}
     }
 
     # TFPX Type 2.3 e-links
     # Note: Channel labels are different than types 3.2 and 2.2!
     mapping_type2p3 = {
         "name"  : "TFPX Type 2p3",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d2"    : {"tx" : "1", "rx" : "1"},
-        "d1"    : {"tx" : "2", "rx" : "2"},
-        "d0"    : {"tx" : "3", "rx" : "3"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "1"},
+        "A_d2"    : {"tx" : "2",    "rx" : "6"},
+        "A_d1"    : {"tx" : "3",    "rx" : "4"},
+        "A_d0"    : {"tx" : "4",    "rx" : "2"},
+        "B_cmd"   : {"tx" : "10",   "rx" : "9"},
+        "B_d2"    : {"tx" : "7",    "rx" : "11"},
+        "B_d1"    : {"tx" : "8",    "rx" : "10"},
+        "B_d0"    : {"tx" : "9",    "rx" : "8"}
     }
 
     # TFPX Type 1.3 e-links
     # Note: Channel labels are different than types 3.2 and 2.2!
     mapping_type1p3 = {
         "name"  : "TFPX Type 1p3",
-        "cmd"   : {"tx" : "7", "rx" : "7"},
-        "d2"    : {"tx" : "1", "rx" : "1"},
-        "d1"    : {"tx" : "2", "rx" : "2"},
-        "d0"    : {"tx" : "3", "rx" : "3"}
+        "A_cmd"   : {"tx" : "5",    "rx" : "1"},
+        "A_d2"    : {"tx" : "2",    "rx" : "6"},
+        "A_d1"    : {"tx" : "3",    "rx" : "4"},
+        "A_d0"    : {"tx" : "4",    "rx" : "2"}
     }
 
     # cable mappings for supported e-link types
@@ -172,16 +207,30 @@ def main():
         "2p3"   : mapping_type2p3,
         "1p3"   : mapping_type1p3
     }
+    # FIXME: Update for Rev B relay board: entries should include both branch and channel (e.g. A_cmd_p)
 
+    # channels for Rev A relay board
     # cable channels for supported e-link types
+    # cable_channels = {
+    #     "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+    #     "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+    #     "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+    #     "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+    #     "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
+    #     "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
+    #     "1p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"]
+    # }
+
+    # channels for Rev B relay board
+    # entries should include both branch and channel (e.g. A_cmd_p)
     cable_channels = {
         "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
-        "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
-        "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
-        "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
-        "1p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"]
+        "3p2"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d2_p", "A_d2_n", "B_cmd_p", "B_cmd_n", "B_d0_p", "B_d0_n", "B_d2_p", "B_d2_n", "C_cmd_p", "C_cmd_n", "C_d0_p", "C_d0_n", "C_d2_p", "C_d2_n"],
+        "2p2"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d2_p", "A_d2_n", "C_cmd_p", "C_cmd_n", "C_d0_p", "C_d0_n", "C_d2_p", "C_d2_n"],
+        "2p3"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d1_p", "A_d1_n", "A_d2_p", "A_d2_n", "B_cmd_p", "B_cmd_n", "B_d0_p", "B_d0_n", "B_d1_p", "B_d1_n", "B_d2_p", "B_d2_n"],
+        "1p3"   : ["A_cmd_p", "A_cmd_n", "A_d0_p", "A_d0_n", "A_d1_p", "A_d1_n", "A_d2_p", "A_d2_n"]
     }
 
     # cable branches based on cable type
@@ -258,17 +307,9 @@ def main():
     #
     # get cable branch
     #
+    # For the Rev B relay board, the user does not need to enter a branch!
     branches = []
     branch = ""
-    # only get branch for cable type that has branches
-    if cable_type in cable_branches:
-        branches = cable_branches[cable_type]
-        is_valid = False
-        while is_valid == False:
-            branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
-            is_valid = is_valid_branch(branches, branch)
-            if is_valid == False:
-                print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch: {branches}.")
 
     #
     # get ready to use this as our destination path
@@ -337,21 +378,31 @@ def main():
         print("Beginning 4-point DC resistance calibration.")
         print("--------------------------------------------")
 
-        # TODO: automatically create new calibration file name
         # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
-        calibration_file = "4_point_DC_Calibration_v2.json"
-
+        calibration_file = input(Fore.RED + f"Please enter a new calibration json file, including e-link type (4_point_DC_CalibrationRev2_Type3p2_v1.json): " + Fore.GREEN)
         print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
         
         # Confirm that user wants to continue
-        user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
-        if user_accept.lower() == "y":
+        valid_inputs = ["y", "n"]
+        accept = input(Fore.RED + f"Do you want to proceed? (y/n): " + Fore.GREEN).lower()
+        while accept not in valid_inputs:
+            accept = input(f"The input '{accept}' is not vaild. Do you want to proceed (y/n): ").lower()
+        if accept == "y":
             print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
-        else:
+        if accept == "n":
             print("Exiting...")
             print(Fore.RED + "Terminating code 3: exit based on user input.")
             sys.exit(3)
+        
+        # Confirm that user wants to continue
+        # user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
+        # if user_accept.lower() == "y":
+        #     print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
+        # else:
+        #     print("Exiting...")
+        #     print(Fore.RED + "Terminating code 3: exit based on user input.")
+        #     sys.exit(3)
         
         print("Measured calibration values (ohms):")
 
@@ -368,8 +419,10 @@ def main():
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
 
-            # pause for user to connect through lines (P to P and N to N) for channel
-            print(Fore.RED + f"Please connect through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
+            # FIXME: verify if we should use P and N according to e-link mapping, or always "P to P" and "N to N" according to relay board labels
+            # pause for user to connect through lines (P and N according to e-link mapping) for channel
+            print(Fore.RED + f"Please connect through lines (P and N according to e-link mapping) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
+            
             user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
 
             # take measurements; do not subtract anything
@@ -384,6 +437,36 @@ def main():
             # print results
             print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
 
+            # Ask user to accept or redo measurement
+            valid_inputs = ["y", "n"]
+            accept = input(Fore.RED + f"Please review and accept (y) or redo (n) this measurement: " + Fore.GREEN).lower()
+            while accept not in valid_inputs:
+                accept = input(f"The input '{accept}' is not vaild. Please accept (y) or redo (n) this measurement: ").lower()
+            
+            while accept == "n":            
+                user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
+
+                # take measurements; do not subtract anything
+                eb.connection(txpath+b"\r\n")
+                eb.connection(rxpath+b"\r\n")
+                eb.LED(2,"ON")
+                eb.MODE(b"MODE DMM +\r\n")
+                positive = round(dmm.reading(),2)
+                eb.MODE(b"MODE DMM -\r\n")
+                negative = round(dmm.reading(),2)
+
+                # print results
+                print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+
+                # Ask user to accept or redo measurement
+                valid_inputs = ["y", "n"]
+                accept = input(Fore.RED + f"Please review and accept (y) or redo (n) this measurement: " + Fore.GREEN).lower()
+                while accept not in valid_inputs:
+                    accept = input(f"The input '{accept}' is not vaild. Please accept (y) or redo (n) this measurement: ").lower()
+
+            if accept == "y":
+                print("Proceeding with calibration.")
+            
             # save calibration data
             calibration_data[key + "_p"] = positive
             calibration_data[key + "_n"] = negative
@@ -407,7 +490,7 @@ def main():
         
         measurement_data = {}
         calibration_data = {}
-        calibration_file = "4_point_DC_Calibration_v1.json"
+        calibration_file = GetDCCalibrationFile(cable_type)
 
         print(f"Using the calibration file {calibration_file}.")
         
@@ -442,26 +525,47 @@ def main():
             positive = round(dmm.reading(),2) - pos_path
             eb.MODE(b"MODE DMM -\r\n")
             negative = round(dmm.reading(),2) - neg_path
-
+            
+            # key with p and n
+            key_p = key + "_p"
+            key_n = key + "_n"
+            
+            # for values greater than or equal to this cufoff, print INF (consider these values as infinite resistance)
+            cutoff = 1e6
+            val_to_print_positive = ""
+            val_to_print_negative = ""
+            if positive < cutoff:
+                val_to_print_positive = "{:.2f}".format(positive)
+            else:
+                val_to_print_positive = "INF"
+            if negative < cutoff:
+                val_to_print_negative = "{:.2f}".format(negative)
+            else:
+                val_to_print_negative = "INF"
+            
             # print results
-            print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+            print(" - channel {0:6}: {1:8} = {2:4}, {3:8} = {4:4}".format(key, key_p, val_to_print_positive, key_n, val_to_print_negative))
 
             # save measurement data
-            measurement_data[key + "_p"] = positive
-            measurement_data[key + "_n"] = negative
+            measurement_data[key_p] = positive
+            measurement_data[key_n] = negative
 
         # get bad 4-point DC channels
         bad_channels = GetBadDCChannels(measurement_data)
 
+        # print bad 4-point DC channels
         if bad_channels:
-            print(Fore.RED + "Warning: The following channels have large 4-point DC resistance:" + Fore.GREEN)
+            print(Fore.RED + "Warning: The following channels have large 4-point DC resistance (ohms):" + Fore.GREEN)
             for key in bad_channels:
                 value = bad_channels[key]
-                print(f" - {key}: {value}")
+                print(f" - {key:8}: {value}")
             print(Fore.RED + "Possible causes:" + Fore.GREEN)
             print(" - The e-link is not connected properly.")
-            print(" - The SMA cable mapping is not correct for this type of e-link.")
+            print(" - The SMA cable mapping (connections to the relay board) is not correct for this type of e-link.")
             print(" - The e-link has a break or discontinuity for these channels.")
+            print(" - The SMA cable or adapter board has a break or discontinuity for these channels.")
+            print(" - There is a software and/or firmware bug causing a mapping problem.")
+            print(" - There is some new and unknown problem... good luck debugging! Be systematic and eliminate one possible cause at a time.")
 
         # get date and time
         now = datetime.datetime.now()
@@ -495,7 +599,7 @@ def main():
         path = "R:/BEAN_GRP/EyeBertAutomation/"
                 
         # Use different spreasheets for each cable type
-        file_name = f"DCResistanceAutomation_Type_{cable_type}.xlsx"
+        file_name = f"DCResistanceAutomationRev2_Type_{cable_type}.xlsx"
 
         full_file_path = path + file_name
 
@@ -617,23 +721,16 @@ def main():
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write('write_hw_sio_scan -force "C:/Users/Public/Documents/automation_results/temp.csv" [get_hw_sio_scans {SCAN_0}]\r\n')
-
-            # send tcl "source eye_and_save.tcl"
-            result = pygui.locateCenterOnScreen('tcl_console.png', grayscale=True)
-            if result == None :
-                result = pygui.locateCenterOnScreen('light_tcl_console.png', grayscale=True)
-
-            if result == None :
-                # handle error
-                print(Fore.RED + "Unable to locate TCL Console tab.")
-                sys.exit(9)
-
-            pygui.click(result) # bring tab to focus
+            
+            # pygui hotkeys: https://pyautogui.readthedocs.io/en/latest/keyboard.html
+            # Hotkey to select Tcl Console and put the cursor in the command box
+            print(Fore.GREEN + "Pressing hotkey for Tcl Console!")
             time.sleep(0.25)
-            pygui.press('tab') # move focus to text entry box of tab
+            pygui.hotkey('ctrl', 'shift', 't')
             time.sleep(0.25)
 
             # launch the test via TCL script
+            #rwy polarity TCL goes here before the scan: it is a link setting, not a scan setting
             pygui.write("source eye_and_save.tcl\n", interval = 0.01)
 
             # wait a bit
@@ -706,7 +803,7 @@ def main():
             
             # EyeBERT Template Analysis
 
-            reference_template_file = "reference_template_v3.csv"
+            reference_template_file = "reference_template_Rev2_v3.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
             # Create EyeBERTFile object to read data from file
@@ -812,7 +909,7 @@ def main():
         path = "R:/BEAN_GRP/EyeBertAutomation/"
 
         # Use different spreasheets for each cable type
-        file_name = f"EyeBERTautomation_Type_{cable_type}.xlsx"
+        file_name = f"EyeBERTautomationRev2_Type_{cable_type}.xlsx"
         
         full_file_path = path + file_name
 

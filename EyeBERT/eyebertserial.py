@@ -37,6 +37,7 @@ class EyeBERTRelayControl:
         self.ser.stopbits = serial.STOPBITS_ONE
         self.ser.bytesize = serial.EIGHTBITS
         self.ser.timeout = 1
+        self.blinkOK = True
 
     def __del__(self):
         self.ser.close()
@@ -44,6 +45,8 @@ class EyeBERTRelayControl:
     # USB VID:PID=0403:6001 SER=B0026EF9A
     # that's the VID/PID and serial number of the
     # usb chip on the EyeBERT relay board
+    # if a different chip is present, change the necessary hwid
+    # string below
     def FindEyeBERT(self) :
         port_to_use = None
         ports = serial.tools.list_ports.comports()
@@ -54,6 +57,10 @@ class EyeBERTRelayControl:
                 break
             if hwid == "USB VID:PID=0403:6001 SER=B0039DXVA" :
                 port_to_use = port
+                break
+            if hwid == "USB VID:PID=0403:6001 SER=B003NFE1A" :
+                port_to_use = port
+                self.blinkOK = False
                 break
          
         return port_to_use
@@ -89,28 +96,31 @@ class EyeBERTRelayControl:
     # blink the LEDs as a test
     # blocking function due to time.sleep()
     def Blinky(self,count=3) :
-        blinkcount = count
-        if blinkcount < 2 :
-            blinkcount = 2
-        elif blinkcount > 10 :
-            blinkcount = 10
-        duration = 0.1
-        #print("Blinking LEDs 2 & 3 {} times".format(blinkcount))
-        on2 = b"LED 2 ON\r\n"
-        off2 = b"LED 2 OFF\r\n"
-        on3 = b"LED 3 ON\r\n"
-        off3 = b"LED 3 OFF\r\n"
-        self.ser.write(off2)
-        self.ser.write(on3)
-        for i in range(blinkcount) :
-            self.ser.write(on2)
-            self.ser.write(off3)
-            time.sleep(duration)
+        if self.blinkOK == True :
+            blinkcount = count
+            if blinkcount < 2 :
+                blinkcount = 2
+            elif blinkcount > 10 :
+                blinkcount = 10
+            duration = 0.1
+            #print("Blinking LEDs 2 & 3 {} times".format(blinkcount))
+            on2 = b"LED 2 ON\r\n"
+            off2 = b"LED 2 OFF\r\n"
+            on3 = b"LED 3 ON\r\n"
+            off3 = b"LED 3 OFF\r\n"
             self.ser.write(off2)
             self.ser.write(on3)
-            time.sleep(duration)
-        self.ser.write(off2)
-        self.ser.write(off3)
+            for i in range(blinkcount) :
+                self.ser.write(on2)
+                self.ser.write(off3)
+                time.sleep(duration)
+                self.ser.write(off2)
+                self.ser.write(on3)
+                time.sleep(duration)
+            self.ser.write(off2)
+            self.ser.write(off3)
+        else :
+            pass
 
     # request a TX or RX connection
     # path contains a string such as "TX 0\r\n"
@@ -120,11 +130,14 @@ class EyeBERTRelayControl:
         self.ser.write(path)
 
     def LED(self, whichled, ledstate) :
-        # error checking
-        if (whichled == 2 or whichled == 3) and (ledstate.upper() == "ON" or ledstate.upper() == "OFF" )  :
-            cmd = b"LED " + bytes(str(whichled), 'utf-8') + b" " + bytes(ledstate, 'utf-8') + b"\r\n"
-            #print(cmd)
-            self.ser.write(cmd)
+        if self.blinkOK == True :
+            # error checking
+            if (whichled == 2 or whichled == 3) and (ledstate.upper() == "ON" or ledstate.upper() == "OFF" )  :
+                cmd = b"LED " + bytes(str(whichled), 'utf-8') + b" " + bytes(ledstate, 'utf-8') + b"\r\n"
+                #print(cmd)
+                self.ser.write(cmd)
+        else :
+            pass
 
     def MODE(self, modestr) :
         self.ser.reset_input_buffer()
@@ -176,7 +189,7 @@ class EyeBERTRelayControl:
 # #print("Testing sample paths")
 # #testV_45_33(eb, typeV_45_33) # this would also need to handle the running of the EyeBERT TCL files
 
-# print("Done")
-# cmd = b"MODE DMM +\r\n"
-# eb.MODE(cmd)
-# testV_45_33(eb, typeV_45_33)
+#print("Done")
+#cmd = b"MODE DMM +\r\n"
+#eb.MODE(cmd)
+#testV_45_33(eb, typeV_45_33)
