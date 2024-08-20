@@ -25,8 +25,21 @@
 #   : repeat tests as needed
 #   : much better error recovery & data validation!
 
+# Hardware requirements:
+# - KC705
+# - Digital Multimeter (DMM)
+# - Relay board (Rev A)
+# - SMA adapter boards: one 45-pin Kyocera board and one 15-pin Molex board 
+# - SMA cables
+
+# Software requirements:
+# - Computer: Windows 10 PC 
+# - Languages: Python 3, TCL, Windows Batch Script 
+# - Applications: Vivado 2020.2 
+# - Code Repository: https://github.com/ku-cms/eLink_Instrumentation 
+
 # version
-version = 1.13
+version = 1.14
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -51,6 +64,19 @@ from pathvalidate import is_valid_filename
 import eyebertserial
 import dmmserial
 import json
+
+# get adapter board channel
+def getAdapterBoardChannel(cable_type, channel):
+    channel_map = {
+                "cmd" : "cmd", 
+                "d2" : "d1",
+                "d1" : "d2",
+                "d0" : "d3"
+    }
+    if cable_type == "2p3" or cable_type == "1p3":
+        return channel_map[channel]
+    else:
+        return channel 
 
 # get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
@@ -347,7 +373,7 @@ def main():
         # Confirm that user wants to continue
         user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
         if user_accept.lower() == "y":
-            print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
+            print("Proceeding with calibration. Please connect SMA through lines for each channel as instructed.")
         else:
             print("Exiting...")
             print(Fore.RED + "Terminating code 3: exit based on user input.")
@@ -368,8 +394,8 @@ def main():
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
 
-            # pause for user to connect through lines (P to P and N to N) for channel
-            print(Fore.RED + f"Please connect through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
+            # pause for user to connect SMA through lines (P to P and N to N) for channel
+            print(Fore.RED + f"Please connect SMA through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
             user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
 
             # take measurements; do not subtract anything
@@ -424,11 +450,12 @@ def main():
                 continue
             # otherwise, we assume that the key is the channel
             else:
+                key_adapter_board = getAdapterBoardChannel(cable_type, key)
                 channel = str(key)
             
             # get calibration data for channel (for both P and N lines)
-            pos_path = calibration_data[key + "_p"]
-            neg_path = calibration_data[key + "_n"]
+            pos_path = calibration_data[key_adapter_board + "_p"]
+            neg_path = calibration_data[key_adapter_board + "_n"]
             
             # get TX and RX paths from cable mapping
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
@@ -612,7 +639,7 @@ def main():
             # create custom "source eye_and_save.tcl" with the cable name & path included
             eye_and_save = "C:/Users/Public/Documents/cable_tests/eye_and_save.tcl"
             with open (eye_and_save, 'w') as f :
-                f.write("source create_scan_0.tcl\r\n")
+                f.write("source create_scan_0_RevA.tcl\r\n")
                 f.write(f"set_property DESCRIPTION {test_name} [get_hw_sio_scans SCAN_0]\r\n")
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")

@@ -25,7 +25,18 @@
 #   : repeat tests as needed
 #   : much better error recovery & data validation!
 
-# Updated for the Rev B relay board
+# Hardware requirements:
+# - KC705
+# - Digital Multimeter (DMM)
+# - Relay board (Rev B)
+# - SMA adapter boards: one 45-pin Kyocera board and three 15-pin Molex boards 
+# - SMA cables
+
+# Software requirements:
+# - Computer: Windows 10 PC 
+# - Languages: Python 3, TCL, Windows Batch Script 
+# - Applications: Vivado 2020.2 
+# - Code Repository: https://github.com/ku-cms/eLink_Instrumentation 
 
 # version
 version = 2.2
@@ -54,15 +65,14 @@ import eyebertserial
 import dmmserial
 import json
 
-# FIXME: Create new Rev 2 DC calibration files for Rev B relay board
-# get 4-point DC cabliration file based on cable type
+# get 4-point DC calibration file based on cable type
 def GetDCCalibrationFile(cable_type):
     if cable_type in ["1", "5K", "5K2"]:
         return "4_point_DC_Calibration_v1.json"
     elif cable_type in ["3p2", "2p2"]:
-        return "4_point_DC_CalibrationRev2_Type3p2_v0.json"
+        return "4_point_DC_CalibrationRev2_Type3p2_v2.json"
     elif cable_type in ["2p3", "1p3"]:
-        return "4_point_DC_CalibrationRev2_Type2p3_v0.json"
+        return "4_point_DC_CalibrationRev2_Type2p3_v2.json"
     else:
         print(Fore.RED + f"ERROR: There is no calibration file available for cable type {cable_type}." + Fore.GREEN)
         return ""
@@ -96,9 +106,9 @@ def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
     verbose                     = False
-    RUN_4PT_DC_RES_CALIBRATION  = True
-    RUN_4PT_DC_RES              = False
-    RUN_EYE_BERT_AREA           = False
+    RUN_4PT_DC_RES_CALIBRATION  = False
+    RUN_4PT_DC_RES              = True
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -207,22 +217,10 @@ def main():
         "2p3"   : mapping_type2p3,
         "1p3"   : mapping_type1p3
     }
-    # FIXME: Update for Rev B relay board: entries should include both branch and channel (e.g. A_cmd_p)
-
-    # channels for Rev A relay board
-    # cable channels for supported e-link types
-    # cable_channels = {
-    #     "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
-    #     "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
-    #     "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
-    #     "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
-    #     "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
-    #     "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
-    #     "1p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"]
-    # }
-
-    # channels for Rev B relay board
-    # entries should include both branch and channel (e.g. A_cmd_p)
+    
+    # channels for Rev B relay board for supported e-link types
+    # - for e-links without branches, entries should include channel and sign (e.g. cmd_p)
+    # - for e-links with branches, entries should include branch, channel, and sign (e.g. A_cmd_p)
     cable_channels = {
         "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
@@ -389,21 +387,12 @@ def main():
         while accept not in valid_inputs:
             accept = input(f"The input '{accept}' is not vaild. Do you want to proceed (y/n): ").lower()
         if accept == "y":
-            print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
+            print("Proceeding with calibration. Please connect SMA through lines for each channel as instructed.")
         if accept == "n":
             print("Exiting...")
             print(Fore.RED + "Terminating code 3: exit based on user input.")
             sys.exit(3)
-        
-        # Confirm that user wants to continue
-        # user_accept = input(Fore.RED + "Would you like to continue? [y/n]: " + Fore.GREEN)
-        # if user_accept.lower() == "y":
-        #     print("Proceeding with calibration. Please connect through lines for each channel as instructed.")
-        # else:
-        #     print("Exiting...")
-        #     print(Fore.RED + "Terminating code 3: exit based on user input.")
-        #     sys.exit(3)
-        
+                
         print("Measured calibration values (ohms):")
 
         # Loop over channels
@@ -418,11 +407,9 @@ def main():
             # get TX and RX paths from cable mapping
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
             rxpath = b"rx " + bytes(cable_mapping[key]['rx'], 'utf-8')
-
-            # FIXME: verify if we should use P and N according to e-link mapping, or always "P to P" and "N to N" according to relay board labels
-            # pause for user to connect through lines (P and N according to e-link mapping) for channel
-            print(Fore.RED + f"Please connect through lines (P and N according to e-link mapping) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
             
+            # pause for user to connect SMA through lines (P to P and N to N) for channel
+            print(Fore.RED + f"Please connect SMA through lines (P to P and N to N) for channel {key}: txpath = {txpath.decode()} and rxpath = {rxpath.decode()}." + Fore.GREEN)
             user_ready = input(Fore.RED + f"Press enter when ready. " + Fore.GREEN)
 
             # take measurements; do not subtract anything
@@ -716,7 +703,7 @@ def main():
             # create custom "source eye_and_save.tcl" with the cable name & path included
             eye_and_save = "C:/Users/Public/Documents/cable_tests/eye_and_save.tcl"
             with open (eye_and_save, 'w') as f :
-                f.write("source create_scan_0.tcl\r\n")
+                f.write("source create_scan_0_RevB.tcl\r\n")
                 f.write(f"set_property DESCRIPTION {test_name} [get_hw_sio_scans SCAN_0]\r\n")
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
