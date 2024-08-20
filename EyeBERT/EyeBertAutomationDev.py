@@ -26,7 +26,7 @@
 #   : much better error recovery & data validation!
 
 # version
-version = 1.13
+version = 1.14
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -51,6 +51,19 @@ from pathvalidate import is_valid_filename
 import eyebertserial
 import dmmserial
 import json
+
+# get adapter board channel
+def getAdapterBoardChannel(cable_type, channel):
+    channel_map = {
+                "cmd" : "cmd", 
+                "d2" : "d1",
+                "d1" : "d2",
+                "d0" : "d3"
+    }
+    if cable_type == "2p3" or cable_type == "1p3":
+        return channel_map[channel]
+    else:
+        return channel 
 
 # get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
@@ -424,11 +437,12 @@ def main():
                 continue
             # otherwise, we assume that the key is the channel
             else:
+                key_adapter_board = getAdapterBoardChannel(cable_type, key)
                 channel = str(key)
             
             # get calibration data for channel (for both P and N lines)
-            pos_path = calibration_data[key + "_p"]
-            neg_path = calibration_data[key + "_n"]
+            pos_path = calibration_data[key_adapter_board + "_p"]
+            neg_path = calibration_data[key_adapter_board + "_n"]
             
             # get TX and RX paths from cable mapping
             txpath = b"tx " + bytes(cable_mapping[key]['tx'], 'utf-8')
@@ -612,7 +626,7 @@ def main():
             # create custom "source eye_and_save.tcl" with the cable name & path included
             eye_and_save = "C:/Users/Public/Documents/cable_tests/eye_and_save.tcl"
             with open (eye_and_save, 'w') as f :
-                f.write("source create_scan_0.tcl\r\n")
+                f.write("source create_scan_0_RevA.tcl\r\n")
                 f.write(f"set_property DESCRIPTION {test_name} [get_hw_sio_scans SCAN_0]\r\n")
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
