@@ -60,9 +60,9 @@ def GetDCCalibrationFile(cable_type):
     if cable_type in ["1", "5K", "5K2"]:
         return "4_point_DC_Calibration_v1.json"
     elif cable_type in ["3p2", "2p2"]:
-        return "4_point_DC_CalibrationRev2_Type3p2_v0.json"
+        return "4_point_DC_CalibrationRev2_Type3p2_v2.json"
     elif cable_type in ["2p3", "1p3"]:
-        return "4_point_DC_CalibrationRev2_Type2p3_v0.json"
+        return "4_point_DC_CalibrationRev2_Type2p3_v2.json"
     else:
         print(Fore.RED + f"ERROR: There is no calibration file available for cable type {cable_type}." + Fore.GREEN)
         return ""
@@ -96,9 +96,9 @@ def main():
     # parameters
     # TODO: let user specify parameters for what test(s) to run
     verbose                     = False
-    RUN_4PT_DC_RES_CALIBRATION  = True
-    RUN_4PT_DC_RES              = False
-    RUN_EYE_BERT_AREA           = False
+    RUN_4PT_DC_RES_CALIBRATION  = False
+    RUN_4PT_DC_RES              = True
+    RUN_EYE_BERT_AREA           = True
     pygui.PAUSE = 0.5
     
     # dictionaries to save results
@@ -716,7 +716,7 @@ def main():
             # create custom "source eye_and_save.tcl" with the cable name & path included
             eye_and_save = "C:/Users/Public/Documents/cable_tests/eye_and_save.tcl"
             with open (eye_and_save, 'w') as f :
-                f.write("source create_scan_0.tcl\r\n")
+                f.write("source create_scan_0_RevB.tcl\r\n")
                 f.write(f"set_property DESCRIPTION {test_name} [get_hw_sio_scans SCAN_0]\r\n")
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
