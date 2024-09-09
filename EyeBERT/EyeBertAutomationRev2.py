@@ -516,6 +516,8 @@ def main():
             # key with p and n
             key_p = key + "_p"
             key_n = key + "_n"
+
+            # TODO: Use PrintDCValues().
             
             # for values greater than or equal to this cufoff, print INF (consider these values as infinite resistance)
             cutoff = 1e6
