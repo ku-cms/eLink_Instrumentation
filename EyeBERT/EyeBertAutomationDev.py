@@ -39,7 +39,7 @@
 # - Code Repository: https://github.com/ku-cms/eLink_Instrumentation 
 
 # version
-version = 1.14
+version = 1.15
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -77,6 +77,26 @@ def getAdapterBoardChannel(cable_type, channel):
         return channel_map[channel]
     else:
         return channel 
+
+# print 4-point DC values
+def PrintDCValues(channel, channel_p, channel_n, value_p, value_n):
+    # For values greater than or equal to this cufoff,
+    # print INF (consider these values as infinite resistance).
+    cutoff = 1e6
+    
+    value_to_print_p = ""
+    value_to_print_n = ""
+    if value_p < cutoff:
+        value_to_print_p = "{:.2f}".format(value_p)
+    else:
+        value_to_print_p = "INF"
+    if value_n < cutoff:
+        value_to_print_n = "{:.2f}".format(value_n)
+    else:
+        value_to_print_n = "INF"
+    
+    # print results
+    print(" - channel {0:6}: {1:8} = {2:4}, {3:8} = {4:4}".format(channel, channel_p, value_to_print_p, channel_n, value_to_print_n))
 
 # get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
@@ -470,12 +490,16 @@ def main():
             eb.MODE(b"MODE DMM -\r\n")
             negative = round(dmm.reading(),2) - neg_path
 
+            # key with p and n
+            key_p = key + "_p"
+            key_n = key + "_n"
+
             # print results
-            print(" - channel {0}: {1}_p = {2:.2f}, {3}_n = {4:.2f}".format(key, key, positive, key, negative))
+            PrintDCValues(key, key_p, key_n, positive, negative)
 
             # save measurement data
-            measurement_data[key + "_p"] = positive
-            measurement_data[key + "_n"] = negative
+            measurement_data[key_p] = positive
+            measurement_data[key_n] = negative
 
         # get bad 4-point DC channels
         bad_channels = GetBadDCChannels(measurement_data)
