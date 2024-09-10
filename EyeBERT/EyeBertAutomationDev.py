@@ -39,7 +39,7 @@
 # - Code Repository: https://github.com/ku-cms/eLink_Instrumentation 
 
 # version
-version = 1.15
+version = 1.16
 
 from template_analysis_windows import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -63,63 +63,8 @@ import ctypes
 from pathvalidate import is_valid_filename
 import eyebertserial
 import dmmserial
+import tools
 import json
-
-# get adapter board channel
-def getAdapterBoardChannel(cable_type, channel):
-    channel_map = {
-                "cmd" : "cmd", 
-                "d2" : "d1",
-                "d1" : "d2",
-                "d0" : "d3"
-    }
-    if cable_type == "2p3" or cable_type == "1p3":
-        return channel_map[channel]
-    else:
-        return channel 
-
-# print 4-point DC values
-def PrintDCValues(channel, channel_p, channel_n, value_p, value_n):
-    # For values greater than or equal to this cufoff,
-    # print INF (consider these values as infinite resistance).
-    cutoff = 1e6
-    
-    value_to_print_p = ""
-    value_to_print_n = ""
-    if value_p < cutoff:
-        value_to_print_p = "{:.2f}".format(value_p)
-    else:
-        value_to_print_p = "INF"
-    if value_n < cutoff:
-        value_to_print_n = "{:.2f}".format(value_n)
-    else:
-        value_to_print_n = "INF"
-    
-    # print results
-    print(" - channel {0:6}: {1:8} = {2:4}, {3:8} = {4:4}".format(channel, channel_p, value_to_print_p, channel_n, value_to_print_n))
-
-# get bad 4-point DC channels
-def GetBadDCChannels(measurement_data):
-    bad_channels = {}
-    for key in measurement_data:
-        value = measurement_data[key]
-        if value > 10.0:
-            bad_channels[key] = value
-    return bad_channels
-
-# determine if cable type is valid
-def is_valid_cable_type(cable_types, cable_type):
-    if cable_type in cable_types:
-        return True
-    else:
-        return False
-    
-# determine if branch is valid
-def is_valid_branch(branches, branch):
-    if branch in branches:
-        return True
-    else:
-        return False
 
 def main():
     # parameters
@@ -292,7 +237,7 @@ def main():
     is_valid = False
     while is_valid == False:
         cable_type = input(Fore.RED + f"Enter cable type {cable_types}: " + Fore.GREEN)
-        is_valid = is_valid_cable_type(cable_types, cable_type)
+        is_valid = tools.is_valid_cable_type(cable_types, cable_type)
         if is_valid == False:
             print(Fore.RED + f"{cable_type} is not a valid cable type. Re-enter a valid cable type: {cable_types}.")
     
@@ -312,7 +257,7 @@ def main():
         is_valid = False
         while is_valid == False:
             branch = input(Fore.RED + f"Enter branch {branches}: " + Fore.GREEN)
-            is_valid = is_valid_branch(branches, branch)
+            is_valid = tools.is_valid_branch(branches, branch)
             if is_valid == False:
                 print(Fore.RED + f"{branch} is not a valid branch. Re-enter a valid branch: {branches}.")
 
@@ -321,16 +266,10 @@ def main():
     #
     cable_path = file_path + "/" + filename
     r_cable_path = r_file_path + "/" + filename
-    isExist = os.path.exists(cable_path)
-    if isExist == False :
-        # create the path
-        os.makedirs(cable_path)
-
-    isExist = os.path.exists(r_cable_path)
-    if isExist == False :
-        #create the path
-        os.makedirs(r_cable_path)
-        
+    # create directories if they do not exist
+    tools.makeDir(cable_path)
+    tools.makeDir(r_cable_path)
+            
     #
     # get serial number of test boards
     #
@@ -470,7 +409,7 @@ def main():
                 continue
             # otherwise, we assume that the key is the channel
             else:
-                key_adapter_board = getAdapterBoardChannel(cable_type, key)
+                key_adapter_board = tools.getAdapterBoardChannel(cable_type, key)
                 channel = str(key)
             
             # get calibration data for channel (for both P and N lines)
@@ -495,24 +434,16 @@ def main():
             key_n = key + "_n"
 
             # print results
-            PrintDCValues(key, key_p, key_n, positive, negative)
+            tools.PrintDCValues(key, key_p, key_n, positive, negative)
 
             # save measurement data
             measurement_data[key_p] = positive
             measurement_data[key_n] = negative
 
         # get bad 4-point DC channels
-        bad_channels = GetBadDCChannels(measurement_data)
-
-        if bad_channels:
-            print(Fore.RED + "Warning: The following channels have large 4-point DC resistance:" + Fore.GREEN)
-            for key in bad_channels:
-                value = bad_channels[key]
-                print(f" - {key}: {value}")
-            print(Fore.RED + "Possible causes:" + Fore.GREEN)
-            print(" - The e-link is not connected properly.")
-            print(" - The SMA cable mapping is not correct for this type of e-link.")
-            print(" - The e-link has a break or discontinuity for these channels.")
+        bad_channels = tools.GetBadDCChannels(measurement_data)
+        # print bad 4-point DC channels
+        tools.PrintBadDCChannels(bad_channels)
 
         # get date and time
         now = datetime.datetime.now()
