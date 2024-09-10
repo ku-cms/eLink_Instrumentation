@@ -65,6 +65,8 @@ import eyebertserial
 import dmmserial
 import json
 
+# TODO: Use functions from tools.py.
+
 # get 4-point DC calibration file based on cable type
 def GetDCCalibrationFile(cable_type):
     if cable_type in ["1", "5K", "5K2"]:
@@ -79,11 +81,11 @@ def GetDCCalibrationFile(cable_type):
 
 # get bad 4-point DC channels
 def GetBadDCChannels(measurement_data):
+    # resistance threshold for bad channels
     cutoff = 10.0
     bad_channels = {}
     for key in measurement_data:
         value = measurement_data[key]
-        # resistance threshold for bad channels
         if value >= cutoff:
             bad_channels[key] = value
     return bad_channels
@@ -314,6 +316,9 @@ def main():
     #
     cable_path = file_path + "/" + filename
     r_cable_path = r_file_path + "/" + filename
+
+    # TODO: Use makeDir() from tools.py.
+
     isExist = os.path.exists(cable_path)
     if isExist == False :
         # create the path
@@ -517,7 +522,7 @@ def main():
             key_p = key + "_p"
             key_n = key + "_n"
 
-            # TODO: Use PrintDCValues().
+            # TODO: Use PrintDCValues() from tools.py.
             
             # for values greater than or equal to this cufoff, print INF (consider these values as infinite resistance)
             cutoff = 1e6
@@ -541,6 +546,8 @@ def main():
 
         # get bad 4-point DC channels
         bad_channels = GetBadDCChannels(measurement_data)
+
+        # TODO: Use PrintBadDCChannels() from tools.py.
 
         # print bad 4-point DC channels
         if bad_channels:
