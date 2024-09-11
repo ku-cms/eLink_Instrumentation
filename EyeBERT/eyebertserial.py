@@ -25,6 +25,13 @@ typeV_45_33 = {
      "d5" : {"tx" : "6", "rx" : "6"}
 }
 
+
+# list of known EyeBert and EyeBert Rev 2 boards
+list_of_FTDI = ["USB VID:PID=0403:6001 SER=B0026EF9A",
+                "USB VID:PID=0403:6001 SER=B0039DXVA",
+                "USB VID:PID=0403:6001 SER=B003NFE1A",
+                "USB VID:PID=0403:6001 SER=BG001WSTA"]
+
 init(convert=True) # for colorama to work correctly
 
 class EyeBERTRelayControl:
@@ -39,32 +46,30 @@ class EyeBERTRelayControl:
         self.ser.timeout = 1
         self.blinkOK = True
 
+
     def __del__(self):
         self.ser.close()
 
+
     # USB VID:PID=0403:6001 SER=B0026EF9A
-    # that's the VID/PID and serial number of the
+    # that's an example VID/PID and serial number of the
     # usb chip on the EyeBERT relay board
-    # if a different chip is present, change the necessary hwid
-    # string below
+    # if a different chip is present, add the necessary hwid
+    # string in list_of_FTDI
+    #
+    # if more than one EyeBert board is present, this
+    # will return COM for first available board
     def FindEyeBERT(self) :
         port_to_use = None
         ports = serial.tools.list_ports.comports()
         for port, desc, hwid in sorted(ports) :
             #print("{}: {} [{}]".format(port,desc,hwid))
-            if hwid == "USB VID:PID=0403:6001 SER=B0026EF9A" :
+            if hwid in list_of_FTDI :
                 port_to_use = port
-                break
-            if hwid == "USB VID:PID=0403:6001 SER=B0039DXVA" :
-                port_to_use = port
-                break
-            if hwid == "USB VID:PID=0403:6001 SER=B003NFE1A" :
-                port_to_use = port
-                self.blinkOK = False
                 break
          
         return port_to_use
-
+    
 
     def initialize(self) :
         # try and find instand of board
@@ -92,6 +97,7 @@ class EyeBERTRelayControl:
             retval = False
 
         return retval
+    
 
     # blink the LEDs as a test
     # blocking function due to time.sleep()
@@ -121,6 +127,7 @@ class EyeBERTRelayControl:
             self.ser.write(off3)
         else :
             pass
+        
 
     # request a TX or RX connection
     # path contains a string such as "TX 0\r\n"
@@ -128,6 +135,7 @@ class EyeBERTRelayControl:
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
         self.ser.write(path)
+        
 
     def LED(self, whichled, ledstate) :
         if self.blinkOK == True :
@@ -138,6 +146,7 @@ class EyeBERTRelayControl:
                 self.ser.write(cmd)
         else :
             pass
+
 
     def MODE(self, modestr) :
         self.ser.reset_input_buffer()
