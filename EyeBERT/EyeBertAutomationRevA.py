@@ -39,9 +39,9 @@
 # - Code Repository: https://github.com/ku-cms/eLink_Instrumentation 
 
 # version
-version = 1.16
+version = 1.17
 
-from template_analysis_windows import EyeBERTFile, Reference
+from template_analysis_windows_RevA import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
 
 init(convert=True)
@@ -325,7 +325,7 @@ def main():
         # TODO: automatically create new calibration file name
         # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
-        calibration_file = "4_point_DC_Calibration_v2.json"
+        calibration_file = "4_point_DC_Calibration_RevA_v2.json"
 
         print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
         
@@ -392,7 +392,7 @@ def main():
         
         measurement_data = {}
         calibration_data = {}
-        calibration_file = "4_point_DC_Calibration_v1.json"
+        calibration_file = "4_point_DC_Calibration_RevA_v1.json"
 
         print(f"Using the calibration file {calibration_file}.")
         
@@ -688,7 +688,7 @@ def main():
             
             # EyeBERT Template Analysis
 
-            reference_template_file = "reference_template_v3.csv"
+            reference_template_file = "reference_template_RevA_v3.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
             # Create EyeBERTFile object to read data from file

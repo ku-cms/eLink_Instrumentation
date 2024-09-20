@@ -1,3 +1,3 @@
 r:
 cd R:\BEAN_GRP\EyeBERTAutomation
-python EyeBERTAutomationDev.py
+python EyeBERTAutomationRevA.py
