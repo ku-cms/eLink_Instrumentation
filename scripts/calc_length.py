@@ -49,14 +49,24 @@ full_types = list(cable_lengths.keys())
 def CalcWireLengthElink(wiring_type, length_type, loss):
     wire_length_elink = -1
     branches = []
+    full_type = ""
+    
+    # check if wiring type is valid
     wiring_type_is_valid = script_tools.group_contains_element(wiring_types, wiring_type)
     if wiring_type_is_valid:
+        # assign branches
         branches = cable_branches[wiring_type]
     else:
+        # print error messages and return
         print(Fore.RED + f"ERROR: {wiring_type} is not a valid wiring type." + Fore.RESET)
         print(Fore.RED + f"Please enter a valid wiring type: {wiring_types}" + Fore.RESET)
         return wire_length_elink
     print(f"branches: {branches}")
+    
+    # check if full type (wiring + length) is valid
+    full_type = "{0} {1}".format(wiring_type, length_type)
+    print(f"full_type: {full_type}")
+    
     return wire_length_elink
 
 # calculate wire length for a batch of n e-links
@@ -77,11 +87,11 @@ def run():
 
     # FIXME: Convert user inputs to int when applicable
 
-    # Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
-    # - Convert to lowercase.
-    # - Replace "p" with ".".
-    wiring_type = wiring_type.lower()
-    wiring_type = wiring_type.replace("p", ".")
+    # format wiring type
+    wiring_type = script_tools.formatWiringType(wiring_type)
+
+    # format length type
+    length_type = script_tools.formatLengthType(length_type)
 
     print("-------------------------------------")
     print(f" - wiring_type: {wiring_type}")

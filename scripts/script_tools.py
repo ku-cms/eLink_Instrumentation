@@ -23,6 +23,30 @@ def group_contains_element(group, element):
     else:
         return False
 
+# Process input wiring type to support these formats:
+# inputs: 2.3, 2p3, 2P3
+# output: 2.3
+def formatWiringType(wiring_type):
+    # - Remove leading and ending whitespace using strip().
+    # - Convert to lowercase.
+    # - Replace "p" with ".".
+    wiring_type = wiring_type.strip()
+    wiring_type = wiring_type.lower()
+    wiring_type = wiring_type.replace("p", ".")
+    return wiring_type
+
+# Process input length type to support these formats:
+# inputs: R1_G1, r1_g1, R1 G1, r1 g1
+# output: R1_G1
+def formatLengthType(length_type):
+    # - Remove leading and ending whitespace using strip().
+    # - Convert to uppercase.
+    # - Replace " " with "_".
+    length_type = length_type.strip()
+    length_type = length_type.upper()
+    length_type = length_type.replace(" ", "_")
+    return length_type
+
 # get adapter board channel
 def getAdapterBoardChannel(cable_type, channel):
     channel_map = {
