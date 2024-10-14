@@ -6,6 +6,7 @@
 # - Create class
 
 # DONE:
+# - Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
 
 from colorama import Fore, Back, Style, init
 import script_tools
@@ -75,9 +76,11 @@ def run():
 
     # FIXME: Convert user inputs to int when applicable
 
-    # Idea:
-    # support both formats for type: 3.2 and 3p2
-    # convert on format to the other using replace()
+    # Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
+    # - Convert to lowercase.
+    # - Replace "p" with ".".
+    wiring_type = wiring_type.lower()
+    wiring_type = wiring_type.replace("p", ".")
 
     print("-------------------------------------")
     print(f" - wiring_type: {wiring_type}")
@@ -86,9 +89,9 @@ def run():
     print(f" - n_elinks: {n_elinks}")
     print("-------------------------------------")
 
-    # Calculate length;
-    # may split into two steps: 1 e-link vs. n e-links
-    # so that we can print out both...
+    # Calculate wire length:
+    # Split into two steps (1 e-link and n e-links)
+    # so that we can print out both.
 
     # calculate wire length for one e-link
     wire_length_elink = CalcWireLengthElink(wiring_type, length_type, loss)
