@@ -1,12 +1,15 @@
 # calc_length.py
 
 # TODO:
-# - Require valid user inputs
-# - Convert user inputs to int when applicable
-# - Create class
+# - Ask user for current wire log value in feet (remaining length of wire in spool)
+# - Print the new wire log value in feet (after subtracting used wire)
+# - Create LengthCalculator class
 
 # DONE:
 # - Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
+# - Process input length type to support these formats: R1_G1, r1_g1, R1 G1, and r1 g1.
+# - Convert user inputs to int when applicable
+# - Require valid user inputs
 
 from colorama import Fore, Back, Style, init
 import script_tools
@@ -20,6 +23,14 @@ cable_branches = {
     "2.2" : ["A", "C"],
     "2.3" : ["A", "B"],
     "1.3" : ["A"]
+}
+
+# number of channels per branch based on wiring type
+cable_channels_per_branch = {
+    "3.2" : 3,
+    "2.2" : 3,
+    "2.3" : 4,
+    "1.3" : 4
 }
 
 # cable lengths from Design B (Axel Filenius, March 1, 2024)
@@ -82,11 +93,21 @@ def CalcWireLengthElink(wiring_type, length_type, loss):
         print(Fore.RED + f"{full_types}" + Fore.RESET)
         return wire_length_elink
     
+    # get number of channels per branch
+    n_channels_per_branch = cable_channels_per_branch[wiring_type]
+    
     print(f" - full_type: {full_type}")
     print(f" - branches: {branches}")
+    print(f" - n_channels_per_branch: {n_channels_per_branch}")
     print(f" - branch_lengths: {branch_lengths}")
     script_tools.printLine(line_length)
-    
+
+    # calculate wire length for one e-link
+    wire_length_elink = 0
+    for branch in branches:
+        branch_length = branch_lengths[branch]
+        length_to_add = n_channels_per_branch * (branch_length + loss)
+        wire_length_elink += length_to_add
     return wire_length_elink
 
 # calculate wire length for a batch of n e-links
@@ -94,6 +115,7 @@ def CalcWireLengthBatch(n_elinks, wire_length_elink):
     wire_length_batch = n_elinks * wire_length_elink
     return wire_length_batch
 
+# run wire length calculator
 def run():
     script_tools.printLine(line_length)
     print(Fore.GREEN + "Calculating twisted pair wire length." + Fore.RESET)
@@ -102,10 +124,8 @@ def run():
     # User input
     wiring_type = input(Fore.GREEN + "Enter e-link wiring type: " + Fore.RESET)
     length_type = input(Fore.GREEN + "Enter e-link length type: " + Fore.RESET)
-    loss        = input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET)
-    n_elinks    = input(Fore.GREEN + "Enter number of e-links: " + Fore.RESET)
-
-    # FIXME: Convert user inputs to int when applicable
+    loss        = int(input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET))
+    n_elinks    = int(input(Fore.GREEN + "Enter number of e-links: " + Fore.RESET))
 
     # format wiring type
     wiring_type = script_tools.formatWiringType(wiring_type)
@@ -142,4 +162,3 @@ def main():
 
 if __name__ == "__main__":
     run()
-
