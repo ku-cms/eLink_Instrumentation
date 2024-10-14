@@ -11,6 +11,9 @@
 from colorama import Fore, Back, Style, init
 import script_tools
 
+# specify length of line for printing
+line_length = 50
+
 # cable branches based on wiring type
 cable_branches = {
     "3.2" : ["A", "B", "C"],
@@ -48,8 +51,9 @@ full_types = list(cable_lengths.keys())
 # calculate wire length for one e-link
 def CalcWireLengthElink(wiring_type, length_type, loss):
     wire_length_elink = -1
-    branches = []
     full_type = ""
+    branches = []
+    branch_lengths = {}
     
     # check if wiring type is valid
     wiring_type_is_valid = script_tools.group_contains_element(wiring_types, wiring_type)
@@ -59,13 +63,29 @@ def CalcWireLengthElink(wiring_type, length_type, loss):
     else:
         # print error messages and return
         print(Fore.RED + f"ERROR: {wiring_type} is not a valid wiring type." + Fore.RESET)
-        print(Fore.RED + f"Please enter a valid wiring type: {wiring_types}" + Fore.RESET)
+        print(Fore.RED + f"Please enter a valid wiring type from this list:" + Fore.RESET)
+        print(Fore.RED + f"{wiring_types}" + Fore.RESET)
         return wire_length_elink
-    print(f"branches: {branches}")
+    
+    # get full type (wiring + length)
+    full_type = "{0} {1}".format(wiring_type, length_type)
     
     # check if full type (wiring + length) is valid
-    full_type = "{0} {1}".format(wiring_type, length_type)
-    print(f"full_type: {full_type}")
+    full_type_is_valid = script_tools.group_contains_element(full_types, full_type)
+    if full_type_is_valid:
+        # assign branch lengths
+        branch_lengths = cable_lengths[full_type]
+    else:
+        # print error messages and return
+        print(Fore.RED + f"ERROR: {full_type} is not a valid e-link type (defined by wiring and length)." + Fore.RESET)
+        print(Fore.RED + f"Please enter a valid combination of e-link wiring and length types from this list:" + Fore.RESET)
+        print(Fore.RED + f"{full_types}" + Fore.RESET)
+        return wire_length_elink
+    
+    print(f" - full_type: {full_type}")
+    print(f" - branches: {branches}")
+    print(f" - branch_lengths: {branch_lengths}")
+    script_tools.printLine(line_length)
     
     return wire_length_elink
 
@@ -75,9 +95,9 @@ def CalcWireLengthBatch(n_elinks, wire_length_elink):
     return wire_length_batch
 
 def run():
-    print("-------------------------------------")
+    script_tools.printLine(line_length)
     print(Fore.GREEN + "Calculating twisted pair wire length." + Fore.RESET)
-    print("-------------------------------------")
+    script_tools.printLine(line_length)
     
     # User input
     wiring_type = input(Fore.GREEN + "Enter e-link wiring type: " + Fore.RESET)
@@ -93,12 +113,12 @@ def run():
     # format length type
     length_type = script_tools.formatLengthType(length_type)
 
-    print("-------------------------------------")
+    script_tools.printLine(line_length)
     print(f" - wiring_type: {wiring_type}")
     print(f" - length_type: {length_type}")
     print(f" - loss: {loss} mm")
     print(f" - n_elinks: {n_elinks}")
-    print("-------------------------------------")
+    script_tools.printLine(line_length)
 
     # Calculate wire length:
     # Split into two steps (1 e-link and n e-links)

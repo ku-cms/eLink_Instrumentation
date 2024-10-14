@@ -23,6 +23,11 @@ def group_contains_element(group, element):
     else:
         return False
 
+# print line of a specified length
+def printLine(length):
+    line = "-" * length
+    print(line)
+
 # Process input wiring type to support these formats:
 # inputs: 2.3, 2p3, 2P3
 # output: 2.3
