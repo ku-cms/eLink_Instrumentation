@@ -16,6 +16,13 @@ def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
+# determine if a group contains and element
+def group_contains_element(group, element):
+    if element in group:
+        return True
+    else:
+        return False
+
 # get adapter board channel
 def getAdapterBoardChannel(cable_type, channel):
     channel_map = {
@@ -28,17 +35,3 @@ def getAdapterBoardChannel(cable_type, channel):
         return channel_map[channel]
     else:
         return channel 
-
-# determine if cable type is valid
-def is_valid_cable_type(cable_types, cable_type):
-    if cable_type in cable_types:
-        return True
-    else:
-        return False
-    
-# determine if branch is valid
-def is_valid_branch(branches, branch):
-    if branch in branches:
-        return True
-    else:
-        return False

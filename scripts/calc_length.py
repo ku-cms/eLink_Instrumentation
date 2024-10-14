@@ -48,7 +48,7 @@ full_types = list(cable_lengths.keys())
 def CalcWireLengthElink(wiring_type, length_type, loss):
     wire_length_elink = -1
     branches = []
-    wiring_type_is_valid = script_tools.is_valid_cable_type(wiring_types, wiring_type)
+    wiring_type_is_valid = script_tools.group_contains_element(wiring_types, wiring_type)
     if wiring_type_is_valid:
         branches = cable_branches[wiring_type]
     else:
