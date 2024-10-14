@@ -1,10 +1,27 @@
 # calc_length.py
-
+#
+# Developed by the KU CMS group.
+#
+# ---------------------- #
+# Wire Length Calculator
+# Author: Caleb Smith
+# ---------------------- #
+#
+# Computes the total wire length for 1 e-link and n e-links based on user input.
+#
+# The user must input the following information:
+# - e-link wiring type
+# - e-link length type
+# - loss per twisted pair (mm)
+# - number of e-links
+# - FIXME: current wire log (ft)
+#
 # TODO:
 # - Ask user for current wire log value in feet (remaining length of wire in spool)
 # - Print the new wire log value in feet (after subtracting used wire)
 # - Create LengthCalculator class
-
+# - Print results in mm and ft
+#
 # DONE:
 # - Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
 # - Process input length type to support these formats: R1_G1, r1_g1, R1 G1, and r1 g1.
