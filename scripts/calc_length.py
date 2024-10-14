@@ -65,14 +65,15 @@ def CalcWireLengthBatch(n_elinks, wire_length_elink):
     return wire_length_batch
 
 def run():
-    print("Calculating twisted pair wire length.")
+    print("-------------------------------------")
+    print(Fore.GREEN + "Calculating twisted pair wire length." + Fore.RESET)
     print("-------------------------------------")
     
     # User input
-    wiring_type = input("Enter e-link wiring type: ")
-    length_type = input("Enter e-link length type: ")
-    loss        = input("Enter loss per twisted pair (mm): ")
-    n_elinks    = input("Enter number of e-links: ")
+    wiring_type = input(Fore.GREEN + "Enter e-link wiring type: " + Fore.RESET)
+    length_type = input(Fore.GREEN + "Enter e-link length type: " + Fore.RESET)
+    loss        = input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET)
+    n_elinks    = input(Fore.GREEN + "Enter number of e-links: " + Fore.RESET)
 
     # FIXME: Convert user inputs to int when applicable
 
