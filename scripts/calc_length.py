@@ -7,7 +7,8 @@
 
 # DONE:
 
-import tools
+from colorama import Fore, Back, Style, init
+import script_tools
 
 # cable branches based on wiring type
 cable_branches = {
@@ -47,12 +48,12 @@ full_types = list(cable_lengths.keys())
 def CalcWireLengthElink(wiring_type, length_type, loss):
     wire_length_elink = -1
     branches = []
-    wiring_type_is_valid = tools.is_valid_cable_type(wiring_types, wiring_type)
+    wiring_type_is_valid = script_tools.is_valid_cable_type(wiring_types, wiring_type)
     if wiring_type_is_valid:
         branches = cable_branches[wiring_type]
     else:
-        print(f"ERROR: {wiring_type} is not a valid wiring type.")
-        print(f"Please enter a valid wiring type: {wiring_types}")
+        print(Fore.RED + f"ERROR: {wiring_type} is not a valid wiring type." + Fore.RESET)
+        print(Fore.RED + f"Please enter a valid wiring type: {wiring_types}" + Fore.RESET)
         return wire_length_elink
     print(f"branches: {branches}")
     return wire_length_elink
