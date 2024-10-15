@@ -8,18 +8,17 @@
 # ---------------------- #
 #
 # Computes the total wire length for 1 e-link and n e-links based on user input.
+# Also computes updated wire log.
 #
 # The user must input the following information:
 # - e-link wiring type
 # - e-link length type
 # - loss per twisted pair (mm)
 # - number of e-links
-# - FIXME: current wire log (ft)
+# - previous wire log (ft)
 #
 # TODO:
-# - Ask user for current wire log value in feet (remaining length of wire in spool)
-# - Print the new wire log value in feet (after subtracting used wire)
-# - Create LengthCalculator class in a different file
+# - Create LengthCalculator or WireLengthCalculator class in a different file
 #
 # DONE:
 # - Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
@@ -27,6 +26,8 @@
 # - Convert user inputs to int when applicable
 # - Require valid user inputs
 # - Print results in mm and ft
+# - Ask user for previous wire log value in feet (remaining length of wire in spool)
+# - Print the new wire log value in feet (after subtracting used wire)
 
 from colorama import Fore, Back, Style, init
 import script_tools
@@ -139,10 +140,11 @@ def run():
     script_tools.printLine(line_length)
     
     # User input
-    wiring_type = input(Fore.GREEN + "Enter e-link wiring type: " + Fore.RESET)
-    length_type = input(Fore.GREEN + "Enter e-link length type: " + Fore.RESET)
-    loss        = int(input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET))
-    n_elinks    = int(input(Fore.GREEN + "Enter number of e-links: " + Fore.RESET))
+    wiring_type     = input(Fore.GREEN + "Enter e-link wiring type: " + Fore.RESET)
+    length_type     = input(Fore.GREEN + "Enter e-link length type: " + Fore.RESET)
+    loss            = float(input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET))
+    n_elinks        = int(input(Fore.GREEN + "Enter number of e-links: " + Fore.RESET))
+    prev_wire_log   = float(input(Fore.GREEN + "Enter previous wire log entry (ft): " + Fore.RESET))
 
     # format wiring type
     wiring_type = script_tools.formatWiringType(wiring_type)
@@ -155,6 +157,7 @@ def run():
     print(f" - length_type: {length_type}")
     print(f" - loss: {loss} mm")
     print(f" - n_elinks: {n_elinks}")
+    print(f" - prev_wire_log: {prev_wire_log} ft")
     script_tools.printLine(line_length)
 
     # Calculate wire length:
@@ -173,9 +176,16 @@ def run():
     wire_length_batch_mm = CalcWireLengthBatch(n_elinks, wire_length_elink_mm)
     wire_length_batch_ft = script_tools.convert_mm_to_ft(wire_length_batch_mm)
 
-    # FIXME: print old and new wire log values
-    print(f"wire length for 1 e-link: {wire_length_elink_mm} mm = {wire_length_elink_ft:.1f} ft")
-    print(f"wire length for {n_elinks} e-links: {wire_length_batch_mm} mm = {wire_length_batch_ft:.1f} ft")
+    # calculate new wire log
+    new_wire_log = prev_wire_log - wire_length_batch_ft
+
+    print(Fore.GREEN + f"Wire length for 1 e-link: " + Fore.RESET)
+    print(f"\t{wire_length_elink_mm:.1f} mm = {wire_length_elink_ft:.1f} ft")
+    print(Fore.GREEN + f"Wire length for {n_elinks} e-links: " + Fore.RESET)
+    print(f"\t{wire_length_batch_mm:.1f} mm = {wire_length_batch_ft:.1f} ft")
+    print(Fore.GREEN + f"New wire log entry: " + Fore.RESET)
+    print(f"\t{prev_wire_log:.1f} ft - {wire_length_batch_ft:.1f} ft = {new_wire_log:.1f} ft")
+    script_tools.printLine(line_length)
 
 def main():
     run()
