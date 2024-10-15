@@ -28,6 +28,16 @@ def printLine(length):
     line = "-" * length
     print(line)
 
+# convert mm to ft
+def convert_mm_to_ft(value_mm):
+    value_ft = value_mm / 304.8
+    return value_ft
+
+# convert ft to mm
+def convert_ft_to_mm(value_ft):
+    value_mm = value_ft * 304.8
+    return value_mm
+
 # Process input wiring type to support these formats:
 # inputs: 2.3, 2p3, 2P3
 # output: 2.3

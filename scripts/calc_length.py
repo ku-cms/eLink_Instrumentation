@@ -19,14 +19,14 @@
 # TODO:
 # - Ask user for current wire log value in feet (remaining length of wire in spool)
 # - Print the new wire log value in feet (after subtracting used wire)
-# - Create LengthCalculator class
-# - Print results in mm and ft
+# - Create LengthCalculator class in a different file
 #
 # DONE:
 # - Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
 # - Process input length type to support these formats: R1_G1, r1_g1, R1 G1, and r1 g1.
 # - Convert user inputs to int when applicable
 # - Require valid user inputs
+# - Print results in mm and ft
 
 from colorama import Fore, Back, Style, init
 import script_tools
@@ -50,7 +50,7 @@ cable_channels_per_branch = {
     "1.3" : 4
 }
 
-# cable lengths from Design B (Axel Filenius, March 1, 2024)
+# cable lengths (mm) from Design B (Axel Filenius, March 1, 2024)
 cable_lengths = {
     # Ring 1 (R1)
     "2.3 R1_G1" : {"A" : 280, "B" : 280},
@@ -162,17 +162,20 @@ def run():
     # so that we can print out both.
 
     # calculate wire length for one e-link
-    wire_length_elink = CalcWireLengthElink(wiring_type, length_type, loss)
+    wire_length_elink_mm = CalcWireLengthElink(wiring_type, length_type, loss)
+    wire_length_elink_ft = script_tools.convert_mm_to_ft(wire_length_elink_mm)
 
     # if length < 0 (invalid), return
-    if wire_length_elink < 0:
+    if wire_length_elink_mm < 0:
         return
 
     # calculate wire length for a batch of n e-links
-    wire_length_batch = CalcWireLengthBatch(n_elinks, wire_length_elink)
+    wire_length_batch_mm = CalcWireLengthBatch(n_elinks, wire_length_elink_mm)
+    wire_length_batch_ft = script_tools.convert_mm_to_ft(wire_length_batch_mm)
 
-    print(f"wire_length_elink: {wire_length_elink}")
-    print(f"wire_length_batch: {wire_length_batch}")
+    # FIXME: print old and new wire log values
+    print(f"wire length for 1 e-link: {wire_length_elink_mm} mm = {wire_length_elink_ft:.1f} ft")
+    print(f"wire length for {n_elinks} e-links: {wire_length_batch_mm} mm = {wire_length_batch_ft:.1f} ft")
 
 def main():
     run()
