@@ -1,4 +1,4 @@
-# calc_length.py
+# wire_length.py
 #
 # Developed by the KU CMS group.
 #
@@ -179,6 +179,7 @@ def run():
     # calculate new wire log
     new_wire_log = prev_wire_log - wire_length_batch_ft
 
+    # print results
     print(Fore.GREEN + f"Wire length for 1 e-link: " + Fore.RESET)
     print(f"\t{wire_length_elink_mm:.1f} mm = {wire_length_elink_ft:.1f} ft")
     print(Fore.GREEN + f"Wire length for {n_elinks} e-links: " + Fore.RESET)
