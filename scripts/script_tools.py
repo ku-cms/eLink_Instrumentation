@@ -1,15 +1,14 @@
 # script_tools.py
 
-# This is a place for utility functions (tools).
+# This is a place for utility functions (tools) for scripts.
 
 # To use these functions in another file, add this import statement:
-# import tools
+# import script_tools
 
 # Then, call functions as needed, for example:
-# tools.makeDir(dir_name)
+# script_tools.makeDir(dir_name)
 
 import os
-from colorama import Fore, Back, Style, init
 
 # creates directory if it does not exist
 def makeDir(dir_name):
