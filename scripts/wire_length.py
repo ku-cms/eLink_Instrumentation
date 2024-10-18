@@ -29,8 +29,11 @@
 # - Ask user for previous wire log value in feet (remaining length of wire in spool)
 # - Print the new wire log value in feet (after subtracting used wire)
 
-from colorama import Fore, Back, Style, init
 import script_tools
+from colorama import Fore, Back, Style, init
+
+# Fixes colors for Windows Command Prompt:
+init(convert=True)
 
 # specify length of line for printing
 line_length = 50
