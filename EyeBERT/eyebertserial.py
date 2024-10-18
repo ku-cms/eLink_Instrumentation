@@ -25,10 +25,16 @@ typeV_45_33 = {
      "d5" : {"tx" : "6", "rx" : "6"}
 }
 
+# list of known EyeBert Rev A and EyeBert Rev B boards
+list_of_FTDI = ["USB VID:PID=0403:6001 SER=B0026EF9A",
+                "USB VID:PID=0403:6001 SER=B0039DXVA",
+                "USB VID:PID=0403:6001 SER=B003NFE1A",
+                "USB VID:PID=0403:6001 SER=BG001WSTA",
+                "USB VID:PID=0403:6001 SER=B003NFDYA"]
+
 init(convert=True) # for colorama to work correctly
 
 class EyeBERTRelayControl:
-
 
     def __init__(self):
         self.ser = serial.Serial()
@@ -38,39 +44,38 @@ class EyeBERTRelayControl:
         self.ser.bytesize = serial.EIGHTBITS
         self.ser.timeout = 1
         self.blinkOK = True
+        self.verbose = True
 
     def __del__(self):
         self.ser.close()
 
     # USB VID:PID=0403:6001 SER=B0026EF9A
-    # that's the VID/PID and serial number of the
+    # that's an example VID/PID and serial number of the
     # usb chip on the EyeBERT relay board
-    # if a different chip is present, change the necessary hwid
-    # string below
+    # if a different chip is present, add the necessary hwid
+    # string in list_of_FTDI
+    #
+    # if more than one EyeBert board is present, this
+    # will return COM for first available board
     def FindEyeBERT(self) :
         port_to_use = None
         ports = serial.tools.list_ports.comports()
+        if self.verbose:
+            print("Searching serial ports for EyeBERT relay board...")
         for port, desc, hwid in sorted(ports) :
-            #print("{}: {} [{}]".format(port,desc,hwid))
-            if hwid == "USB VID:PID=0403:6001 SER=B0026EF9A" :
+            if self.verbose:
+                print(" - {}: {} [{}]".format(port,desc,hwid))
+            if hwid in list_of_FTDI :
                 port_to_use = port
-                break
-            if hwid == "USB VID:PID=0403:6001 SER=B0039DXVA" :
-                port_to_use = port
-                break
-            if hwid == "USB VID:PID=0403:6001 SER=B003NFE1A" :
-                port_to_use = port
-                self.blinkOK = False
                 break
          
         return port_to_use
-
-
+    
     def initialize(self) :
         # try and find instand of board
         port_to_use = self.FindEyeBERT()
         if port_to_use != None :
-            print(Fore.GREEN + "EyeBERT Relay board found on port {}".format(port_to_use))
+            print(Fore.GREEN + "EyeBERT relay board found on port {}".format(port_to_use))
             self.ser.port = port_to_use
             try :
                 self.ser.open()
@@ -88,11 +93,11 @@ class EyeBERTRelayControl:
                 print(Fore.RED + f"\t{e}")
                 retval = False
         else :
-            print(Fore.RED + "\tEyeBERT Relay board not found.")
+            print(Fore.RED + "\tEyeBERT relay board not found.")
             retval = False
 
         return retval
-
+    
     # blink the LEDs as a test
     # blocking function due to time.sleep()
     def Blinky(self,count=3) :
@@ -128,7 +133,7 @@ class EyeBERTRelayControl:
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
         self.ser.write(path)
-
+        
     def LED(self, whichled, ledstate) :
         if self.blinkOK == True :
             # error checking
@@ -144,19 +149,10 @@ class EyeBERTRelayControl:
         self.ser.reset_output_buffer()
         self.ser.write(modestr.upper());
 
-
-
-
-
-
-
-
-
-
 #
 # how to step through entries in connection dictionary
 #
-""" def testV_45_33(obj,type) :
+def testV_45_33(obj,type) :
     keys = list(type.keys())
     print(keys)
     for x in keys :
@@ -170,26 +166,30 @@ class EyeBERTRelayControl:
         time.sleep(5) # actual testing occurs here, time delay is dummy
         obj.LED(2,"OFF")
     obj.LED(2,"OFF")
- """
 
-#
-# test code
-#
-# create instance & continue if relay board found
-#eb = EyeBERTRelayControl()
-#if eb.initialize() == False :
-#    print("Terminating code 1")
-#    sys.exit(1)
+def main():
+    #
+    # test code
+    # 
+    print("Running test code...")
 
-# # blink some LEDs
-#print("Das Blinkin Lights")
-#eb.Blinky(5)
+    # create instance & continue if relay board found
+    eb = EyeBERTRelayControl()
+    if eb.initialize() == False :
+        print("Terminating code 1")
+        sys.exit(1)
 
-# # a sample test could be like this call
-# #print("Testing sample paths")
-# #testV_45_33(eb, typeV_45_33) # this would also need to handle the running of the EyeBERT TCL files
+    # blink some LEDs
+    print("Das Blinkin Lights!")
+    eb.Blinky(5)
 
-#print("Done")
-#cmd = b"MODE DMM +\r\n"
-#eb.MODE(cmd)
-#testV_45_33(eb, typeV_45_33)
+    # a sample test could be like this call
+    print("Testing sample paths...")
+    cmd = b"MODE DMM +\r\n"
+    eb.MODE(cmd)
+    testV_45_33(eb, typeV_45_33)
+
+    print("Done.")
+
+if __name__ == "__main__":
+    main()
