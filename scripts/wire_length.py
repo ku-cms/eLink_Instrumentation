@@ -4,7 +4,8 @@
 #
 # ---------------------- #
 # Wire Length Calculator
-# Author: Caleb Smith
+# Author:   Caleb Smith
+# Date:     October 21, 2024
 # ---------------------- #
 #
 # Computes the total wire length for 1 e-link and n e-links based on user input.
@@ -29,6 +30,9 @@
 # - Ask user for previous wire log value in feet (remaining length of wire in spool)
 # - Print the new wire log value in feet (after subtracting used wire)
 # - Hardcode estimated loss per twisted pair (mm)
+
+# version
+version = 1.1
 
 import script_tools
 from colorama import Fore, Back, Style, init
@@ -140,6 +144,7 @@ def CalcWireLengthBatch(n_elinks, wire_length_elink):
 # run wire length calculator
 def run():
     script_tools.printLine(line_length)
+    print(Fore.GREEN + f"Wire Length Calculator (version {version})" + Fore.RESET)
     print(Fore.GREEN + "Calculating twisted pair wire length." + Fore.RESET)
     script_tools.printLine(line_length)
 
