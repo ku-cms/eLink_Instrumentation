@@ -13,7 +13,7 @@
 # The user must input the following information:
 # - e-link wiring type
 # - e-link length type
-# - loss per twisted pair (mm)
+# - loss per twisted pair (mm); now hardcoded
 # - number of e-links
 # - previous wire log (ft)
 #
@@ -28,6 +28,7 @@
 # - Print results in mm and ft
 # - Ask user for previous wire log value in feet (remaining length of wire in spool)
 # - Print the new wire log value in feet (after subtracting used wire)
+# - Hardcode estimated loss per twisted pair (mm)
 
 import script_tools
 from colorama import Fore, Back, Style, init
@@ -141,11 +142,14 @@ def run():
     script_tools.printLine(line_length)
     print(Fore.GREEN + "Calculating twisted pair wire length." + Fore.RESET)
     script_tools.printLine(line_length)
+
+    # Hardcode estimated loss per twisted pair (mm)
+    loss = 128
     
     # User input
     wiring_type     = input(Fore.GREEN + "Enter e-link wiring type: " + Fore.RESET)
     length_type     = input(Fore.GREEN + "Enter e-link length type: " + Fore.RESET)
-    loss            = float(input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET))
+    #loss            = float(input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET))
     n_elinks        = int(input(Fore.GREEN + "Enter number of e-links: " + Fore.RESET))
     prev_wire_log   = float(input(Fore.GREEN + "Enter previous wire log entry (ft): " + Fore.RESET))
 
