@@ -1,4 +1,4 @@
-# EyeBertAutomationRev2.py
+# EyeBertAutomationRevB.py
 #
 # Developed by the KU CMS group.
 #
@@ -41,7 +41,7 @@
 # version
 version = 2.3
 
-from template_analysis_windows_Rev2 import EyeBERTFile, Reference
+from template_analysis_windows_RevB import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
 
 init(convert=True)
@@ -71,9 +71,9 @@ def GetDCCalibrationFile(cable_type):
     if cable_type in ["1", "5K", "5K2"]:
         return "4_point_DC_Calibration_v1.json"
     elif cable_type in ["3p2", "2p2"]:
-        return "4_point_DC_CalibrationRev2_Type3p2_v2.json"
+        return "4_point_DC_CalibrationRevB_Type3p2_v2.json"
     elif cable_type in ["2p3", "1p3"]:
-        return "4_point_DC_CalibrationRev2_Type2p3_v2.json"
+        return "4_point_DC_CalibrationRevB_Type2p3_v2.json"
     else:
         print(Fore.RED + f"ERROR: There is no calibration file available for cable type {cable_type}." + Fore.GREEN)
         return ""
@@ -348,7 +348,7 @@ def main():
 
         # Note: Make sure to use a new calibration file name; the calibration file you specify will be overwritten!
         calibration_data = {}
-        calibration_file = input(Fore.RED + f"Please enter a new calibration json file, including e-link type (4_point_DC_CalibrationRev2_Type3p2_v1.json): " + Fore.GREEN)
+        calibration_file = input(Fore.RED + f"Please enter a new calibration json file, including e-link type (4_point_DC_CalibrationRevB_Type3p2_v1.json): " + Fore.GREEN)
         print(f"Calibration data will be saved to {calibration_file}. This file will be overwritten.")
         
         # Confirm that user wants to continue
@@ -531,7 +531,7 @@ def main():
         path = "R:/BEAN_GRP/EyeBertAutomation/"
                 
         # Use different spreasheets for each cable type
-        file_name = f"DCResistanceAutomationRev2_Type_{cable_type}.xlsx"
+        file_name = f"DCResistanceAutomationRevB_Type_{cable_type}.xlsx"
 
         full_file_path = path + file_name
 
@@ -735,7 +735,7 @@ def main():
             
             # EyeBERT Template Analysis
 
-            reference_template_file = "reference_template_Rev2_v3.csv"
+            reference_template_file = "reference_template_RevB_v3.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
             # Create EyeBERTFile object to read data from file
@@ -841,7 +841,7 @@ def main():
         path = "R:/BEAN_GRP/EyeBertAutomation/"
 
         # Use different spreasheets for each cable type
-        file_name = f"EyeBERTautomationRev2_Type_{cable_type}.xlsx"
+        file_name = f"EyeBERTautomationRevB_Type_{cable_type}.xlsx"
         
         full_file_path = path + file_name
 
