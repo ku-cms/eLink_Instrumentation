@@ -24,7 +24,6 @@
 # - New wire log entry.
 #
 # TODO:
-# - Customize the "fix color" init() command based on the operating system.
 #
 # DONE:
 # - Process input wiring type to support these formats: 3.2, 3p2, and 3P2.
@@ -36,30 +35,38 @@
 # - Print the new wire log value in feet (after subtracting used wire)
 # - Hardcode estimated loss per twisted pair (mm)
 # - Create WireLengthCalculator class in a different file
-
-# version
-version = 2.0
+# - Customize the "fix color" init() command based on the operating system.
 
 from WireLengthCalculator import WireLengthCalculator
 import script_tools
 from colorama import Fore, Back, Style, init
+import sys
 
-# Fixes colors for Windows Command Prompt:
-init(convert=True)
-
-# specify length of line for printing
-line_length = 50
+# Check operating system (platform)
+if sys.platform == "win32":
+    # For Windows Command Prompt, fix colors using convert=True:
+    init(convert=True)
+else:
+    # For other OS/platforms, use convert=False:
+    init(convert=False)
 
 # run wire length calculator
 def run():
+    # version
+    version = 2.0
+
+    # specify length of line for printing
+    line_length = 50
+
+    # hardcode estimated loss per twisted pair (mm)
+    loss = 128
+
     script_tools.printLine(line_length)
     print(Fore.GREEN + f"Wire Length Calculator (version {version})" + Fore.RESET)
+    print(Fore.GREEN + f"Operating System (platform): {sys.platform}" + Fore.RESET)
     print(Fore.GREEN + "Calculating twisted pair wire length." + Fore.RESET)
     script_tools.printLine(line_length)
 
-    # Hardcode estimated loss per twisted pair (mm)
-    loss = 128
-    
     # User input
     wiring_type     = input(Fore.GREEN + "Enter e-link wiring type: " + Fore.RESET)
     length_type     = input(Fore.GREEN + "Enter e-link length type: " + Fore.RESET)
