@@ -3,7 +3,6 @@
 # Developed by the KU CMS group.
 #
 # -------------------------- #
-# Get Elink Results
 # Author:   Caleb Smith
 # Date:     January 10, 2025
 # -------------------------- #

@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+#
+# collectResults.sh
+#
+# Developed by the KU CMS group.
+#
+# -------------------------- #
+# Author:   Caleb Smith
+# Date:     January 10, 2025
+# -------------------------- #
 
 VPN_URL=kuanywhere.ku.edu
 SERVER_PATH=smb://resfs.home.ku.edu/GROUPS/PHSX/General/BEAN_GRP
@@ -16,6 +25,8 @@ then
     exit 1
 fi
 
+echo "Collecting e-link results."
+
 # Backup results.
 echo "Backing up results..."
 echo " - source (R drive): ${RESULTS_DIR}"
@@ -24,9 +35,20 @@ mkdir -p $BACKUP_DIR
 #rsync -az $RESULTS_DIR $BACKUP_DIR
 
 # Copy results.
+echo "Copying results..."
 python3.10 getElinkResults.py -s $RESULTS_DIR -t $TARGET_DIR
 
 # Create tarball.
+echo "Creating tarball..."
+
+# Find newest directory:
+NEWEST_DIR=$(ls -t ${TARGET_DIR} | tail -n 1)
+
+echo "Newest directory: ${NEWEST_DIR}"
+
+tar -czf ${TARGET_DIR}/${NEWEST_DIR}.tar.gz ${TARGET_DIR}/${NEWEST_DIR}
+
+echo "Created ${TARGET_DIR}/${NEWEST_DIR}.tar.gz"
 
 echo "Done!"
 
