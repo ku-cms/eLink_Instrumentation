@@ -4,7 +4,7 @@ VPN_URL=kuanywhere.ku.edu
 SERVER_PATH=smb://resfs.home.ku.edu/GROUPS/PHSX/General/BEAN_GRP
 RESULTS_DIR=/Volumes/BEAN_GRP/EyeBERTAutomation/automation_results
 BACKUP_DIR=~/CMS/Tracker/e-links/EyeBERTAutomation
-#TARGET_DIR=
+TARGET_DIR=~/CMS/Tracker/e-links/EyeBERTAutomation/results_for_database
 
 # Confirm access to the results stored on the R drive.
 if [ ! -d "$RESULTS_DIR" ];
@@ -21,7 +21,12 @@ echo "Backing up results..."
 echo " - source (R drive): ${RESULTS_DIR}"
 echo " - destination (local): ${BACKUP_DIR}"
 mkdir -p $BACKUP_DIR
-rsync -az $RESULTS_DIR $BACKUP_DIR
+#rsync -az $RESULTS_DIR $BACKUP_DIR
+
+# Copy results.
+python3.10 getElinkResults.py -s $RESULTS_DIR -t $TARGET_DIR
+
+# Create tarball.
 
 echo "Done!"
 
