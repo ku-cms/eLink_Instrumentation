@@ -16,31 +16,41 @@ import shutil
 import glob
 
 # TODO:
+# - Only copy files from the largest run number.
 # - Add date to output directory.
-# - Print number of files copied for each e-link
-# - Print total number of e-links that had results copied.
 
 # DONE:
+# - Print total number of e-links that had results copied.
+# - Print number of files copied for each e-link.
 
 def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
     output_dir = "{0}/results_elinks_{1}_to_{2}".format(target_dir, min_elink_num, max_elink_num)
     script_tools.makeDir(output_dir)
     
+    print("Input directory:  {0}".format(source_dir))
+    print("Output directory: {0}".format(output_dir))
     print("Copying results for e-links {0} to {1}.".format(min_elink_num, max_elink_num))
-    print(" - input directory:  {0}".format(source_dir))
-    print(" - output directory: {0}".format(output_dir))
 
+    num_elinks_copied = 0
     for number in range(min_elink_num, max_elink_num + 1):
         elink_input_dir  = "{0}/{1}".format(source_dir, number)
         elink_output_dir = "{0}/{1}".format(output_dir, number)
         
         if os.path.isdir(elink_input_dir):
-            print(" - e-link {0}".format(number))
             script_tools.makeDir(elink_output_dir)
+            
             pattern = "{0}/*.png".format(elink_input_dir)
-            for file in glob.glob(pattern):
+            file_list = glob.glob(pattern)
+            num_files = len(file_list)
+            
+            for file in file_list:
                 #print(file)
                 shutil.copy(file, elink_output_dir)
+            
+            print(" - e-link {0}: copied {1} files".format(number, num_files))
+            num_elinks_copied += 1
+    
+    print("Copied results for {0} e-links.".format(num_elinks_copied))
 
 def main():
     # Arguments
