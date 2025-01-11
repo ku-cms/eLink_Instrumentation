@@ -42,7 +42,13 @@ python3.10 getElinkResults.py -s $RESULTS_DIR -t $TARGET_DIR
 echo "Creating tarball..."
 
 # Find newest directory:
-NEWEST_DIR=$(ls -td ${TARGET_DIR}/* | head -1)
+# See https://stackoverflow.com/questions/9275964/get-the-newest-directory-to-a-variable-in-bash
+NEWEST_DIR=$(ls -td ${TARGET_DIR}/*/ | head -1)
+
+# Remove "/" from the end:
+# See https://unix.stackexchange.com/questions/144298/delete-the-last-character-of-a-string-using-string-manipulation-in-shell-script
+NEWEST_DIR=${NEWEST_DIR::-1}
+
 echo "Found this newest directory to use for tarball:" 
 echo "${NEWEST_DIR}"
 
