@@ -42,13 +42,12 @@ python3.10 getElinkResults.py -s $RESULTS_DIR -t $TARGET_DIR
 echo "Creating tarball..."
 
 # Find newest directory:
-NEWEST_DIR=$(ls -t ${TARGET_DIR} | tail -n 1)
+NEWEST_DIR=$(ls -td ${TARGET_DIR}/* | head -1)
+echo "Found this newest directory to use for tarball:" 
+echo "${NEWEST_DIR}"
 
-echo "Newest directory: ${NEWEST_DIR}"
-
-tar -czf ${TARGET_DIR}/${NEWEST_DIR}.tar.gz ${TARGET_DIR}/${NEWEST_DIR}
-
-echo "Created ${TARGET_DIR}/${NEWEST_DIR}.tar.gz"
+tar -czf ${NEWEST_DIR}.tar.gz ${NEWEST_DIR}
+echo "Created ${NEWEST_DIR}.tar.gz"
 
 echo "Done!"
 
