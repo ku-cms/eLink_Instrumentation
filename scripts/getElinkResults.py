@@ -26,8 +26,8 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
     output_dir = "{0}/results_elinks_{1}_to_{2}".format(target_dir, min_elink_num, max_elink_num)
     script_tools.makeDir(output_dir)
     
-    print("Input directory:  {0}".format(source_dir))
-    print("Output directory: {0}".format(output_dir))
+    print(" - Input directory:  {0}".format(source_dir))
+    print(" - Output directory: {0}".format(output_dir))
     print("Copying results for e-links {0} to {1}.".format(min_elink_num, max_elink_num))
 
     num_elinks_copied = 0
@@ -71,8 +71,8 @@ def main():
 
     # Additional user input
     print("Please enter a range of e-link numbers (min and max) to include:")
-    min_elink_num = int(input("Enter minimum e-link number: "))
-    max_elink_num = int(input("Enter maximum e-link number: "))
+    min_elink_num = int(input(" - Enter minimum e-link number: "))
+    max_elink_num = int(input(" - Enter maximum e-link number: "))
 
     if min_elink_num > max_elink_num:
         print("ERROR: Invalid range of e-link numbers: [{0}, {1}]".format(min_elink_num, max_elink_num))
