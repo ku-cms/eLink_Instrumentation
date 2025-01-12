@@ -9,34 +9,14 @@
 # Date:     January 10, 2025
 # -------------------------- #
 
-VPN_URL=kuanywhere.ku.edu
-SERVER_PATH=smb://resfs.home.ku.edu/GROUPS/PHSX/General/BEAN_GRP
-RESULTS_DIR=/Volumes/BEAN_GRP/EyeBERTAutomation/automation_results
-BACKUP_DIR=~/CMS/Tracker/e-links/EyeBERTAutomation
+SOURCE_DIR=~/CMS/Tracker/e-links/EyeBERTAutomation/automation_results
 TARGET_DIR=~/CMS/Tracker/e-links/EyeBERTAutomation/results_for_database
-
-# Confirm access to the results stored on the R drive.
-if [ ! -d "$RESULTS_DIR" ];
-then
-    echo "ERROR: Cannot access the results directory on the R drive: ${RESULTS_DIR}"
-    echo "Please connect to the R drive using this path: ${SERVER_PATH}"
-    echo "You need to be connected to the JAYHAWK network, either from campus or using a VPN client."
-    echo "You can get a KU VPN using Cisco Secure Client with this URL: ${VPN_URL}"
-    exit 1
-fi
 
 echo "Collecting e-link results."
 
-# Backup results.
-echo "Backing up results..."
-echo " - source (R drive): ${RESULTS_DIR}"
-echo " - destination (local): ${BACKUP_DIR}"
-mkdir -p $BACKUP_DIR
-#rsync -az $RESULTS_DIR $BACKUP_DIR
-
 # Copy results.
 echo "Copying results..."
-python3.10 getElinkResults.py -s $RESULTS_DIR -t $TARGET_DIR
+python3.10 getElinkResults.py -s $SOURCE_DIR -t $TARGET_DIR
 
 # Create tarball.
 echo "Creating tarball..."
@@ -55,5 +35,5 @@ echo "${NEWEST_DIR}"
 tar -czf ${NEWEST_DIR}.tar.gz ${NEWEST_DIR}
 echo "Created ${NEWEST_DIR}.tar.gz"
 
-echo "Done!"
+echo "Finished collecting e-link results."
 
