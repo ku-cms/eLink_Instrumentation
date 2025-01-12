@@ -15,41 +15,13 @@ import shutil
 import glob
 
 # TODO:
-# - Only copy files from the largest run number.
 # - Add date to output directory.
+# - Print e-link branches that were copied.
 
 # DONE:
 # - Print total number of e-links that had results copied.
 # - Print number of files copied for each e-link.
-
-def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
-    output_dir = "{0}/results_elinks_{1}_to_{2}".format(target_dir, min_elink_num, max_elink_num)
-    script_tools.makeDir(output_dir)
-    
-    print(" - Input directory:  {0}".format(source_dir))
-    print(" - Output directory: {0}".format(output_dir))
-    print("Copying results for e-links {0} to {1}.".format(min_elink_num, max_elink_num))
-
-    num_elinks_copied = 0
-    for number in range(min_elink_num, max_elink_num + 1):
-        elink_input_dir  = "{0}/{1}".format(source_dir, number)
-        elink_output_dir = "{0}/{1}".format(output_dir, number)
-        
-        if os.path.isdir(elink_input_dir):
-            script_tools.makeDir(elink_output_dir)
-            
-            pattern = "{0}/*.png".format(elink_input_dir)
-            file_list = glob.glob(pattern)
-            num_files = len(file_list)
-            
-            for file in file_list:
-                #print(file)
-                shutil.copy(file, elink_output_dir)
-            
-            print(" - e-link {0}: copied {1} files".format(number, num_files))
-            num_elinks_copied += 1
-    
-    print("Copied results for {0} e-links.".format(num_elinks_copied))
+# - Only copy files from the largest run number.
 
 def main():
     # Arguments
@@ -81,6 +53,66 @@ def main():
         sys.exit(1) 
     
     copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num)
+
+def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
+    output_dir = "{0}/results_elinks_{1}_to_{2}".format(target_dir, min_elink_num, max_elink_num)
+    script_tools.makeDir(output_dir)
+    
+    print(" - Input directory:  {0}".format(source_dir))
+    print(" - Output directory: {0}".format(output_dir))
+    print("Copying results for e-links {0} to {1}.".format(min_elink_num, max_elink_num))
+
+    elink_branches = ["A", "B", "C"]
+
+    num_elinks_copied = 0
+    for number in range(min_elink_num, max_elink_num + 1):
+        elink_input_dir  = "{0}/{1}".format(source_dir, number)
+        elink_output_dir = "{0}/{1}".format(output_dir, number)
+        
+        if os.path.isdir(elink_input_dir):
+            script_tools.makeDir(elink_output_dir)
+            num_files_per_elink = 0
+
+            for branch in elink_branches:
+                latest_run = findLatestRunForBranch(elink_input_dir, number, branch)
+                
+                pattern = ""
+                if latest_run <= 0:
+                    continue
+                elif latest_run == 1:
+                    pattern = "{0}/{1}_{2}_*.png".format(elink_input_dir, number, branch)
+                else:
+                    pattern = "{0}/{1}_{2}_*_{3}.png".format(elink_input_dir, number, branch, latest_run)
+                
+                file_list = glob.glob(pattern)
+                num_files_per_branch = len(file_list)
+                num_files_per_elink += num_files_per_branch
+                
+                for file in file_list:
+                    #print(file)
+                    shutil.copy(file, elink_output_dir)
+            
+            print(" - e-link {0}: copied {1} files".format(number, num_files_per_elink))
+            num_elinks_copied += 1
+    
+    print("Copied results for {0} e-links.".format(num_elinks_copied))
+
+def findLatestRunForBranch(directory, elink_number, elink_branch):
+    result = -1
+    elink_channel = "cmd"
+    
+    file_path = "{0}/{1}_{2}_{3}.png".format(directory, elink_number, elink_branch, elink_channel)
+    if os.path.isfile(file_path):
+        result = 1
+    
+    run = 2
+    file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
+    while os.path.isfile(file_path):
+        result = run
+        run += 1
+        file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
+
+    return result
 
 if __name__ == "__main__":
     main()
