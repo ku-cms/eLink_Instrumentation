@@ -32,5 +32,5 @@ echo " - destination (local): ${BACKUP_DIR}"
 mkdir -p $BACKUP_DIR
 rsync -az $RESULTS_DIR $BACKUP_DIR
 
-echo "Finished backing up results."
+echo "Finished backing up results!"
 
