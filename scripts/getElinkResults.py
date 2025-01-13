@@ -74,16 +74,12 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
             num_files_per_elink = 0
             branches_copied = []
             for branch in elink_branches:
-                latest_run = findLatestRunForBranch(elink_input_dir, number, branch)
-                
-                pattern = ""
-                if latest_run <= 0:
+                latest_run = findLatestRunForBranch(elink_input_dir, number, branch)                
+                pattern = getPattern(elink_input_dir, number, branch, latest_run)
+
+                if not pattern:
                     continue
-                elif latest_run == 1:
-                    pattern = "{0}/{1}_{2}_*.png".format(elink_input_dir, number, branch)
-                else:
-                    pattern = "{0}/{1}_{2}_*_{3}.png".format(elink_input_dir, number, branch, latest_run)
-                
+
                 file_list = glob.glob(pattern)
                 num_files_per_branch = len(file_list)
                 num_files_per_elink += num_files_per_branch
@@ -114,6 +110,17 @@ def findLatestRunForBranch(directory, elink_number, elink_branch):
         file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
 
     return result
+
+def getPattern(directory, elink_number, elink_branch, latest_run):
+    if latest_run <= 0:
+        pattern = ""
+        return pattern
+    elif latest_run == 1:
+        pattern = "{0}/{1}_{2}_*.png".format(directory, elink_number, elink_branch)
+        return pattern
+    else:
+        pattern = "{0}/{1}_{2}_*_{3}.png".format(directory, elink_number, elink_branch, latest_run)
+        return pattern
 
 if __name__ == "__main__":
     main()
