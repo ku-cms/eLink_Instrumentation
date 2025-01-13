@@ -16,12 +16,12 @@ import glob
 
 # TODO:
 # - Add date to output directory.
-# - Print e-link branches that were copied.
 
 # DONE:
 # - Print total number of e-links that had results copied.
 # - Print number of files copied for each e-link.
 # - Only copy files from the largest run number.
+# - Print e-link branches that were copied.
 
 def main():
     # Arguments
@@ -63,7 +63,6 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
     print("Copying results for e-links {0} to {1}.".format(min_elink_num, max_elink_num))
 
     elink_branches = ["A", "B", "C"]
-
     num_elinks_copied = 0
     for number in range(min_elink_num, max_elink_num + 1):
         elink_input_dir  = "{0}/{1}".format(source_dir, number)
@@ -71,8 +70,9 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
         
         if os.path.isdir(elink_input_dir):
             script_tools.makeDir(elink_output_dir)
+            
             num_files_per_elink = 0
-
+            branches_copied = []
             for branch in elink_branches:
                 latest_run = findLatestRunForBranch(elink_input_dir, number, branch)
                 
@@ -87,12 +87,13 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
                 file_list = glob.glob(pattern)
                 num_files_per_branch = len(file_list)
                 num_files_per_elink += num_files_per_branch
-                
+                branches_copied.append(branch)
+
                 for file in file_list:
                     #print(file)
                     shutil.copy(file, elink_output_dir)
             
-            print(" - e-link {0}: copied {1} files".format(number, num_files_per_elink))
+            print(" - e-link {0}: copied {1} files for branches {2}".format(number, num_files_per_elink, branches_copied))
             num_elinks_copied += 1
     
     print("Copied results for {0} e-links.".format(num_elinks_copied))
