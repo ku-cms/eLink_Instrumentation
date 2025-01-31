@@ -16,6 +16,7 @@ import glob
 
 # TODO:
 # - Add date to output directory.
+# - Add ability to skip e-links (for e-links that already have plots in the database).
 
 # DONE:
 # - Print total number of e-links that had results copied.
@@ -55,7 +56,7 @@ def main():
     copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num)
 
 def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
-    output_dir = "{0}/results_elinks_{1}_to_{2}".format(target_dir, min_elink_num, max_elink_num)
+    output_dir = "{0}/EyeBERT_plots_elinks_{1}_to_{2}".format(target_dir, min_elink_num, max_elink_num)
     script_tools.makeDir(output_dir)
     
     print(" - Input directory:  {0}".format(source_dir))
