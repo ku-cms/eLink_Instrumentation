@@ -16,7 +16,6 @@ import glob
 from datetime import datetime
 
 # TODO:
-# - Add ability to skip e-links (for e-links that already have plots in the database).
 
 # DONE:
 # - Print total number of e-links that had results copied.
@@ -24,6 +23,7 @@ from datetime import datetime
 # - Only copy files from the largest run number.
 # - Print e-link branches that were copied.
 # - Add date to output directory.
+# - Add ability to skip e-links (for e-links that already have plots in the database).
 
 def main():
     # Arguments
@@ -65,9 +65,19 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
     print(" - Output directory: {0}".format(output_dir))
     print("Copying results for e-links {0} to {1}.".format(min_elink_num, max_elink_num))
 
+    # list of e-links to skip (already have plots in the database)
+    elinks_to_skip = [904, 958, 988]
+    print("elinks_to_skip: {0}".format(elinks_to_skip))
+    
     elink_branches = ["A", "B", "C"]
     num_elinks_copied = 0
+    
     for number in range(min_elink_num, max_elink_num + 1):
+        
+        if number in elinks_to_skip:
+            print(" - Skipping e-link {0}".format(number))
+            continue
+        
         elink_input_dir  = "{0}/{1}".format(source_dir, number)
         elink_output_dir = "{0}/{1}".format(output_dir, number)
         
