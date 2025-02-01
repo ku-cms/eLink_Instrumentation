@@ -13,9 +13,9 @@ import sys
 import os
 import shutil
 import glob
+from datetime import datetime
 
 # TODO:
-# - Add date to output directory.
 # - Add ability to skip e-links (for e-links that already have plots in the database).
 
 # DONE:
@@ -23,6 +23,7 @@ import glob
 # - Print number of files copied for each e-link.
 # - Only copy files from the largest run number.
 # - Print e-link branches that were copied.
+# - Add date to output directory.
 
 def main():
     # Arguments
@@ -56,7 +57,8 @@ def main():
     copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num)
 
 def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
-    output_dir = "{0}/EyeBERT_plots_elinks_{1}_to_{2}".format(target_dir, min_elink_num, max_elink_num)
+    today = datetime.today().strftime("%Y_%m_%d")    
+    output_dir = "{0}/EyeBERT_plots_elinks_{1}_to_{2}_date_{3}".format(target_dir, min_elink_num, max_elink_num, today)
     script_tools.makeDir(output_dir)
     
     print(" - Input directory:  {0}".format(source_dir))
