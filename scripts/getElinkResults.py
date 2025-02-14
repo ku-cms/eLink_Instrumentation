@@ -24,6 +24,7 @@ from datetime import datetime
 # - Print e-link branches that were copied.
 # - Add date to output directory.
 # - Add ability to skip e-links (for e-links that already have plots in the database).
+# - Fix bug: Files are not copied for all channels if command and data have a different number of runs.
 
 def main():
     # Arguments
@@ -70,6 +71,7 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
     print("elinks_to_skip: {0}".format(elinks_to_skip))
     
     elink_branches = ["A", "B", "C"]
+    elink_channels = ["cmd", "d0", "d1", "d2", "d3"]
     num_elinks_copied = 0
     
     for number in range(min_elink_num, max_elink_num + 1):
@@ -87,53 +89,37 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
             num_files_per_elink = 0
             branches_copied = []
             for branch in elink_branches:
-                latest_run = findLatestRunForBranch(elink_input_dir, number, branch)                
-                pattern = getPattern(elink_input_dir, number, branch, latest_run)
-
-                if not pattern:
-                    continue
-
-                file_list = glob.glob(pattern)
-                num_files_per_branch = len(file_list)
-                num_files_per_elink += num_files_per_branch
-                branches_copied.append(branch)
-
-                for file in file_list:
-                    #print(file)
-                    shutil.copy(file, elink_output_dir)
+                for channel in elink_channels: 
+                    latest_file = findLatestFileForChannel(elink_input_dir, number, branch, channel)
+                    
+                    if latest_file:
+                        #print("Copying {0}".format(latest_file))
+                        shutil.copy(latest_file, elink_output_dir)
+                        
+                        num_files_per_elink += 1
+                        if branch not in branches_copied:
+                            branches_copied.append(branch)
             
             print(" - e-link {0}: copied {1} files for branches {2}".format(number, num_files_per_elink, branches_copied))
             num_elinks_copied += 1
     
     print("Copied results for {0} e-links.".format(num_elinks_copied))
 
-def findLatestRunForBranch(directory, elink_number, elink_branch):
-    result = -1
-    elink_channel = "cmd"
-    
+def findLatestFileForChannel(directory, elink_number, elink_branch, elink_channel):
+    result = "" 
+
     file_path = "{0}/{1}_{2}_{3}.png".format(directory, elink_number, elink_branch, elink_channel)
     if os.path.isfile(file_path):
-        result = 1
-    
+        result = file_path
+
     run = 2
     file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
     while os.path.isfile(file_path):
-        result = run
+        result = file_path
         run += 1
         file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
 
     return result
-
-def getPattern(directory, elink_number, elink_branch, latest_run):
-    if latest_run <= 0:
-        pattern = ""
-        return pattern
-    elif latest_run == 1:
-        pattern = "{0}/{1}_{2}_*.png".format(directory, elink_number, elink_branch)
-        return pattern
-    else:
-        pattern = "{0}/{1}_{2}_*_{3}.png".format(directory, elink_number, elink_branch, latest_run)
-        return pattern
 
 if __name__ == "__main__":
     main()
