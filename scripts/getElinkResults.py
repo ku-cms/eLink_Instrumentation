@@ -16,7 +16,6 @@ import glob
 from datetime import datetime
 
 # TODO:
-# - Fix bug: Files are not copied for all channels if command and data have a different number of runs.
 
 # DONE:
 # - Print total number of e-links that had results copied.
@@ -25,6 +24,7 @@ from datetime import datetime
 # - Print e-link branches that were copied.
 # - Add date to output directory.
 # - Add ability to skip e-links (for e-links that already have plots in the database).
+# - Fix bug: Files are not copied for all channels if command and data have a different number of runs.
 
 def main():
     # Arguments
@@ -89,26 +89,11 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
             num_files_per_elink = 0
             branches_copied = []
             for branch in elink_branches:
-                # latest_run = findLatestRunForBranch(elink_input_dir, number, branch)                
-                # pattern = getPattern(elink_input_dir, number, branch, latest_run)
-
-                # if not pattern:
-                #     continue
-
-                # file_list = glob.glob(pattern)
-                # num_files_per_branch = len(file_list)
-                # num_files_per_elink += num_files_per_branch
-                # branches_copied.append(branch)
-
-                # for file in file_list:
-                #     #print(file)
-                #     shutil.copy(file, elink_output_dir)
-
                 for channel in elink_channels: 
                     latest_file = findLatestFileForChannel(elink_input_dir, number, branch, channel)
                     
                     if latest_file:
-                        print("Copying {0}".format(latest_file))
+                        #print("Copying {0}".format(latest_file))
                         shutil.copy(latest_file, elink_output_dir)
                         
                         num_files_per_elink += 1
@@ -135,34 +120,6 @@ def findLatestFileForChannel(directory, elink_number, elink_branch, elink_channe
         file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
 
     return result
-
-def findLatestRunForBranch(directory, elink_number, elink_branch):
-    result = -1
-    elink_channel = "cmd"
-    
-    file_path = "{0}/{1}_{2}_{3}.png".format(directory, elink_number, elink_branch, elink_channel)
-    if os.path.isfile(file_path):
-        result = 1
-    
-    run = 2
-    file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
-    while os.path.isfile(file_path):
-        result = run
-        run += 1
-        file_path = "{0}/{1}_{2}_{3}_{4}.png".format(directory, elink_number, elink_branch, elink_channel, run)
-
-    return result
-
-def getPattern(directory, elink_number, elink_branch, latest_run):
-    if latest_run <= 0:
-        pattern = ""
-        return pattern
-    elif latest_run == 1:
-        pattern = "{0}/{1}_{2}_*.png".format(directory, elink_number, elink_branch)
-        return pattern
-    else:
-        pattern = "{0}/{1}_{2}_*_{3}.png".format(directory, elink_number, elink_branch, latest_run)
-        return pattern
 
 if __name__ == "__main__":
     main()
