@@ -594,7 +594,8 @@ def main():
             # create custom "source eye_and_save.tcl" with the cable name & path included
             eye_and_save = "C:/Users/Public/Documents/cable_tests/eye_and_save.tcl"
             with open (eye_and_save, 'w') as f :
-                f.write("source create_scan_0_RevA.tcl\r\n")
+                #f.write("source create_scan_0_RevA.tcl\r\n")
+                f.write("source create_scan_0_RevA_KC705_v2.tcl\r\n")
                 f.write(f"set_property DESCRIPTION {test_name} [get_hw_sio_scans SCAN_0]\r\n")
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
@@ -786,6 +787,9 @@ def main():
             
             # save results for this channel
             eye_bert_results.update(results_for_channel)
+
+            # Reset all relays
+            eb.resetAll()
 
         #end keys loop
 
