@@ -149,6 +149,11 @@ class EyeBERTRelayControl:
         self.ser.reset_output_buffer()
         self.ser.write(modestr.upper());
 
+    def resetAll(self):
+        message = b"rst\r\n"
+        self.ser.write(message.upper())
+        time.sleep(0.1)
+
 #
 # how to step through entries in connection dictionary
 #

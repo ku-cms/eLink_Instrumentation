@@ -39,7 +39,7 @@
 # - Code Repository: https://github.com/ku-cms/eLink_Instrumentation 
 
 # version
-version = 1.17
+version = 1.18
 
 from template_analysis_windows_RevA import EyeBERTFile, Reference
 from colorama import Fore, Back, Style, init
@@ -594,12 +594,14 @@ def main():
             # create custom "source eye_and_save.tcl" with the cable name & path included
             eye_and_save = "C:/Users/Public/Documents/cable_tests/eye_and_save.tcl"
             with open (eye_and_save, 'w') as f :
-                f.write("source create_scan_0_RevA.tcl\r\n")
+                #f.write("source create_scan_0_RevA.tcl\r\n")
+                f.write("source create_scan_0_RevA_KC705_v2.tcl\r\n")
                 f.write(f"set_property DESCRIPTION {test_name} [get_hw_sio_scans SCAN_0]\r\n")
                 f.write("run_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write("wait_on_hw_sio_scan [lindex [get_hw_sio_scans {SCAN_0}] 0]\r\n")
                 f.write('write_hw_sio_scan -force "C:/Users/Public/Documents/automation_results/temp.csv" [get_hw_sio_scans {SCAN_0}]\r\n')
 
+            pygui.hotkey('ctrl','shift','t', interval=0.01)
             # send tcl "source eye_and_save.tcl"
             result = pygui.locateCenterOnScreen('tcl_console.png', grayscale=True)
             if result == None :
@@ -688,7 +690,8 @@ def main():
             
             # EyeBERT Template Analysis
 
-            reference_template_file = "reference_template_RevA_v3.csv"
+            # Created new reference template (v4) for KC705 from Rice using e-link 539, CMD on April 21, 2025.
+            reference_template_file = "reference_template_RevA_v4.csv"
             print(f"Using this reference template data file: {reference_template_file}")
             
             # Create EyeBERTFile object to read data from file
@@ -709,7 +712,7 @@ def main():
 
                 template = analysis.createTemplate()
 
-                ref = Reference("540", branch, "CMD", reference_template_file, refPath)
+                ref = Reference("539", branch, "CMD", reference_template_file, refPath)
                 refTemp = ref.createTemplate()
                 
                 # EDIT: reference needs to be a template object
@@ -786,6 +789,10 @@ def main():
             
             # save results for this channel
             eye_bert_results.update(results_for_channel)
+
+            # Reset all relays
+            print(Fore.GREEN + "Resetting all relays...")
+            eb.resetAll()
 
         #end keys loop
 
