@@ -4,8 +4,8 @@ remove_hw_sio_scan [get_hw_sio_scans {SCAN_0}]
 
 # Setting for manual 
 # set TXDIFFSWING to "741 mV (0111)"
-#set_property TXDIFFSWING {741 mV (0111)} [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203A3CE0EA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203A3CFC8A/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
-#commit_hw_sio -non_blocking [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203A3CFC8A/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203A3CFC8A/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
+#set_property TXDIFFSWING {741 mV (0111)} [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203A3CE0EA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203A3CE0EA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
+#commit_hw_sio -non_blocking [get_hw_sio_links {localhost:3121/xilinx_tcf/Digilent/210203A3CE0EA/0_1_0/IBERT/Quad_117/MGT_X0Y8/TX->localhost:3121/xilinx_tcf/Digilent/210203A3CE0EA/0_1_0/IBERT/Quad_117/MGT_X0Y8/RX}]
 
 # Setting for Rev A relay board
 # set TXDIFFSWING to "1018 mV (1100)"
