@@ -117,6 +117,15 @@ def main():
         "d3"    : {"tx" : "3", "rx" : "3"}
     }
 
+    # TFPX H1x2 e-links
+    mapping_typeH1x2 = {
+        "name"  : "TFPX H1x2",
+        "cmd"   : {"tx" : "7", "rx" : "7"},
+        "d0"    : {"tx" : "0", "rx" : "0"},
+        "d1"    : {"tx" : "1", "rx" : "1"},
+        "d2"    : {"tx" : "2", "rx" : "2"}
+    }
+
     # TFPX Type 3.2 e-links
     mapping_type3p2 = {
         "name"  : "TFPX Type 3p2",
@@ -158,6 +167,7 @@ def main():
         "1"     : mapping_type1,
         "5K"    : mapping_type5,
         "5K2"   : mapping_type5,
+        "H1x2"  : mapping_typeH1x2,
         "3p2"   : mapping_type3p2,
         "2p2"   : mapping_type2p2,
         "2p3"   : mapping_type2p3,
@@ -169,6 +179,7 @@ def main():
         "1"     : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K"    : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
         "5K2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n", "d3_p", "d3_n"],
+        "H1x2"  : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
         "3p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
         "2p2"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d2_p", "d2_n"],
         "2p3"   : ["cmd_p", "cmd_n", "d0_p", "d0_n", "d1_p", "d1_n", "d2_p", "d2_n"],
@@ -177,10 +188,11 @@ def main():
 
     # cable branches based on cable type
     cable_branches = {
-        "3p2" : ["A", "B", "C"],
-        "2p2" : ["A", "C"],
-        "2p3" : ["A", "B"],
-        "1p3" : ["A"]
+        "H1x2" : ["P1", "P2"],
+        "3p2"  : ["A", "B", "C"],
+        "2p2"  : ["A", "C"],
+        "2p3"  : ["A", "B"],
+        "1p3"  : ["A"]
     }
 
     # supported cable types
