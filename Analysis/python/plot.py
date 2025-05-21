@@ -20,3 +20,16 @@ def plot(x, y, y_errs, output_file, title, x_label, y_label, x_lim, y_lim):
     # close all windows to avoid combining plots
     plt.close('all')
 
+def makeCumulativePlot(x, y, output_name, title, x_label, y_label, x_lim, y_lim):
+    plt.plot(x, y)
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    #plt.xlim(x_lim)
+    #plt.ylim(y_lim)
+
+    plt.show()
+
+    # close all windows to avoid combining plots
+    plt.close('all')
+
