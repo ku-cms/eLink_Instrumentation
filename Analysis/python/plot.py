@@ -20,7 +20,7 @@ def plot(x, y, y_errs, output_file, title, x_label, y_label, x_lim, y_lim):
     # close all windows to avoid combining plots
     plt.close('all')
 
-def makeCumulativePlot(x, y, output_name, title, x_label, y_label, x_lim, y_lim):
+def makeCumulativePlot(x, y, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim):
     plt.plot(x, y)
     plt.title(title)
     plt.xlabel(x_label)
@@ -28,8 +28,15 @@ def makeCumulativePlot(x, y, output_name, title, x_label, y_label, x_lim, y_lim)
     #plt.xlim(x_lim)
     #plt.ylim(y_lim)
 
-    plt.show()
+    #plt.show()
+    savePlot(plot_dir, plot_name)
 
     # close all windows to avoid combining plots
     plt.close('all')
 
+# save plot to png and pdf
+def savePlot(plot_dir, plot_name):
+    output_png = "{0}/{1}.png".format(plot_dir, plot_name)
+    output_pdf = "{0}/{1}.pdf".format(plot_dir, plot_name)
+    plt.savefig(output_png, bbox_inches='tight')
+    plt.savefig(output_pdf, bbox_inches='tight')

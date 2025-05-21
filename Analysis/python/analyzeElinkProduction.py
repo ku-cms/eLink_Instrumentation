@@ -6,9 +6,9 @@ import numpy as np
 import pandas as pd
 
 def createSampleData():
-    dates = pd.date_range(start="2025-01-01", periods=10, freq='D')
-    daily_production = np.random.randint(5, 20, size=len(dates))
-    return (dates, daily_production)
+    dates = pd.date_range(start="2025-01-01", periods=10, freq='W')
+    weekly_production = np.random.randint(0, 20, size=len(dates))
+    return (dates, weekly_production)
 
 def analyzeElinkProduction(input_file, plot_dir):
     print("Analyzing e-link production...")
@@ -17,16 +17,16 @@ def analyzeElinkProduction(input_file, plot_dir):
     
     tools.makeDir(plot_dir)
 
-    dates, daily_production = createSampleData()
-    cumulative_production = np.cumsum(daily_production)
+    dates, weekly_production = createSampleData()
+    cumulative_production = np.cumsum(weekly_production)
 
-    output_name = ""
-    title = ""
-    x_label = ""
-    y_label = ""
+    plot_name = "cumulative_plot_example"
+    title = "Cumulative Plot Example"
+    x_label = "Time"
+    y_label = "Number of units"
     x_lim = []
     y_lim = []
-    plot.makeCumulativePlot(dates, cumulative_production, output_name, title, x_label, y_label, x_lim, y_lim)
+    plot.makeCumulativePlot(dates, cumulative_production, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
     
     print("Done!")
 
