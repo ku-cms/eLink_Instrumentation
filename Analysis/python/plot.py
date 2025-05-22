@@ -25,19 +25,19 @@ def makeCumulativePlot(x, y, plot_dir, plot_name, title, x_label, y_label, x_lim
     fig, ax = plt.subplots(figsize=(10, 6))
     plt.plot(x, y, marker='o', linestyle='-', color='green', alpha=0.5)
     
-    # Format x-axis to show ticks every 7 days
-    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.SUNDAY, interval=1))
+    # Format x-axis to show ticks based on time interval
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.SUNDAY, interval=4))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     
-    plt.title(title)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
+    plt.title(title,    fontsize=20)
+    plt.xlabel(x_label, fontsize=16)
+    plt.ylabel(y_label, fontsize=16)
     if x_lim:
         plt.xlim(x_lim)
     if y_lim:
         plt.ylim(y_lim)
     plt.grid(True)
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=45, fontsize=10)
     plt.tight_layout()
 
     savePlot(plot_dir, plot_name)

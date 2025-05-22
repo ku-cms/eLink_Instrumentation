@@ -78,12 +78,6 @@ def analyzeElinkProductionData(input_file, plot_dir):
     print(f" - plot directory: {plot_dir}")
     
     tools.makeDir(plot_dir)
-    # dates, production = loadElinkProductionData(input_file)
-    # cumulative_production = np.cumsum(production)
-    # print("e-link production data:")
-    # print(f" - dates: {dates}")
-    # print(f" - production: {production}")
-    # print(f" - cumulative_production: {cumulative_production}")
 
     daily_counts = loadElinkProductionData(input_file)
     cumulative_counts = daily_counts.cumsum()
@@ -99,11 +93,10 @@ def analyzeElinkProductionData(input_file, plot_dir):
 
     plot_name = "elink_production"
     title = "Cumulative e-link production"
-    x_label = "Time (week)"
+    x_label = "Time"
     y_label = "Number of e-links"
     x_lim = []
     y_lim = []
-    #plot.makeCumulativePlot(dates, cumulative_production, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
     plot.makeCumulativePlot(cumulative_counts.index, cumulative_counts.values, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
     
     print("Done!")
