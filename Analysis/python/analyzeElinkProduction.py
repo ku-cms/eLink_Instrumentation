@@ -100,13 +100,54 @@ def analyzeElinkProductionData(input_file, plot_dir):
     # print(" - cumulative_counts.values:")
     # print(cumulative_counts.values)
 
+    plot_name = f"elink_production_{column_name.lower()}"
+    title = f"Cumulative e-link production: {column_name}"
+    x_label = "Time"
+    y_label = "Number of e-links"
+    x_lim = []
+    y_lim = []
+    plot.makeCumulativePlot(cumulative_counts.index, cumulative_counts.values, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
+    
+    print("Done!")
+
+def loadElinkProductionDataMultiStage(input_file, stages):
+    df = pd.read_csv(input_file, encoding="latin1")
+
+    # FIXME: Select e-link number >= 700
+
+    # Convert date strings to datetime objects
+    for stage in stages:
+        df[stage] = pd.to_datetime(df[stage], format='%m-%d-%y', errors='coerce')
+    
+    # Compute cumulative counts
+    cumulative_data = {}
+    for stage in stages:
+        stage_dates = df[stage].dropna()
+        counts = stage_dates.value_counts().sort_index()
+        full_range = pd.date_range(start=stage_dates.min(), end=stage_dates.max())
+        counts = counts.reindex(full_range, fill_value=0)
+        cumulative_data[stage] = counts.cumsum()
+    
+    return cumulative_data
+
+
+def analyzeElinkProductionDataMultiStage(input_file, plot_dir):
+    print("Analyzing e-link production data, multi stage...")
+    print(f" - input file: {input_file}")
+    print(f" - plot directory: {plot_dir}")
+
+    tools.makeDir(plot_dir)
+    
+    stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
+    cumulative_data = loadElinkProductionDataMultiStage(input_file, stages)
+
     plot_name = "elink_production"
     title = "Cumulative e-link production"
     x_label = "Time"
     y_label = "Number of e-links"
     x_lim = []
     y_lim = []
-    plot.makeCumulativePlot(cumulative_counts.index, cumulative_counts.values, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
+    plot.makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
     
     print("Done!")
 
@@ -117,6 +158,7 @@ def main():
     input_file  = "data/Harness_Serial_Number_2025_05_21.csv"
     plot_dir    = "elink_production_plots"
     analyzeElinkProductionData(input_file, plot_dir)
+    analyzeElinkProductionDataMultiStage(input_file, plot_dir)
 
 if __name__ == "__main__":
     main()
