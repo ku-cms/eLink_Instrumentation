@@ -10,6 +10,12 @@ def createSampleData():
     production = np.random.randint(0, 20, size=len(dates))
     return (dates, production)
 
+def loadElinkProductionData(input_file):
+    data = tools.getData(input_file)
+    dates = [row[1] for row in data]
+    production = []
+    return (dates, production)
+
 def analyzeSampleData(plot_dir):
     print("Analyzing sample data...")
     print(f" - plot directory: {plot_dir}")
@@ -34,7 +40,7 @@ def analyzeElinkProductionData(input_file, plot_dir):
     print(f" - plot directory: {plot_dir}")
     
     tools.makeDir(plot_dir)
-    dates, production = createSampleData()
+    dates, production = loadElinkProductionData(input_file)
     cumulative_production = np.cumsum(production)
 
     plot_name = "elink_production"

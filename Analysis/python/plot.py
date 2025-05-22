@@ -32,8 +32,10 @@ def makeCumulativePlot(x, y, plot_dir, plot_name, title, x_label, y_label, x_lim
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    #plt.xlim(x_lim)
-    #plt.ylim(y_lim)
+    if x_lim:
+        plt.xlim(x_lim)
+    if y_lim:
+        plt.ylim(y_lim)
     plt.grid(True)
     plt.xticks(rotation=45)
     plt.tight_layout()
