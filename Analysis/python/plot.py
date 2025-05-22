@@ -53,7 +53,7 @@ def makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_
         ax.plot(cumulative_series.index, cumulative_series.values, label=stage)
 
     # Format x-axis to show ticks based on time interval
-    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.SUNDAY, interval=8))
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.SUNDAY, interval=4))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 
     plt.title(title,    fontsize=20)

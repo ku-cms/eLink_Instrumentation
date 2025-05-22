@@ -4,12 +4,10 @@ import plot
 import tools
 import numpy as np
 import pandas as pd
+import datetime
 
 # ---------------------------------------------
 # TODO:
-# - Select production e-links: e-link number >= 700
-# - Plot multiple lines from data on one plot
-# - Add legend
 # ---------------------------------------------
 # DONE:
 # - Load e-link production data
@@ -21,6 +19,9 @@ import pandas as pd
 # - Convert frequency of date to unit count per date
 # - Plot one line from data
 # - Use data = list(reader) to load csv
+# - Select production e-links: e-link number >= 700
+# - Plot multiple lines from data on one plot
+# - Add legend
 # ---------------------------------------------
 
 def createSampleData():
@@ -100,20 +101,21 @@ def analyzeElinkProductionData(input_file, plot_dir):
     # print(" - cumulative_counts.values:")
     # print(cumulative_counts.values)
 
-    plot_name = f"elink_production_{column_name.lower()}"
-    title = f"Cumulative e-link production: {column_name}"
-    x_label = "Time"
-    y_label = "Number of e-links"
-    x_lim = []
-    y_lim = []
+    plot_name   = f"elink_production_{column_name.lower()}"
+    title       = f"Cumulative e-link production: {column_name}"
+    x_label     = "Time"
+    y_label     = "Number of e-links"
+    x_lim       = []
+    y_lim       = []
     plot.makeCumulativePlot(cumulative_counts.index, cumulative_counts.values, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
     
     print("Done!")
 
-def loadElinkProductionDataMultiStage(input_file, stages):
+def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
     df = pd.read_csv(input_file, encoding="latin1")
 
-    # FIXME: Select e-link number >= 700
+    df["Harness #"] = pd.to_numeric(df["Harness #"], errors="coerce")
+    df = df[df["Harness #"] >= min_elink_number]
 
     # Convert date strings to datetime objects
     for stage in stages:
@@ -137,16 +139,19 @@ def analyzeElinkProductionDataMultiStage(input_file, plot_dir):
     print(f" - plot directory: {plot_dir}")
 
     tools.makeDir(plot_dir)
-    
+    min_elink_number = 700
     stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
-    cumulative_data = loadElinkProductionDataMultiStage(input_file, stages)
+    cumulative_data = loadElinkProductionDataMultiStage(input_file, min_elink_number, stages)
 
-    plot_name = "elink_production"
-    title = "Cumulative e-link production"
-    x_label = "Time"
-    y_label = "Number of e-links"
-    x_lim = []
-    y_lim = []
+    start_date = datetime.datetime(2024, 4, 1)
+    end_date   = datetime.datetime(2025, 5, 31)
+
+    plot_name   = "elink_production"
+    title       = "Cumulative e-link production"
+    x_label     = "Time"
+    y_label     = "Number of e-links"
+    x_lim       = [start_date, end_date]
+    y_lim       = []
     plot.makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
     
     print("Done!")
