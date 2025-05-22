@@ -5,10 +5,10 @@ import tools
 import numpy as np
 
 # -------------------------------------
-# TODO: 
+# TODO:
 # - plot DC resistance vs. Eye BERT area
 # - plot impedance vs. DC resistance 
-#
+# -------------------------------------
 # DONE:
 # - plot DC resistance vs. length
 # - plot impedance area vs. length

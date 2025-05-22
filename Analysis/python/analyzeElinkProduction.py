@@ -5,6 +5,24 @@ import tools
 import numpy as np
 import pandas as pd
 
+# ---------------------------------------------
+# TODO:
+# - Convert frequency of date to date with unit count
+# - Select production e-links: e-link number >= 700
+# - Use data = list(reader) to load csv
+# - Plot one line from data
+# - Plot multiple lines from data on one plot
+# - Add legend
+# ---------------------------------------------
+# DONE:
+# - Load e-link production data
+# - Fix CSV encoding error
+# - Check if input file exists
+# - Separate headers from data
+# - Remove empty date entries
+# - Convert dates to datetime objects
+# ---------------------------------------------
+
 def createSampleData():
     dates = pd.date_range(start="2025-01-01", periods=5, freq='W')
     production = np.random.randint(0, 20, size=len(dates))
@@ -12,8 +30,19 @@ def createSampleData():
 
 def loadElinkProductionData(input_file):
     data = tools.getData(input_file)
-    dates = [row[1] for row in data]
-    production = []
+    
+    headers = data[0]
+    rows = data[1:]
+    print(f"headers: {headers}")
+    
+    # Remove empty date entries
+    dates = [row[1] for row in rows if row[1]]
+    dates = pd.to_datetime(dates, format='%m-%d-%y')
+    # FIXME: For every date, we are setting the number produced to 1 for testing.
+    n = len(dates)
+    production = [1] * n
+    print(f"n: {n}")
+    
     return (dates, production)
 
 def analyzeSampleData(plot_dir):
@@ -23,6 +52,10 @@ def analyzeSampleData(plot_dir):
     tools.makeDir(plot_dir)
     dates, production = createSampleData()
     cumulative_production = np.cumsum(production)
+    print("Sample data:")
+    print(f" - dates: {dates}")
+    print(f" - production: {production}")
+    print(f" - cumulative_production: {cumulative_production}")
 
     plot_name = "cumulative_plot_example"
     title = "Cumulative plot example: units produced over time"
@@ -42,6 +75,10 @@ def analyzeElinkProductionData(input_file, plot_dir):
     tools.makeDir(plot_dir)
     dates, production = loadElinkProductionData(input_file)
     cumulative_production = np.cumsum(production)
+    print("e-link production data:")
+    print(f" - dates: {dates}")
+    print(f" - production: {production}")
+    print(f" - cumulative_production: {cumulative_production}")
 
     plot_name = "elink_production"
     title = "Cumulative e-link production"
