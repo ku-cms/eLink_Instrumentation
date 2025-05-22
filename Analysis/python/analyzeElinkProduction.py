@@ -8,7 +8,6 @@ import pandas as pd
 # ---------------------------------------------
 # TODO:
 # - Select production e-links: e-link number >= 700
-# - Use data = list(reader) to load csv
 # - Plot multiple lines from data on one plot
 # - Add legend
 # ---------------------------------------------
@@ -21,6 +20,7 @@ import pandas as pd
 # - Convert dates to datetime objects
 # - Convert frequency of date to unit count per date
 # - Plot one line from data
+# - Use data = list(reader) to load csv
 # ---------------------------------------------
 
 def createSampleData():
@@ -62,8 +62,9 @@ def loadElinkProductionData(input_file, column_name):
     
     # Get column index based on column name
     column_index = headers.index(column_name)
-    print(f"headers: {headers}")
-    print(f"column_index: {column_index}")
+    print(f" - headers: {headers}")
+    print(f" - column_name: {column_name}")
+    print(f" - column_index: {column_index}")
     
     # Collect dates for a specific column and remove empty entries
     dates = [row[column_index] for row in rows if row[column_index]]
@@ -74,8 +75,8 @@ def loadElinkProductionData(input_file, column_name):
     # Sort by date
     daily_counts = daily_counts.sort_index()
     
-    print("daily_counts:")
-    print(daily_counts)
+    # print("daily_counts:")
+    # print(daily_counts)
         
     return daily_counts
 
@@ -94,10 +95,10 @@ def analyzeElinkProductionData(input_file, plot_dir):
     print(daily_counts)
     print(" - cumulative_counts:")
     print(cumulative_counts)
-    print(" - cumulative_counts.index:")
-    print(cumulative_counts.index)
-    print(" - cumulative_counts.values:")
-    print(cumulative_counts.values)
+    # print(" - cumulative_counts.index:")
+    # print(cumulative_counts.index)
+    # print(" - cumulative_counts.values:")
+    # print(cumulative_counts.values)
 
     plot_name = "elink_production"
     title = "Cumulative e-link production"

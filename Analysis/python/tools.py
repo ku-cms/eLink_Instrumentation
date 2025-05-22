@@ -81,8 +81,7 @@ def getData(input_file):
     
     with open(input_file, newline='', encoding='latin1') as f:
         reader = csv.reader(f)
-        for row in reader:
-            data.append(row)
+        data = list(reader)
     
     return data
 
