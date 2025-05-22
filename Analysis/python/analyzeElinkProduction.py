@@ -28,28 +28,6 @@ def createSampleData():
     production = np.random.randint(0, 20, size=len(dates))
     return (dates, production)
 
-def loadElinkProductionData(input_file):
-    data = tools.getData(input_file)
-    
-    # Separate headers from data
-    headers = data[0]
-    rows = data[1:]
-    print(f"headers: {headers}")
-    
-    # Remove empty date entries
-    dates = [row[1] for row in rows if row[1]]
-    # Convert to datetime objects
-    dates = pd.to_datetime(dates, format='%m-%d-%y')
-    # Count occurrences of each date
-    daily_counts = pd.Series(dates).value_counts()
-    # Sort by date
-    daily_counts = daily_counts.sort_index()
-    
-    print("daily_counts:")
-    print(daily_counts)
-        
-    return daily_counts
-
 def analyzeSampleData(plot_dir):
     print("Analyzing sample data...")
     print(f" - plot directory: {plot_dir}")
@@ -72,14 +50,44 @@ def analyzeSampleData(plot_dir):
     
     print("Done!")
 
+def loadElinkProductionData(input_file, column_name):
+    data = tools.getData(input_file)
+    
+    # Separate headers from data
+    headers = data[0]
+    rows = data[1:]
+    
+    if column_name not in headers:
+        print(f"ERROR: The column_name '{column_name}' is not in headers!")
+    
+    # Get column index based on column name
+    column_index = headers.index(column_name)
+    print(f"headers: {headers}")
+    print(f"column_index: {column_index}")
+    
+    # Collect dates for a specific column and remove empty entries
+    dates = [row[column_index] for row in rows if row[column_index]]
+    # Convert to datetime objects
+    dates = pd.to_datetime(dates, format='%m-%d-%y')
+    # Count occurrences of each date
+    daily_counts = pd.Series(dates).value_counts()
+    # Sort by date
+    daily_counts = daily_counts.sort_index()
+    
+    print("daily_counts:")
+    print(daily_counts)
+        
+    return daily_counts
+
 def analyzeElinkProductionData(input_file, plot_dir):
     print("Analyzing e-link production data...")
     print(f" - input file: {input_file}")
     print(f" - plot directory: {plot_dir}")
     
     tools.makeDir(plot_dir)
-
-    daily_counts = loadElinkProductionData(input_file)
+    
+    column_name = "Shipped"
+    daily_counts = loadElinkProductionData(input_file, column_name)
     cumulative_counts = daily_counts.cumsum()
     print("e-link production data:")
     print(" - daily_counts:")
