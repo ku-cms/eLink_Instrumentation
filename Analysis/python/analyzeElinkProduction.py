@@ -2,9 +2,10 @@
 
 import plot
 import tools
+import os
+import datetime
 import numpy as np
 import pandas as pd
-import datetime
 
 # ---------------------------------------------
 # TODO:
@@ -112,6 +113,12 @@ def analyzeElinkProductionData(input_file, plot_dir):
     print("Done!")
 
 def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
+    cumulative_data = {}
+    
+    if not os.path.exists(input_file):
+        print(f"ERROR in getData(): The input file '{input_file}' does not exist.")
+        return cumulative_data
+
     df = pd.read_csv(input_file, encoding="latin1")
 
     df["Harness #"] = pd.to_numeric(df["Harness #"], errors="coerce")
@@ -122,7 +129,6 @@ def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
         df[stage] = pd.to_datetime(df[stage], format='%m-%d-%y', errors='coerce')
     
     # Compute cumulative counts
-    cumulative_data = {}
     for stage in stages:
         stage_dates = df[stage].dropna()
         counts = stage_dates.value_counts().sort_index()
@@ -160,7 +166,14 @@ def main():
     plot_dir    = "sample_data_plots"
     analyzeSampleData(plot_dir)
     
-    input_file  = "data/Harness_Serial_Number_2025_05_21.csv"
+    # Harness_Serial_Number_2025_05_21.csv:
+    # - Problem with Epoxy column: date not entered for some completed e-links >= 700
+    #input_file  = "data/Harness_Serial_Number_2025_05_21.csv"
+    
+    # Harness_Serial_Number_2025_05_22_v1.csv:
+    # - Fixed Epoxy column: entered dates for completed e-links >= 700
+    input_file  = "data/Harness_Serial_Number_2025_05_22_v1.csv"
+    
     plot_dir    = "elink_production_plots"
     analyzeElinkProductionData(input_file, plot_dir)
     analyzeElinkProductionDataMultiStage(input_file, plot_dir)
