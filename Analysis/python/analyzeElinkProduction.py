@@ -57,7 +57,7 @@ def main():
     plot_dir    = "sample_data_plots"
     analyzeSampleData(plot_dir)
     
-    input_file  = ""
+    input_file  = "data/Harness_Serial_Number_2025_05_21.csv"
     plot_dir    = "elink_production_plots"
     analyzeElinkProductionData(input_file, plot_dir)
 

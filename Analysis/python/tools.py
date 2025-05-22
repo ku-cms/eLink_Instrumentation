@@ -79,7 +79,7 @@ def getData(input_file):
         print(f"ERROR in getData(): The input file '{input_file}' does not exist.")
         return data
     
-    with open(input_file, "r") as f:
+    with open(input_file, newline='', encoding='latin1') as f:
         reader = csv.reader(f)
         for row in reader:
             data.append(row)
