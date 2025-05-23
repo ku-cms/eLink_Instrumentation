@@ -37,10 +37,10 @@ def analyzeSampleData(plot_dir):
     tools.makeDir(plot_dir)
     dates, production = createSampleData()
     cumulative_production = np.cumsum(production)
-    print("Sample data:")
-    print(f" - dates: {dates}")
-    print(f" - production: {production}")
-    print(f" - cumulative_production: {cumulative_production}")
+    # print("Sample data:")
+    # print(f" - dates: {dates}")
+    # print(f" - production: {production}")
+    # print(f" - cumulative_production: {cumulative_production}")
 
     plot_name = "cumulative_plot_example"
     title = "Cumulative plot example: units produced over time"
@@ -64,9 +64,9 @@ def loadElinkProductionData(input_file, column_name):
     
     # Get column index based on column name
     column_index = headers.index(column_name)
-    print(f" - headers: {headers}")
-    print(f" - column_name: {column_name}")
-    print(f" - column_index: {column_index}")
+    # print(f" - headers: {headers}")
+    # print(f" - column_name: {column_name}")
+    # print(f" - column_index: {column_index}")
     
     # Collect dates for a specific column and remove empty entries
     dates = [row[column_index] for row in rows if row[column_index]]
@@ -92,15 +92,11 @@ def analyzeElinkProductionData(input_file, plot_dir):
     column_name = "Shipped"
     daily_counts = loadElinkProductionData(input_file, column_name)
     cumulative_counts = daily_counts.cumsum()
-    print("e-link production data:")
-    print(" - daily_counts:")
-    print(daily_counts)
-    print(" - cumulative_counts:")
-    print(cumulative_counts)
-    # print(" - cumulative_counts.index:")
-    # print(cumulative_counts.index)
-    # print(" - cumulative_counts.values:")
-    # print(cumulative_counts.values)
+    # print("e-link production data:")
+    # print(" - daily_counts:")
+    # print(daily_counts)
+    # print(" - cumulative_counts:")
+    # print(cumulative_counts)
 
     plot_name   = f"elink_production_{column_name.lower()}"
     title       = f"Cumulative e-link production: {column_name}"
@@ -149,6 +145,16 @@ def analyzeElinkProductionDataMultiStage(input_file, plot_dir):
     stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
     cumulative_data = loadElinkProductionDataMultiStage(input_file, min_elink_number, stages)
 
+    # Use Tableau colors
+    colors = {
+        "Cut"           : "tab:red",
+        "Stripped"      : "tab:orange",
+        "Soldered"      : "tab:blue",
+        "Epoxy"         : "tab:purple",
+        "Turned over"   : "tab:green",
+        "Shipped"       : "tab:cyan"
+    }
+
     start_date = datetime.datetime(2024, 4, 1)
     end_date   = datetime.datetime(2025, 5, 31)
 
@@ -158,7 +164,7 @@ def analyzeElinkProductionDataMultiStage(input_file, plot_dir):
     y_label     = "Number of e-links"
     x_lim       = [start_date, end_date]
     y_lim       = []
-    plot.makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim)
+    plot.makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim, colors)
     
     print("Done!")
 

@@ -45,12 +45,10 @@ def makeCumulativePlot(x, y, plot_dir, plot_name, title, x_label, y_label, x_lim
     # close all windows to avoid combining plots
     plt.close('all')
 
-def makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim):
-    # FIXME: adjust figsize
+def makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim, colors):
     fig, ax = plt.subplots(figsize=(12, 6))
     for stage, cumulative_series in cumulative_data.items():
-        # FIXME: Use different colors for each line
-        ax.plot(cumulative_series.index, cumulative_series.values, label=stage)
+        ax.plot(cumulative_series.index, cumulative_series.values, label=stage, linestyle='-', color=colors[stage])
 
     # Format x-axis to show ticks based on time interval
     ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.SUNDAY, interval=4))
