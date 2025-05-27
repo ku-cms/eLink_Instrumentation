@@ -74,13 +74,18 @@ def printData(input_file):
 # takes a csv file as input and outputs data in a matrix
 def getData(input_file):
     data = []
-    with open(input_file, "r") as f:
+    
+    if not os.path.exists(input_file):
+        print(f"ERROR in getData(): The input file '{input_file}' does not exist.")
+        return data
+    
+    with open(input_file, newline='', encoding='latin1') as f:
         reader = csv.reader(f)
-        for row in reader:
-            data.append(row)
+        data = list(reader)
+    
     return data
 
-# input: data (matrix), x and y column indicies; output: lists of x and y values
+# input: data (matrix), x and y column indices; output: lists of x and y values
 def getXYData(data, x_column_index, y_column_index, verbose):
     x_vals  = []
     y_vals  = []
