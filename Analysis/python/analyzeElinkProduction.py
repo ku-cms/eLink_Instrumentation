@@ -18,7 +18,7 @@ import pandas as pd
 
 # ---------------------------------------------
 # TODO:
-# - Add arguments: start date, end date, and input file
+# - Write functions to get date objects and create plot name
 # ---------------------------------------------
 # DONE:
 # - Load e-link production data
@@ -33,6 +33,7 @@ import pandas as pd
 # - Select production e-links: e-link number >= 700
 # - Plot multiple lines from data on one plot
 # - Add legend
+# - Add arguments: start date, end date, and input file
 # ---------------------------------------------
 
 def createSampleData():
@@ -145,21 +146,20 @@ def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
     return cumulative_data
 
 def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir):
-    print("Analyzing e-link production data, multi stage...")
-    print(f" - start date: {start_date}")
-    print(f" - end date: {end_date}")
-    print(f" - input file: {input_file}")
-    print(f" - plot directory: {plot_dir}")
+    tools.makeDir(plot_dir)
+    min_elink_number = 700
+    stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
+    cumulative_data = loadElinkProductionDataMultiStage(input_file, min_elink_number, stages)
     
     # Convert dates from string to datetime objects
     date_format = "%Y-%m-%d"
     start_date_object   = datetime.datetime.strptime(start_date, date_format)
     end_date_object     = datetime.datetime.strptime(end_date, date_format)
-
-    tools.makeDir(plot_dir)
-    min_elink_number = 700
-    stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
-    cumulative_data = loadElinkProductionDataMultiStage(input_file, min_elink_number, stages)
+    
+    # Create plot name
+    start_date_for_name = start_date.replace("-", "_")
+    end_date_for_name   = end_date.replace("-", "_")
+    plot_name           = "elink_production_{0}_to_{1}".format(start_date_for_name, end_date_for_name)
 
     # Use Tableau colors
     colors = {
@@ -171,7 +171,13 @@ def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_
         "Shipped"       : "tab:cyan"
     }
 
-    plot_name   = "elink_production"
+    print("Analyzing e-link production data, multi stage...")
+    print(f" - start date: {start_date}")
+    print(f" - end date: {end_date}")
+    print(f" - input file: {input_file}")
+    print(f" - plot directory: {plot_dir}")
+    print(f" - plot name: {plot_name}")
+
     title       = "Cumulative e-link production"
     x_label     = "Time"
     y_label     = "Number of e-links"
