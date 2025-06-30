@@ -151,9 +151,6 @@ def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_
     print(f" - input file: {input_file}")
     print(f" - plot directory: {plot_dir}")
     
-    #start_date_object   = datetime.datetime(2024, 4, 1)
-    #end_date_object     = datetime.datetime(2025, 6, 30)
-
     # Convert dates from string to datetime objects
     date_format = "%Y-%m-%d"
     start_date_object   = datetime.datetime.strptime(start_date, date_format)
@@ -187,8 +184,8 @@ def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_
 def main():
     # Arguments
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--start_date", "-a", default="", help="Start date")
-    parser.add_argument("--end_date",   "-b", default="", help="End date")
+    parser.add_argument("--start_date", "-a", default="", help="Start date (YYYY-MM-DD)")
+    parser.add_argument("--end_date",   "-b", default="", help="End date (YYYY-MM-DD)")
     parser.add_argument("--input_file", "-c", default="", help="Input file (csv)")
 
     options     = parser.parse_args()
@@ -197,31 +194,18 @@ def main():
     input_file  = options.input_file
 
     if not start_date:
-        print("Please provide a start date using the -a option.")
+        print("Please provide a start date (YYYY-MM-DD) using the -a option.")
         sys.exit(1)
 
     if not end_date:
-        print("Please provide an end date using the -b option.")
+        print("Please provide an end date (YYYY-MM-DD) using the -b option.")
         sys.exit(1)
     
     if not input_file:
         print("Please provide an input file (csv) using the -c option.")
         sys.exit(1)
-
-    #plot_dir    = "sample_data_plots"
-    #analyzeSampleData(plot_dir)
     
-    # Harness_Serial_Number_2025_05_21.csv:
-    # - Problem with Epoxy column: date not entered for some completed e-links >= 700
-    #input_file  = "data/Harness_Serial_Number_2025_05_21.csv"
-    
-    # Harness_Serial_Number_2025_05_22_v1.csv:
-    # - Fixed Epoxy column: entered dates for completed e-links >= 700
-    #input_file  = "data/Harness_Serial_Number_2025_05_22_v1.csv"
-    
-    #input_file  = "data/Harness_Serial_Number_2025_06_30.csv"
     plot_dir    = "elink_production_plots"
-    #analyzeElinkProductionData(input_file, plot_dir)
     analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir)
 
 if __name__ == "__main__":
