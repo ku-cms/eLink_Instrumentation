@@ -156,7 +156,7 @@ def analyzeElinkProductionDataMultiStage(input_file, plot_dir):
     }
 
     start_date = datetime.datetime(2024, 4, 1)
-    end_date   = datetime.datetime(2025, 5, 31)
+    end_date   = datetime.datetime(2025, 6, 30)
 
     plot_name   = "elink_production"
     title       = "Cumulative e-link production"
@@ -178,7 +178,9 @@ def main():
     
     # Harness_Serial_Number_2025_05_22_v1.csv:
     # - Fixed Epoxy column: entered dates for completed e-links >= 700
-    input_file  = "data/Harness_Serial_Number_2025_05_22_v1.csv"
+    #input_file  = "data/Harness_Serial_Number_2025_05_22_v1.csv"
+    
+    input_file  = "data/Harness_Serial_Number_2025_06_30.csv"
     
     plot_dir    = "elink_production_plots"
     analyzeElinkProductionData(input_file, plot_dir)
@@ -186,3 +188,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
