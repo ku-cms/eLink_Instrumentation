@@ -1,14 +1,24 @@
 # analyzeElinkProduction.py
+#
+# Developed by the KU CMS group.
+#
+# -------------------------- #
+# Author:   Caleb Smith
+# Date:     May 21, 2025
+# -------------------------- #
 
 import plot
 import tools
 import os
+import sys
+import argparse
 import datetime
 import numpy as np
 import pandas as pd
 
 # ---------------------------------------------
 # TODO:
+# - Add arguments: start date, end date, and input file
 # ---------------------------------------------
 # DONE:
 # - Load e-link production data
@@ -134,11 +144,20 @@ def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
     
     return cumulative_data
 
-
-def analyzeElinkProductionDataMultiStage(input_file, plot_dir):
+def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir):
     print("Analyzing e-link production data, multi stage...")
+    print(f" - start date: {start_date}")
+    print(f" - end date: {end_date}")
     print(f" - input file: {input_file}")
     print(f" - plot directory: {plot_dir}")
+    
+    #start_date_object   = datetime.datetime(2024, 4, 1)
+    #end_date_object     = datetime.datetime(2025, 6, 30)
+
+    # Convert dates from string to datetime objects
+    date_format = "%Y-%m-%d"
+    start_date_object   = datetime.datetime.strptime(start_date, date_format)
+    end_date_object     = datetime.datetime.strptime(end_date, date_format)
 
     tools.makeDir(plot_dir)
     min_elink_number = 700
@@ -155,22 +174,42 @@ def analyzeElinkProductionDataMultiStage(input_file, plot_dir):
         "Shipped"       : "tab:cyan"
     }
 
-    start_date = datetime.datetime(2024, 4, 1)
-    end_date   = datetime.datetime(2025, 6, 30)
-
     plot_name   = "elink_production"
     title       = "Cumulative e-link production"
     x_label     = "Time"
     y_label     = "Number of e-links"
-    x_lim       = [start_date, end_date]
+    x_lim       = [start_date_object, end_date_object]
     y_lim       = []
     plot.makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim, colors)
     
     print("Done!")
 
 def main():
-    plot_dir    = "sample_data_plots"
-    analyzeSampleData(plot_dir)
+    # Arguments
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--start_date", "-a", default="", help="Start date")
+    parser.add_argument("--end_date",   "-b", default="", help="End date")
+    parser.add_argument("--input_file", "-c", default="", help="Input file (csv)")
+
+    options     = parser.parse_args()
+    start_date  = options.start_date
+    end_date    = options.end_date
+    input_file  = options.input_file
+
+    if not start_date:
+        print("Please provide a start date using the -a option.")
+        sys.exit(1)
+
+    if not end_date:
+        print("Please provide an end date using the -b option.")
+        sys.exit(1)
+    
+    if not input_file:
+        print("Please provide an input file (csv) using the -c option.")
+        sys.exit(1)
+
+    #plot_dir    = "sample_data_plots"
+    #analyzeSampleData(plot_dir)
     
     # Harness_Serial_Number_2025_05_21.csv:
     # - Problem with Epoxy column: date not entered for some completed e-links >= 700
@@ -180,11 +219,10 @@ def main():
     # - Fixed Epoxy column: entered dates for completed e-links >= 700
     #input_file  = "data/Harness_Serial_Number_2025_05_22_v1.csv"
     
-    input_file  = "data/Harness_Serial_Number_2025_06_30.csv"
-    
+    #input_file  = "data/Harness_Serial_Number_2025_06_30.csv"
     plot_dir    = "elink_production_plots"
-    analyzeElinkProductionData(input_file, plot_dir)
-    analyzeElinkProductionDataMultiStage(input_file, plot_dir)
+    #analyzeElinkProductionData(input_file, plot_dir)
+    analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir)
 
 if __name__ == "__main__":
     main()
