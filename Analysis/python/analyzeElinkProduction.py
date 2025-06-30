@@ -18,7 +18,6 @@ import pandas as pd
 
 # ---------------------------------------------
 # TODO:
-# - Write functions to get date objects and create plot name
 # ---------------------------------------------
 # DONE:
 # - Load e-link production data
@@ -34,6 +33,7 @@ import pandas as pd
 # - Plot multiple lines from data on one plot
 # - Add legend
 # - Add arguments: start date, end date, and input file
+# - Write functions to get date objects and create plot name
 # ---------------------------------------------
 
 def createSampleData():
@@ -145,21 +145,29 @@ def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
     
     return cumulative_data
 
-def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir):
-    tools.makeDir(plot_dir)
-    min_elink_number = 700
-    stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
-    cumulative_data = loadElinkProductionDataMultiStage(input_file, min_elink_number, stages)
-    
-    # Convert dates from string to datetime objects
+def getDateObjects(start_date, end_date):
     date_format = "%Y-%m-%d"
     start_date_object   = datetime.datetime.strptime(start_date, date_format)
     end_date_object     = datetime.datetime.strptime(end_date, date_format)
-    
-    # Create plot name
+    return (start_date_object, end_date_object)
+
+def createPlotName(start_date, end_date):
     start_date_for_name = start_date.replace("-", "_")
     end_date_for_name   = end_date.replace("-", "_")
     plot_name           = "elink_production_{0}_to_{1}".format(start_date_for_name, end_date_for_name)
+    return plot_name
+
+def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir):
+    min_elink_number = 700
+    stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
+    
+    tools.makeDir(plot_dir)
+    
+    cumulative_data = loadElinkProductionDataMultiStage(input_file, min_elink_number, stages)
+    
+    start_date_object, end_date_object = getDateObjects(start_date, end_date)
+    
+    plot_name = createPlotName(start_date, end_date)
 
     # Use Tableau colors
     colors = {
