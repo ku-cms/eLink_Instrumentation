@@ -67,7 +67,10 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
     print("Copying results for e-links {0} to {1}.".format(min_elink_num, max_elink_num))
 
     # list of e-links to skip (already have plots in the database or have a specific issue)
-    elinks_to_skip = [901, 904, 909, 910, 911, 958, 988]
+    elinks_to_skip = [
+        706, 708, 720, 730, 731, 732, 742, 743, 744, 749, 762, 765, 766, 767, 768,
+        901, 904, 909, 910, 911, 958, 988
+    ]
     print("elinks_to_skip: {0}".format(elinks_to_skip))
     
     elink_branches = ["A", "B", "C"]
