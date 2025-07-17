@@ -70,7 +70,7 @@ def copyElinkResults(source_dir, target_dir, min_elink_num, max_elink_num):
     elinks_to_skip = [
         706, 708, 720, 730, 731, 732, 742, 743, 744, 749, 762, 765, 766, 767, 768,
         901, 904, 909, 910, 911, 958, 988,
-        1027, 1031
+        1007, 1027, 1031
     ]
     print("elinks_to_skip: {0}".format(elinks_to_skip))
     
