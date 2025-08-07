@@ -9,6 +9,7 @@
 
 import tools
 import datetime
+import os
 
 def getTodayDate():
     date_format = "%Y-%m-%d"
@@ -19,8 +20,10 @@ def getTodayDate():
 def addDateToFile(original_file_name):
     today_date = getTodayDate()
     today_date = today_date.replace("-", "_")
-    split_name = original_file_name.split(".")
-    new_file_name = f"{split_name[0]}_{today_date}.{split_name[1]}"
+    # split_name = original_file_name.split(".")
+    # new_file_name = f"{split_name[0]}_{today_date}.{split_name[1]}"
+    file_base, file_extension = os.path.splitext(original_file_name)
+    new_file_name = f"{file_base}_{today_date}{file_extension}"
     print(f" - today's date: {today_date}")
     print(f" - original_file_name: {original_file_name}")
     print(f" - new_file_name: {new_file_name}")
