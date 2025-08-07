@@ -13,6 +13,15 @@ import os
 import sys
 import shutil
 
+# ---------------------------------------------
+# TODO:
+# - Export the Production tab to a .csv file (same file name, but change extension to .csv).
+# ---------------------------------------------
+# DONE:
+# - Rename the Excel file: append today's date to the end.
+# - Move the Excel file to the working area: .../eLink_Instrumentation/Analysis/data.
+# ---------------------------------------------
+
 def getTodayDate():
     date_format = "%Y-%m-%d"
     today_date_object = datetime.datetime.today()
@@ -33,8 +42,10 @@ def addDateToFile(original_file_name):
 
 def prepareElinkProductionData(excel_file, download_dir, data_dir):
     print("Preparing e-link production data...")
-    original_path = download_dir + excel_file
-    new_path = addDateToFile(original_path)
+    tools.makeDir(data_dir)
+    original_path   = download_dir + excel_file
+    new_path        = data_dir + excel_file
+    new_path = addDateToFile(new_path)
     try:
         shutil.move(original_path, new_path)
     except FileNotFoundError:

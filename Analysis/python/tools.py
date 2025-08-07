@@ -2,6 +2,8 @@
 
 import csv
 import os
+import sys
+import shutil
 import math
 import numpy as np
 
@@ -12,6 +14,13 @@ ERROR_CODE = -999
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
+
+def moveFile(original_path, new_path):
+    try:
+        shutil.move(original_path, new_path)
+    except FileNotFoundError:
+        print(f"ERROR: Cannot move file '{original_path}' as it was not found.")
+        sys.exit(1)
 
 # append slash to path if path does not end in slash
 def appendSlash(path):
