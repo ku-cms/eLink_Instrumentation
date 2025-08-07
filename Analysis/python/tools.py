@@ -13,6 +13,13 @@ def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
+# append slash to path if path does not end in slash
+def appendSlash(path):
+    slash = "/"
+    if path[-1] != slash:
+        path += slash
+    return path
+
 # check if string can be converted to int
 def is_int(num):
     try:
