@@ -15,6 +15,7 @@ def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
+# move file if it exists; if not, print error and exit
 def moveFile(original_path, new_path):
     try:
         shutil.move(original_path, new_path)
