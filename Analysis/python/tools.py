@@ -16,11 +16,11 @@ def makeDir(dir_name):
         os.makedirs(dir_name)
 
 # move file if it exists; if not, print error and exit
-def moveFile(original_path, new_path):
+def moveFile(source_file, destination_file):
     try:
-        shutil.move(original_path, new_path)
+        shutil.move(source_file, destination_file)
     except FileNotFoundError:
-        print(f"ERROR: Cannot move file '{original_path}' as it was not found.")
+        print(f"ERROR: Cannot move the file '{source_file}' as it was not found.")
         sys.exit(1)
 
 # append slash to path if path does not end in slash

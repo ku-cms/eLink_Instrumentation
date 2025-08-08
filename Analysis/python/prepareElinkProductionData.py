@@ -30,7 +30,7 @@ def getTodayDate():
 
 def addDateToFileName(original_file_name):
     print("Adding date to file name...")
-    
+
     today_date = getTodayDate()
     today_date = today_date.replace("-", "_")
     file_base, file_extension = os.path.splitext(original_file_name)
@@ -46,12 +46,14 @@ def prepareElinkProductionData(excel_file, download_dir, data_dir):
     print("Preparing e-link production data...")
 
     tools.makeDir(data_dir)
-    original_path   = download_dir + excel_file
-    new_path        = data_dir + excel_file
-    new_path        = addDateToFileName(new_path)
+    source_file         = download_dir + excel_file
+    destination_file    = data_dir + excel_file
+    destination_file    = addDateToFileName(destination_file)
     
-    print(f"Moving file to '{new_path}'...")
-    tools.moveFile(original_path, new_path)
+    print(f"Moving file...")
+    print(f" - source file: {source_file}")
+    print(f" - destination file: {destination_file}")
+    tools.moveFile(source_file, destination_file)
     
     print("Done!")
 
