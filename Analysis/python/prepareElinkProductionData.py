@@ -29,7 +29,7 @@ def prepareElinkProductionData(excel_file, excel_sheet, download_dir, data_dir):
     
     tools.moveFile(source_file, destination_file)
 
-    tools.exportExcelSheetToCSV(excel_file, excel_sheet)
+    tools.exportExcelSheetToCSV(destination_file, excel_sheet)
     
     print("Done!")
 
