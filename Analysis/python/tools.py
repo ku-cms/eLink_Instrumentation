@@ -36,8 +36,7 @@ def appendSlash(path):
     return path
 
 # get today's date
-def getTodayDate():
-    date_format = "%Y-%m-%d"
+def getTodayDate(date_format="%Y-%m-%d"):
     today_date_object = datetime.datetime.today()
     today_date = today_date_object.strftime(date_format)
     return today_date
