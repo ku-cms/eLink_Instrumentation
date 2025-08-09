@@ -19,7 +19,7 @@ def makeDir(dir_name):
 
 # move file if it exists; if not, print error and exit
 def moveFile(source_file, destination_file):
-    print("Moving Excel file...")
+    print("Moving file...")
     print(f" - source file: {source_file}")
     print(f" - destination file: {destination_file}")
     try:
