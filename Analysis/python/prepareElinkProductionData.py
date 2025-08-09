@@ -4,18 +4,18 @@
 #
 # -------------------------- #
 # Author:   Caleb Smith
-# Date:     August 7, 2025
+# Date:     August 8, 2025
 # -------------------------- #
 
 import tools
 
 # ---------------------------------------------
 # TODO:
-# - Export the Production tab to a .csv file (same file name, but change extension to .csv).
 # ---------------------------------------------
 # DONE:
 # - Rename the Excel file: append today's date to the end.
 # - Move the Excel file to the working area: .../eLink_Instrumentation/Analysis/data.
+# - Export the Production tab to a .csv file (same file name, but change extension to .csv).
 # ---------------------------------------------
 
 def prepareElinkProductionData(excel_file, excel_sheet, download_dir, data_dir):
