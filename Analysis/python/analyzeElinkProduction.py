@@ -133,11 +133,15 @@ def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
 
     # Convert date strings to datetime objects
     for stage in stages:
-        df[stage] = pd.to_datetime(df[stage], format='%m-%d-%y', errors='coerce')
+        # Auto-detect (infer) datetime format
+        df[stage] = pd.to_datetime(df[stage], errors='coerce')
     
     # Compute cumulative counts
     for stage in stages:
         stage_dates = df[stage].dropna()
+        print(f"stage: {stage}")
+        print(f" - stage_dates.min(): {stage_dates.min()}")
+        print(f" - stage_dates.max(): {stage_dates.max()}")
         counts = stage_dates.value_counts().sort_index()
         full_range = pd.date_range(start=stage_dates.min(), end=stage_dates.max())
         counts = counts.reindex(full_range, fill_value=0)
