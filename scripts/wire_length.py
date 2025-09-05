@@ -72,7 +72,7 @@ def run():
     length_type     = input(Fore.GREEN + "Enter e-link length type: " + Fore.RESET)
     #loss            = float(input(Fore.GREEN + "Enter loss per twisted pair (mm): " + Fore.RESET))
     n_elinks        = int(input(Fore.GREEN + "Enter number of e-links: " + Fore.RESET))
-    prev_wire_log   = float(input(Fore.GREEN + "Enter previous wire log entry (ft): " + Fore.RESET))
+    prev_wire_log   = int(input(Fore.GREEN + "Enter previous wire log entry (to nearest ft): " + Fore.RESET))
 
     # format wiring type
     wiring_type = script_tools.formatWiringType(wiring_type)
@@ -106,17 +106,18 @@ def run():
     # calculate wire length for a batch of n e-links
     wire_length_batch_mm = calculator.CalcWireLengthBatch(n_elinks, wire_length_elink_mm)
     wire_length_batch_ft = script_tools.convert_mm_to_ft(wire_length_batch_mm)
+    wire_length_batch_ft_round = round(wire_length_batch_ft)
 
     # calculate new wire log
-    new_wire_log = prev_wire_log - wire_length_batch_ft
+    new_wire_log = prev_wire_log - wire_length_batch_ft_round
 
     # print results
     print(Fore.GREEN + f"Wire length for 1 e-link: " + Fore.RESET)
     print(f"\t{wire_length_elink_mm:.1f} mm = {wire_length_elink_ft:.1f} ft")
     print(Fore.GREEN + f"Wire length for {n_elinks} e-links: " + Fore.RESET)
     print(f"\t{wire_length_batch_mm:.1f} mm = {wire_length_batch_ft:.1f} ft")
-    print(Fore.GREEN + f"New wire log entry: " + Fore.RESET)
-    print(f"\t{prev_wire_log:.1f} ft - {wire_length_batch_ft:.1f} ft = {new_wire_log:.1f} ft")
+    print(Fore.GREEN + f"New wire log entry (to nearest ft): " + Fore.RESET)
+    print(f"\t{prev_wire_log} ft - {wire_length_batch_ft_round} ft = {new_wire_log} ft")
     script_tools.printLine(line_length)
 
 def main():
