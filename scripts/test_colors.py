@@ -3,19 +3,25 @@
 # Colorama:
 # https://pypi.org/project/colorama/
 #
-# Warning:
+# Print all colorama colors:
+# https://stackoverflow.com/questions/61686780/python-colorama-print-all-colors
+#
+# Fix colors for Windows Command Prompt:
+# https://stackoverflow.com/questions/9848889/colorama-for-python-not-returning-colored-print-lines-on-windows
+#
+# Warning for Windows:
 #
 # By default, colors will not work in Windows Command Prompt;
 # you will only get ANSI escape codes.
 #
-# For Windows, use this line:
+# Option 1: For Windows, use this line (since colorama v0.4.6):
+# just_fix_windows_console()
+#
+# Option 2: For Windows, use this line:
 # init(convert=True)
 #
 # For other operating systems (platforms), use this line:
 # init(convert=False)
-#
-# Fix colors for Windows Command Prompt:
-# https://stackoverflow.com/questions/9848889/colorama-for-python-not-returning-colored-print-lines-on-windows
 #
 
 import script_tools
@@ -30,21 +36,7 @@ else:
     # For other OS/platforms, use convert=False:
     init(convert=False)
 
-def test_colors_v1():
-    print(f"Operating System (platform): {sys.platform}")
-    print("Testing 9 colors...")
-    print("\t1 - " + Fore.BLACK    + "BLACK"    + Fore.RESET)
-    print("\t2 - " + Fore.RED      + "RED"      + Fore.RESET)
-    print("\t3 - " + Fore.GREEN    + "GREEN"    + Fore.RESET)
-    print("\t4 - " + Fore.YELLOW   + "YELLOW"   + Fore.RESET)
-    print("\t5 - " + Fore.BLUE     + "BLUE"     + Fore.RESET)
-    print("\t6 - " + Fore.MAGENTA  + "MAGENTA"  + Fore.RESET)
-    print("\t7 - " + Fore.CYAN     + "CYAN"     + Fore.RESET)
-    print("\t8 - " + Fore.WHITE    + "WHITE"    + Fore.RESET)
-    print("\t9 - " + Fore.RESET    + "RESET"    + Fore.RESET)
-    print("Done!")
-
-def test_colors_v2(colors):
+def test_colors(colors):
     n_colors = len(colors)
     print(f"Operating System (platform): {sys.platform}")
     print(f"Testing {n_colors} colors...")
@@ -56,19 +48,16 @@ def test_colors_v2(colors):
 
 def main():
     # specify length of line for printing
-    line_length = 50
+    line_length = 40
     
+    # list of colors to test (including reset)
     colors = ["BLACK", "RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE", "RESET"]
     
     script_tools.printLine(line_length)
-    print("Running test_colors_v1()...")
+    print("Running test_colors")
     script_tools.printLine(line_length)
-    test_colors_v1()
-
+    test_colors(colors)
     script_tools.printLine(line_length)
-    print("Running test_colors_v2(colors)...")
-    script_tools.printLine(line_length)
-    test_colors_v2(colors)
 
 if __name__ == "__main__":
     main()
