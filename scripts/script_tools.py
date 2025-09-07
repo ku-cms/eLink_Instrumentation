@@ -8,6 +8,7 @@
 # Then, call functions as needed, for example:
 # script_tools.makeDir(dir_name)
 
+from colorama import Fore
 import os
 
 # creates directory if it does not exist
@@ -26,6 +27,23 @@ def group_contains_element(group, element):
 def printLine(length):
     line = "-" * length
     print(line)
+
+# get Fore for a given color
+def getColorFore(color):
+    result = None
+    color_fore_map = {
+        "BLACK"     : Fore.BLACK,
+        "RED"       : Fore.RED,
+        "GREEN"     : Fore.GREEN,
+        "YELLOW"    : Fore.YELLOW,
+        "BLUE"      : Fore.BLUE,
+        "MAGENTA"   : Fore.MAGENTA,
+        "CYAN"      : Fore.CYAN,
+        "WHITE"     : Fore.WHITE,
+        "RESET"     : Fore.RESET
+    }
+    result = color_fore_map[color]
+    return result
 
 # convert mm to ft
 def convert_mm_to_ft(value_mm):

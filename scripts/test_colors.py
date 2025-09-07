@@ -49,7 +49,9 @@ def test_colors_v2(colors):
     print(f"Operating System (platform): {sys.platform}")
     print(f"Testing {n_colors} colors...")
     for i, color in enumerate(colors, start=1):
-        print(f"\t{i} - {color}")
+        color_fore = script_tools.getColorFore(color)
+        message = f"\t{i} - " + color_fore + f"{color}" + Fore.RESET
+        print(message)
     print("Done!")
 
 def main():
@@ -59,12 +61,12 @@ def main():
     colors = ["BLACK", "RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE", "RESET"]
     
     script_tools.printLine(line_length)
-    print("Running test_colors_v1():")
+    print("Running test_colors_v1()...")
     script_tools.printLine(line_length)
     test_colors_v1()
 
     script_tools.printLine(line_length)
-    print("Running test_colors_v2(colors):")
+    print("Running test_colors_v2(colors)...")
     script_tools.printLine(line_length)
     test_colors_v2(colors)
 
