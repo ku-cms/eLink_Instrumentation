@@ -10,6 +10,7 @@
 
 from colorama import Fore
 import os
+import sys
 
 # creates directory if it does not exist
 def makeDir(dir_name):
@@ -42,7 +43,11 @@ def getColorFore(color):
         "WHITE"     : Fore.WHITE,
         "RESET"     : Fore.RESET
     }
-    result = color_fore_map[color]
+    if color in color_fore_map:
+        result = color_fore_map[color]
+    else:
+        print(f"ERROR: Did not find the color '{color}'.")
+        sys.exit(1)
     return result
 
 # convert mm to ft

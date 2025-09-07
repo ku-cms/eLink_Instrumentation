@@ -58,7 +58,7 @@ def main():
     # specify length of line for printing
     line_length = 50
     
-    colors = ["BLACK", "RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE", "RESET"]
+    colors = ["BLACK", "RED", "GREEN", "YELLOW", "BLUE", "MAGENTA", "CYAN", "WHITE", "RESET", "CHEESE"]
     
     script_tools.printLine(line_length)
     print("Running test_colors_v1()...")
