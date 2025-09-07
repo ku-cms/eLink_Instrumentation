@@ -43,11 +43,13 @@ def getColorFore(color):
         "WHITE"     : Fore.WHITE,
         "RESET"     : Fore.RESET
     }
-    if color in color_fore_map:
+
+    try:
         result = color_fore_map[color]
-    else:
-        print(f"ERROR: Did not find the color '{color}'.")
+    except KeyError:
+        print(f"KeyError in getColorFore: Did not find the color '{color}'.")
         sys.exit(1)
+    
     return result
 
 # convert mm to ft
