@@ -10,6 +10,7 @@ Use one of the following methods to prepare a .csv file with the latest e-link p
 2. Run the Python script `prepareElinkProductionData.py`, which should add today's date to the file name, move it to your working area, and export the `Production` sheet to a .csv file.
 
 ```
+cd Analysis
 python3 python/prepareElinkProductionData.py
 ```
 
