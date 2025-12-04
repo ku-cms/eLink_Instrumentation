@@ -81,8 +81,13 @@ def getValidElinkTypes():
     return valid_elink_types
 
 def checkElinkTypes(df):
+    print("Checking that e-link types are valid...")
     valid_elink_types = getValidElinkTypes()
     rows_with_invalid_types = df[~df["Type"].isin(valid_elink_types)]
+    n_types = len(valid_elink_types)
+    n_rows = len(df["Type"])
+    print(f" - number of types: {n_types}")
+    print(f" - number of rows: {n_rows}")
     if rows_with_invalid_types.empty:
         print("All e-link types in the data frame are valid.")
     else:
