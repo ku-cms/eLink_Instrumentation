@@ -63,6 +63,35 @@ def analyzeSampleData(plot_dir):
     
     print("Done!")
 
+def getValidElinkTypes():
+    valid_elink_types = [
+        "2.3 R1_G1",
+        "2.3 R1_G2",
+        "1.3 R1_G3",
+        "2.3 R2_G1",
+        "2.3 R2_G2",
+        "2.3 R2_G3",
+        "2.3 R2_G4",
+        "3.2 R3_G1",
+        "3.2 R3_G2",
+        "3.2 R4_G1",
+        "3.2 R4_G2",
+        "2.2 R4_G3"
+    ]
+    return valid_elink_types
+
+def checkElinkTypes(df):
+    valid_elink_types = getValidElinkTypes()
+    rows_with_invalid_types = df[~df["Type"].isin(valid_elink_types)]
+    if rows_with_invalid_types.empty:
+        print("All e-link types in the data frame are valid.")
+    else:
+        print("Found invalid e-link types in the data frame:")
+        for _, row in rows_with_invalid_types.iterrows():
+            serial_number = row["Harness #"]
+            elink_type = row["Type"]
+            print(f" - serial number: {serial_number}, e-link type: {elink_type}")
+
 def loadElinkProductionData(input_file, column_name):
     data = tools.getData(input_file)
     
@@ -136,6 +165,8 @@ def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
         # Auto-detect (infer) datetime format
         df[stage] = pd.to_datetime(df[stage], errors='coerce')
     
+    checkElinkTypes(df)
+
     # Compute cumulative counts
     for stage in stages:
         stage_dates = df[stage].dropna()
