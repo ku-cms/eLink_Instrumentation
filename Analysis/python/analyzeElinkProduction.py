@@ -139,9 +139,11 @@ def loadElinkProductionDataMultiStage(input_file, min_elink_number, stages):
     # Compute cumulative counts
     for stage in stages:
         stage_dates = df[stage].dropna()
+        total_completed = stage_dates.shape[0]
         print(f"stage: {stage}")
-        print(f" - stage_dates.min(): {stage_dates.min()}")
-        print(f" - stage_dates.max(): {stage_dates.max()}")
+        print(f" - min date: {stage_dates.min()}")
+        print(f" - max date: {stage_dates.max()}")
+        print(f" - total completed: {total_completed}")
         counts = stage_dates.value_counts().sort_index()
         full_range = pd.date_range(start=stage_dates.min(), end=stage_dates.max())
         counts = counts.reindex(full_range, fill_value=0)
@@ -163,7 +165,7 @@ def createPlotName(start_date, end_date):
 
 def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir):
     min_elink_number = 700
-    stages = ['Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
+    stages = ['Requested', 'Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
     
     tools.makeDir(plot_dir)
     
@@ -175,6 +177,7 @@ def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_
 
     # Use Tableau colors
     colors = {
+        "Requested"     : "tab:pink",
         "Cut"           : "tab:red",
         "Stripped"      : "tab:orange",
         "Soldered"      : "tab:blue",
