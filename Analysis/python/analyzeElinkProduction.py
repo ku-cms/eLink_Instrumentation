@@ -69,8 +69,8 @@ def getValidElinkTypes():
         "2.3 R1_G2",
         "1.3 R1_G3",
         "2.3 R2_G1",
-        "2.3 R2_G2",
-        "2.3 R2_G3",
+        # "2.3 R2_G2",
+        # "2.3 R2_G3",
         "2.3 R2_G4",
         "3.2 R3_G1",
         "3.2 R3_G2",
@@ -88,12 +88,14 @@ def checkElinkTypes(df):
     n_rows = len(df["Type"])
     print(f" - number of types: {n_types}")
     print(f" - number of rows: {n_rows}")
+    print("Number of e-links for each type:")
+    print(df["Type"].value_counts())
     if rows_with_invalid_types.empty:
         print("All e-link types in the data frame are valid.")
     else:
         print("Found invalid e-link types in the data frame:")
         for _, row in rows_with_invalid_types.iterrows():
-            serial_number = row["Harness #"]
+            serial_number = int(row["Harness #"])
             elink_type = row["Type"]
             print(f" - serial number: {serial_number}, e-link type: {elink_type}")
 
