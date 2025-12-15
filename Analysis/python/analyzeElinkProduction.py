@@ -18,6 +18,7 @@ import pandas as pd
 
 # ---------------------------------------------
 # TODO:
+# - Plot: Report number of e-links that have completed each stage
 # ---------------------------------------------
 # DONE:
 # - Load e-link production data
@@ -34,6 +35,7 @@ import pandas as pd
 # - Add legend
 # - Add arguments: start date, end date, and input file
 # - Write functions to get date objects and create plot name
+# - Plot: Add lines for number of install and total e-links
 # ---------------------------------------------
 
 def createSampleData():
@@ -202,7 +204,9 @@ def createPlotName(start_date, end_date):
     return plot_name
 
 def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_dir):
-    min_elink_number = 700
+    min_elink_number    = 700
+    num_elinks_install  = 768
+    num_elinks_total    = 1080
     stages = ['Requested', 'Cut', 'Stripped', 'Soldered', 'Epoxy', 'Turned over', 'Shipped']
     
     tools.makeDir(plot_dir)
@@ -236,7 +240,7 @@ def analyzeElinkProductionDataMultiStage(start_date, end_date, input_file, plot_
     y_label     = "Number of e-links"
     x_lim       = [start_date_object, end_date_object]
     y_lim       = []
-    plot.makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim, colors)
+    plot.makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim, colors, num_elinks_install, num_elinks_total)
     
     print("Done!")
 
