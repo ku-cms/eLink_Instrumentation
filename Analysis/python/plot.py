@@ -47,12 +47,21 @@ def makeCumulativePlot(x, y, plot_dir, plot_name, title, x_label, y_label, x_lim
 
 def makeCumulativePlotMultiStage(cumulative_data, plot_dir, plot_name, title, x_label, y_label, x_lim, y_lim, colors, num_elinks_install, num_elinks_total):
     fig, ax = plt.subplots(figsize=(12, 6))
+    
     # plot horizontal lines
-    ax.axhline(y=num_elinks_install,    label="Install",    linestyle=':',  linewidth=2, alpha=1.0, color="tab:gray")
-    ax.axhline(y=num_elinks_total,      label="Total",      linestyle='--', linewidth=2, alpha=1.0, color="tab:gray")
+    label_total     = f"Total ({num_elinks_total})"
+    label_install   = f"Install ({num_elinks_install})"
+    ax.axhline(y=num_elinks_total,      label=label_total,      linestyle='--', linewidth=2, alpha=1.0, color="tab:gray")
+    ax.axhline(y=num_elinks_install,    label=label_install,    linestyle=':',  linewidth=2, alpha=1.0, color="tab:gray")
+    
     # plot cumulative data
     for stage, cumulative_series in cumulative_data.items():
-        ax.plot(cumulative_series.index, cumulative_series.values, label=stage, linestyle='-', color=colors[stage])
+        if cumulative_series.empty:
+            completed = 0
+        else:
+            completed = int(cumulative_series.iloc[-1])
+        label_stage = f"{stage} ({completed})"
+        ax.plot(cumulative_series.index, cumulative_series.values, label=label_stage, linestyle='-', color=colors[stage])
 
     # Format x-axis to show ticks based on time interval
     ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.SUNDAY, interval=4))

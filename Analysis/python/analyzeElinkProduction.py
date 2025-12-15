@@ -18,7 +18,6 @@ import pandas as pd
 
 # ---------------------------------------------
 # TODO:
-# - Plot: Report number of e-links that have completed each stage
 # ---------------------------------------------
 # DONE:
 # - Load e-link production data
@@ -36,6 +35,7 @@ import pandas as pd
 # - Add arguments: start date, end date, and input file
 # - Write functions to get date objects and create plot name
 # - Plot: Add lines for number of install and total e-links
+# - Plot: Report number of e-links that have completed each stage
 # ---------------------------------------------
 
 def createSampleData():
