@@ -543,7 +543,7 @@ def main():
         ws.column_dimensions[col].bestFit = True
         wb.save(full_file_path)
 
-        print(Fore.GREEN + Style.BRIGHT + "4-point DC resistance measuremsnts are complete!" + Fore.RESET + Style.RESET_ALL)
+        print(Fore.GREEN + Style.BRIGHT + "4-point DC resistance measurements are complete!" + Fore.RESET + Style.RESET_ALL)
 
     # Eye BERT area measurements
     if RUN_EYE_BERT_AREA:
@@ -868,7 +868,7 @@ def main():
         wb.save(full_file_path)
 
         pygui.getWindowsWithTitle("Vivado 2020.2")[0].minimize()
-        print(Fore.GREEN + Style.BRIGHT + "Eye BERT area measuremsnts are complete!" + Fore.RESET + Style.RESET_ALL)
+        print(Fore.GREEN + Style.BRIGHT + "Eye BERT area measurements are complete!" + Fore.RESET + Style.RESET_ALL)
 
         #excel_start_return = os.system('start "excel" ' + full_file_path)
 
